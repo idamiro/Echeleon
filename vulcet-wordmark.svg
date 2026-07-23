@@ -6,7 +6,7 @@
 >
   <title id="vulcet-title">Vulcet</title>
   <desc id="vulcet-description">A custom geometric wordmark built from six original vector letterforms.</desc>
-  <g fill="currentColor">
+  <g fill="#07080b">
     <path id="vulcet-v" d="M20 30H46L70 112L94 30H120L83 150H57L20 30Z"/>
     <path id="vulcet-u" d="M145 30H170V108L181 125H209L220 108V30H245V117L222 150H168L145 117V30Z"/>
     <path id="vulcet-l" d="M270 30H295V125H355V150H270V30Z"/>

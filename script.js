@@ -88,6 +88,11 @@ const revealGroups = [
   ['.services-hero .editorial-label, .services-hero h1, .services-hero-copy > *', 'editorial'],
   ['.service-detail-heading > *, .service-visual, .service-audience, .service-inclusions, .inclusion-groups article, .service-detail-footer', 'service'],
   ['.care-grid > *, .capabilities-grid > *, .services-process-grid > *, .services-qualification-grid > *', 'process'],
+  ['.home-services-heading, .home-service-row, .home-services-note', 'service'],
+  ['.v-services-hero .editorial-label, .v-services-hero h1, .v-hero-copy, .v-hero-facts', 'editorial'],
+  ['.v-section-intro > *, .v-service-card, .v-overview-pricing', 'service'],
+  ['.v-detail-heading > *, .v-detail-visual, .v-detail-fit, .v-detail-scope, .v-detail-commercial', 'project'],
+  ['.v-capabilities-intro, .v-capability-groups article, .v-care-object, .v-process-step, .v-faq .faq-item, .v-final-grid > *', 'process'],
 ];
 
 const revealItems = [];
@@ -133,6 +138,24 @@ if (finePointer && !reduceMotion) {
   if (portrait) bindPointer(portrait, '--portrait-x', '--portrait-y', 10);
   document.querySelectorAll('.service-row').forEach(row => bindPointer(row, '--row-x', '--row-y', 8));
   document.querySelectorAll('.button').forEach(button => bindPointer(button, '--button-x', '--button-y', 5));
+  document.querySelectorAll('.v-service-card').forEach(card => {
+    card.addEventListener('pointermove', event => {
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty('--card-light-x', `${((event.clientX - rect.left) / rect.width * 100).toFixed(1)}%`);
+      card.style.setProperty('--card-light-y', `${((event.clientY - rect.top) / rect.height * 100).toFixed(1)}%`);
+    });
+  });
+}
+
+const servicesProcessSteps = [...document.querySelectorAll('.v-process-step')];
+if (servicesProcessSteps.length && !reduceMotion) {
+  const servicesProcessObserver = new IntersectionObserver(entries => {
+    const visible = entries
+      .filter(entry => entry.isIntersecting)
+      .sort((a, b) => Math.abs(a.boundingClientRect.top - innerHeight * .48) - Math.abs(b.boundingClientRect.top - innerHeight * .48));
+    if (visible[0]) servicesProcessSteps.forEach(step => step.classList.toggle('is-current', step === visible[0].target));
+  }, { rootMargin: '-32% 0px -32% 0px' });
+  servicesProcessSteps.forEach(step => servicesProcessObserver.observe(step));
 }
 
 let scrollFrame = 0;

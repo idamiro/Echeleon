@@ -3249,3 +3249,169 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
     padding: 24px 0 28px;
   }
 }
+
+/* Vulcet home Services preview */
+.home-services-preview {
+  padding: 144px 0;
+  background: var(--paper-light);
+}
+
+.home-services-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0,1fr));
+  gap: 24px;
+}
+
+.home-services-grid > .editorial-label {
+  grid-column: 1 / 3;
+}
+
+.home-services-heading {
+  grid-column: 3 / 11;
+}
+
+.home-services-heading h2 {
+  margin: 0;
+  max-width: 900px;
+  font-size: clamp(52px, 5vw, 74px);
+  line-height: .98;
+  font-weight: 560;
+  letter-spacing: -.05em;
+}
+
+.home-services-heading .text-link {
+  margin-top: 36px;
+}
+
+.home-service-list {
+  grid-column: 3 / 13;
+  margin-top: 82px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.home-service-row {
+  position: relative;
+  min-height: 156px;
+  padding: 28px 26px 28px 0;
+  border-top: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: 54px 1.2fr 1.4fr .7fr 24px;
+  gap: 24px;
+  align-items: center;
+  transition: padding 360ms var(--ease-standard), background 360ms var(--ease-standard), color 360ms var(--ease-standard);
+}
+
+.home-service-row > span {
+  color: var(--graphite);
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.home-service-row h3 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.05;
+  font-weight: 570;
+  letter-spacing: -.035em;
+}
+
+.home-service-row p {
+  margin: 0;
+  color: var(--graphite);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.home-service-row strong {
+  justify-self: end;
+  font-size: 14px;
+  font-weight: 620;
+}
+
+.home-service-row > i {
+  justify-self: end;
+  font-size: 18px;
+  font-style: normal;
+  transition: transform 260ms var(--ease-standard);
+}
+
+.home-service-row:hover,
+.home-service-row:focus-visible {
+  padding-left: 22px;
+  background: #ececef;
+}
+
+.home-service-row:hover > i,
+.home-service-row:focus-visible > i {
+  transform: translate(3px,-3px);
+}
+
+.home-service-row--primary {
+  min-height: 178px;
+  padding-left: 22px;
+  background: var(--coal);
+  color: var(--paper-light);
+}
+
+.home-service-row--primary > span,
+.home-service-row--primary p {
+  color: var(--dark-muted);
+}
+
+.home-service-row--primary:hover,
+.home-service-row--primary:focus-visible {
+  padding-left: 34px;
+  background: #202127;
+}
+
+.home-services-note {
+  grid-column: 8 / 13;
+  margin: 36px 0 0;
+  color: var(--graphite);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+@media (max-width: 899px) {
+  .home-services-grid {
+    grid-template-columns: repeat(8, minmax(0,1fr));
+    gap: 20px;
+  }
+  .home-services-grid > .editorial-label { grid-column: 1 / 9; }
+  .home-services-heading { grid-column: 1 / 8; margin-top: 28px; }
+  .home-service-list { grid-column: 1 / 9; }
+  .home-service-row { grid-template-columns: 42px 1fr 1.25fr .65fr 20px; gap: 18px; }
+  .home-services-note { grid-column: 5 / 9; }
+}
+
+@media (max-width: 599px) {
+  .home-services-preview { padding: 96px 0; }
+  .home-services-grid {
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 16px;
+  }
+  .home-services-grid > .editorial-label,
+  .home-services-heading,
+  .home-service-list,
+  .home-services-note { grid-column: 1 / 5; }
+  .home-services-heading h2 { font-size: 41px; line-height: 1.01; }
+  .home-service-list { margin-top: 60px; }
+  .home-service-row {
+    min-height: 230px;
+    padding: 24px 0;
+    display: grid;
+    grid-template-columns: 34px 1fr 20px;
+    gap: 12px;
+    align-content: center;
+  }
+  .home-service-row h3 { grid-column: 2; font-size: 27px; }
+  .home-service-row > i { grid-column: 3; grid-row: 1 / 3; align-self: center; }
+  .home-service-row p { grid-column: 2 / 4; margin-top: 12px; }
+  .home-service-row strong { grid-column: 2 / 4; justify-self: start; margin-top: 20px; }
+  .home-service-row:hover,
+  .home-service-row:focus-visible { padding-left: 14px; }
+  .home-service-row--primary { min-height: 250px; padding-inline: 18px; }
+  .home-service-row--primary:hover,
+  .home-service-row--primary:focus-visible { padding-left: 24px; }
+  .home-services-note { margin-top: 28px; }
+}
