@@ -1,0 +1,17 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 745 180"
+  role="img"
+  aria-labelledby="vulcet-title vulcet-description"
+>
+  <title id="vulcet-title">Vulcet</title>
+  <desc id="vulcet-description">A custom geometric wordmark built from six original vector letterforms.</desc>
+  <g fill="currentColor">
+    <path id="vulcet-v" d="M20 30H46L70 112L94 30H120L83 150H57L20 30Z"/>
+    <path id="vulcet-u" d="M145 30H170V108L181 125H209L220 108V30H245V117L222 150H168L145 117V30Z"/>
+    <path id="vulcet-l" d="M270 30H295V125H355V150H270V30Z"/>
+    <path id="vulcet-c" d="M400 30H480V55H412L400 67V113L412 125H480V150H400L375 125V55L400 30Z"/>
+    <path id="vulcet-e" d="M505 30H600V55H530V78H590V103H530V125H600V150H505V30Z"/>
+    <path id="vulcet-t" d="M625 30H725V55H688V150H662V55H625V30Z"/>
+  </g>
+</svg>

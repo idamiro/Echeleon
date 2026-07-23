@@ -1660,3 +1660,34 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 @media (max-width: 599px) and (prefers-reduced-motion: reduce) {
   .hero-lens span { animation: none !important; }
 }
+
+/* Vulcet custom geometric wordmark */
+.wordmark {
+  width: 124px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.wordmark img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.footer .wordmark img {
+  filter: invert(1);
+}
+
+@media (max-width: 899px) {
+  .wordmark {
+    width: 116px;
+  }
+}
+
+@media (max-width: 599px) {
+  .wordmark {
+    width: 108px;
+  }
+}
