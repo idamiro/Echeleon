@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Start a project with Vulcet. Share the business goal, scope and timing for your website or digital product.">
+  <meta property="og:title" content="Contact — Vulcet">
+  <meta property="og:description" content="Tell us what needs to move.">
+  <meta property="og:type" content="website">
+  <title>Contact — Vulcet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css?v=20260724-16">
+  <link rel="stylesheet" href="../contact.css?v=20260724-16">
+  <script src="../script.js?v=20260724-16" defer></script>
+  <script src="../contact.js?v=20260724-16" defer></script>
+</head>
+<body class="contact-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="shell header-grid">
+      <a class="wordmark" href="../" aria-label="Vulcet home"><img src="../vulcet-wordmark.svg" alt=""></a>
+      <nav class="desktop-nav" aria-label="Primary navigation"><a href="../#work">Work</a><a href="../services/">Services</a><a href="../#process">Process</a><a href="./" aria-current="page">Contact</a></nav>
+      <a class="button button--primary header-cta" href="#project-brief">Start a project <span aria-hidden="true">↘</span></a>
+      <button class="menu-trigger" type="button" aria-expanded="false" aria-controls="mobile-nav"><span class="sr-only">Open menu</span><span class="menu-icon" aria-hidden="true"><i></i><i></i></span></button>
+    </div>
+    <div id="mobile-nav" class="mobile-nav" aria-hidden="true">
+      <nav aria-label="Mobile navigation"><a href="../#work">Work</a><a href="../services/">Services</a><a href="../#process">Process</a><a href="./" aria-current="page">Contact</a></nav>
+      <a class="button button--primary" href="#project-brief">Start a project <span aria-hidden="true">↘</span></a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="contact-hero">
+      <div class="contact-signal" aria-hidden="true">
+        <div class="contact-signal-ring contact-signal-ring--outer"></div>
+        <div class="contact-signal-ring contact-signal-ring--inner"></div>
+        <i></i><i></i><i></i><span></span>
+      </div>
+      <div class="shell contact-hero-grid">
+        <div class="editorial-label editorial-label--dark"><span>01</span><span>Contact</span></div>
+        <h1>Tell us what needs to <em>move.</em></h1>
+        <div class="contact-hero-copy">
+          <p>Share the business challenge, what the website or product needs to accomplish, and where you are in the process.</p>
+          <a href="mailto:hello@vulcet.com">hello@vulcet.com <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="contact-hero-meta">
+          <div><span>Good starting point</span><p>A current website, a clear business goal and an approximate budget.</p></div>
+          <div><span>Working model</span><p>Direct collaboration across strategy, design and engineering.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact-brief" id="project-brief" aria-labelledby="brief-title">
+      <div class="shell contact-brief-grid">
+        <div class="contact-brief-heading">
+          <div class="editorial-label"><span>02</span><span>Project brief</span></div>
+          <h2 id="brief-title">A useful first conversation starts with context.</h2>
+          <p>This short brief prepares an email with the essential project information. Nothing is sent until you approve it in your email application.</p>
+        </div>
+
+        <div class="contact-form-wrap">
+          <div class="contact-progress" aria-label="Form progress">
+            <div class="is-active" data-progress="1"><span>1</span><strong>Project fit</strong></div>
+            <div data-progress="2"><span>2</span><strong>Project details</strong></div>
+          </div>
+
+          <form class="contact-form" id="contact-form" novalidate>
+            <fieldset data-step="1">
+              <legend class="sr-only">Project fit</legend>
+              <div class="contact-field">
+                <label for="contact-name">Name <span aria-hidden="true">*</span></label>
+                <input id="contact-name" name="name" type="text" autocomplete="name" required>
+              </div>
+              <div class="contact-field">
+                <label for="contact-email">Work email <span aria-hidden="true">*</span></label>
+                <input id="contact-email" name="email" type="email" autocomplete="email" required>
+              </div>
+              <div class="contact-field contact-field--wide">
+                <label for="contact-company">Company / organisation</label>
+                <input id="contact-company" name="company" type="text" autocomplete="organization">
+              </div>
+              <div class="contact-field">
+                <label for="contact-need">What do you need? <span aria-hidden="true">*</span></label>
+                <select id="contact-need" name="need" required>
+                  <option value="">Select one</option>
+                  <option>Essential Website</option>
+                  <option>Growth Website</option>
+                  <option>Custom Digital Product</option>
+                  <option>Care &amp; Support</option>
+                  <option>Not sure yet</option>
+                </select>
+              </div>
+              <div class="contact-field">
+                <label for="contact-budget">Estimated budget <span aria-hidden="true">*</span></label>
+                <select id="contact-budget" name="budget" required>
+                  <option value="">Select a range</option>
+                  <option>$1,200–$2,000</option>
+                  <option>$2,000–$4,000</option>
+                  <option>$4,000–$8,000</option>
+                  <option>$8,000+</option>
+                  <option>Not defined yet</option>
+                </select>
+              </div>
+              <div class="contact-form-actions contact-field--wide">
+                <button class="button button--primary" type="button" data-next>Continue <span aria-hidden="true">→</span></button>
+              </div>
+            </fieldset>
+
+            <fieldset data-step="2" hidden>
+              <legend class="sr-only">Project details</legend>
+              <div class="contact-field">
+                <label for="contact-website">Current website</label>
+                <input id="contact-website" name="website" type="url" inputmode="url" placeholder="https://">
+              </div>
+              <div class="contact-field">
+                <label for="contact-start">Preferred start date</label>
+                <select id="contact-start" name="start">
+                  <option>As soon as possible</option>
+                  <option>Within 1–2 months</option>
+                  <option>Within 3–4 months</option>
+                  <option>Later / flexible</option>
+                </select>
+              </div>
+              <div class="contact-field contact-field--wide">
+                <label for="contact-details">Tell us about the project <span aria-hidden="true">*</span></label>
+                <textarea id="contact-details" name="details" rows="7" required placeholder="What is changing, what is not working today, and what should the new platform accomplish?"></textarea>
+              </div>
+              <div class="contact-field contact-field--wide">
+                <label for="contact-source">How did you hear about Vulcet?</label>
+                <input id="contact-source" name="source" type="text">
+              </div>
+              <div class="contact-consent contact-field--wide">
+                <input id="contact-consent" name="consent" type="checkbox" required>
+                <label for="contact-consent">I agree to include this information in an email to Vulcet. <span aria-hidden="true">*</span></label>
+              </div>
+              <div class="contact-form-actions contact-field--wide">
+                <button class="contact-back" type="button" data-back>← Back</button>
+                <button class="button button--primary" type="submit">Prepare email <span aria-hidden="true">↗</span></button>
+              </div>
+            </fieldset>
+            <p class="contact-form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact-direct">
+      <div class="shell contact-direct-grid">
+        <div class="editorial-label editorial-label--dark"><span>03</span><span>Direct contact</span></div>
+        <p>Prefer to keep it simple?</p>
+        <a href="mailto:hello@vulcet.com">hello@vulcet.com <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-signal" aria-hidden="true"><span></span><b></b></div>
+    <div class="shell footer-grid">
+      <div class="footer-brand"><a class="wordmark" href="../" aria-label="Vulcet home"><img src="../vulcet-wordmark.svg" alt=""></a><p>Strategy, design and development for businesses ready to move forward.</p></div>
+      <nav aria-label="Footer navigation"><span>Navigate</span><a href="../">Home</a><a href="../#work">Work</a><a href="../services/">Services</a><a href="../#process">Process</a><a href="./" aria-current="page">Contact</a></nav>
+      <div class="footer-contact"><span>Contact</span><a href="mailto:hello@vulcet.com">hello@vulcet.com</a><p>Working internationally</p></div>
+      <div class="footer-utility"><small>© <span id="year"></span> Vulcet</small><small>Strategy, design and development in one direct process.</small><small>Working internationally</small></div>
+    </div>
+  </footer>
+</body>
+</html>
