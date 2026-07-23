@@ -1300,3 +1300,21 @@ html, body { max-width: 100%; overflow-x: clip; }
   .project-shot--home, .mobile-shot--home, .film-index b:first-child { opacity: 1; transform: none; }
   .project-shot--events, .project-shot--news, .mobile-shot--event, .mobile-shot--news, .film-index b:not(:first-child) { opacity: 0; }
 }
+
+/* Content trim and project-caption flow */
+@media (min-width: 900px) {
+  .project-canvas { position: relative; top: auto; }
+  .project-caption { grid-column: 2 / 8; margin-top: 34px; padding-right: 28px; }
+  .project-link { grid-column: 9 / 13; margin-top: 34px; align-self: start; }
+  .growth-grid { padding-bottom: 112px; }
+}
+
+@media (max-width: 899px) {
+  .growth-grid { padding-bottom: 92px; }
+}
+
+@media (max-width: 599px) {
+  .project-caption { margin-top: 30px; padding-right: 0; }
+  .project-link { margin-top: 22px; }
+  .growth-grid { padding-bottom: 76px; }
+}
