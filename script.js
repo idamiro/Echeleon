@@ -86,7 +86,7 @@ const revealGroups = [
   ['.faq-grid > .editorial-label, .faq-grid > h2, .faq-item', 'faq'],
   ['.final-grid > .editorial-label, .final-grid h2, .final-support, .footer-grid > *', 'final'],
   ['.services-hero .editorial-label, .services-hero h1, .services-hero-copy > *', 'editorial'],
-  ['.service-detail-heading > *, .service-audience, .service-inclusions, .service-detail-footer', 'service'],
+  ['.service-detail-heading > *, .service-visual, .service-audience, .service-inclusions, .inclusion-groups article, .service-detail-footer', 'service'],
   ['.care-grid > *, .capabilities-grid > *, .services-process-grid > *, .services-qualification-grid > *', 'process'],
 ];
 
