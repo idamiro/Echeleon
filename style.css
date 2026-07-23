@@ -3415,3 +3415,34 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   .home-service-row--primary:focus-visible { padding-left: 24px; }
   .home-services-note { margin-top: 28px; }
 }
+
+/* Compact home services revision */
+.home-services-preview {
+  padding: 104px 0;
+}
+
+.home-services-heading h2 {
+  font-size: clamp(40px, 3.4vw, 52px);
+}
+
+.home-service-list {
+  margin-top: 60px;
+}
+
+.home-service-row {
+  min-height: 112px;
+}
+
+@media (max-width: 599px) {
+  .home-services-preview {
+    padding: 72px 0;
+  }
+
+  .home-services-heading h2 {
+    font-size: 36px;
+  }
+
+  .home-service-list {
+    margin-top: 44px;
+  }
+}

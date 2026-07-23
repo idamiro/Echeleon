@@ -1333,3 +1333,462 @@
   .v-service-card::before { display: none; }
   .v-process-step { opacity: 1; }
 }
+
+/* Compact services revision */
+.v-services-hero,
+.v-services-hero-grid {
+  min-height: 680px;
+}
+
+.v-services-hero-grid {
+  padding-top: 52px;
+}
+
+.v-services-hero h1 {
+  margin-top: 58px;
+  max-width: 900px;
+  font-size: clamp(52px, 4.8vw, 72px);
+  line-height: .94;
+}
+
+.v-hero-copy {
+  margin-top: 38px;
+}
+
+.v-hero-copy > p {
+  font-size: 18px;
+}
+
+.v-hero-actions {
+  margin-top: 26px;
+}
+
+.v-hero-facts {
+  margin-top: 44px;
+  min-height: 70px;
+}
+
+.v-hero-system {
+  width: 190px;
+  height: 190px;
+}
+
+.v-hero-system::after {
+  inset: 68px;
+}
+
+.v-service-overview {
+  padding: 104px 0 96px;
+}
+
+.v-section-intro h2,
+.v-capabilities-intro h2 {
+  font-size: clamp(40px, 3.4vw, 52px);
+}
+
+.v-section-intro > p {
+  margin-top: 32px;
+}
+
+.v-service-cards {
+  margin-top: 70px;
+}
+
+.v-service-card {
+  padding: 25px;
+}
+
+.v-service-card--essential {
+  min-height: 680px;
+  margin-top: 34px;
+}
+
+.v-service-card--growth {
+  min-height: 760px;
+  padding: 30px;
+}
+
+.v-service-card--product {
+  min-height: 710px;
+  margin-top: 58px;
+}
+
+.v-service-card h3 {
+  margin-top: 34px;
+  font-size: clamp(35px, 2.8vw, 45px);
+}
+
+.v-card-summary {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.v-card-price {
+  margin-top: 28px;
+}
+
+.v-card-price strong {
+  font-size: 21px;
+}
+
+.v-card-fit,
+.v-card-scope,
+.v-card-duration {
+  margin-top: 20px;
+  padding-top: 14px;
+}
+
+.v-card-scope li {
+  min-height: 34px;
+  padding: 7px 0;
+}
+
+.v-service-card > .button {
+  margin-top: 22px;
+}
+
+.v-overview-pricing {
+  margin-top: 42px;
+}
+
+.v-detail {
+  padding: 96px 0;
+}
+
+.v-detail-heading h2 {
+  grid-column: 3 / 9;
+  font-size: clamp(40px, 3.4vw, 52px);
+}
+
+.v-detail-heading > p {
+  grid-column: 8 / 13;
+  margin-top: 26px;
+  font-size: 16px;
+}
+
+.v-detail-fit,
+.v-detail-scope {
+  margin-top: 64px;
+}
+
+.v-detail-fit li,
+.v-scope-columns li {
+  min-height: 44px;
+  padding: 11px 0;
+  font-size: 13px;
+}
+
+.v-detail-commercial {
+  margin-top: 54px;
+}
+
+.v-detail--product .v-detail-scope,
+.v-detail--product .v-detail-commercial {
+  grid-column: 5 / 13;
+}
+
+.v-capabilities {
+  padding: 104px 0;
+}
+
+.v-capabilities-intro p {
+  margin-top: 24px;
+  font-size: 15px;
+}
+
+.v-capability-groups {
+  margin-top: 62px;
+}
+
+.v-capability-groups article {
+  min-height: 142px;
+  padding: 24px 0;
+}
+
+.v-capability-groups h3 {
+  font-size: 25px;
+}
+
+.v-capability-groups li {
+  min-height: 40px;
+  padding: 10px 0;
+}
+
+.v-care {
+  padding: 104px 0;
+  background: var(--coal);
+  color: var(--paper-light);
+}
+
+.v-care-grid > .editorial-label {
+  color: rgba(250,248,243,.72);
+}
+
+.v-care-grid > .editorial-label span:first-child {
+  color: var(--paper-light);
+}
+
+.v-care-object {
+  padding: 44px;
+  border-color: var(--dark-rule);
+  background: #202127;
+  grid-template-columns: 1.25fr 1fr .85fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.v-care-object::after {
+  display: none;
+}
+
+.v-care-intro,
+.v-care-services,
+.v-care-commercial {
+  min-width: 0;
+}
+
+.v-care-status {
+  grid-column: auto;
+  color: #a8abb3;
+}
+
+.v-care-intro h2 {
+  margin: 34px 0 0;
+  font-size: clamp(40px, 3.6vw, 54px);
+  line-height: .98;
+  font-weight: 560;
+  letter-spacing: -.045em;
+}
+
+.v-care-intro > p {
+  margin: 20px 0 0;
+  color: var(--dark-muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.v-care-services > span {
+  display: block;
+  color: #a8abb3;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.v-care-object .v-care-services ul {
+  margin: 22px 0 0;
+  padding: 0;
+  border: 0;
+  display: block;
+}
+
+.v-care-object .v-care-services li {
+  min-height: 42px;
+  padding: 11px 0;
+  border-color: var(--dark-rule);
+  font-size: 13px;
+}
+
+.v-care-price {
+  grid-column: auto;
+  grid-row: auto;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.v-care-price span {
+  color: #a8abb3;
+}
+
+.v-care-price strong {
+  color: var(--paper-light);
+  font-size: 32px;
+}
+
+.v-care-price strong small {
+  color: var(--dark-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.v-care-note {
+  margin: 24px 0 0;
+  color: var(--dark-muted);
+}
+
+.v-care-object .button {
+  grid-column: auto;
+  justify-self: stretch;
+  width: 100%;
+  min-width: 0;
+  margin-top: 28px;
+}
+
+.v-faq {
+  padding: 104px 0;
+}
+
+.v-faq-grid > h2 {
+  font-size: clamp(40px, 3.4vw, 52px);
+}
+
+.v-faq-grid > .faq-list {
+  margin-top: 68px;
+}
+
+@media (max-width: 899px) {
+  .v-services-hero,
+  .v-services-hero-grid {
+    min-height: 650px;
+  }
+
+  .v-services-hero h1 {
+    margin-top: 58px;
+    font-size: 58px;
+  }
+
+  .v-service-overview,
+  .v-detail,
+  .v-capabilities,
+  .v-care,
+  .v-faq {
+    padding-block: 84px;
+  }
+
+  .v-service-card--essential {
+    margin-top: 32px;
+  }
+
+  .v-service-card--product {
+    margin-top: 0;
+  }
+
+  .v-detail-heading h2 {
+    grid-column: 1 / 7;
+  }
+
+  .v-detail-heading > p {
+    grid-column: 4 / 9;
+  }
+
+  .v-care-object {
+    padding: 36px;
+    grid-template-columns: 1fr 1fr;
+    gap: 42px 32px;
+  }
+
+  .v-care-intro {
+    grid-column: 1 / 3;
+  }
+}
+
+@media (max-width: 599px) {
+  .v-services-hero,
+  .v-services-hero-grid {
+    min-height: 0;
+  }
+
+  .v-services-hero-grid {
+    padding-top: 28px;
+    padding-bottom: 54px;
+  }
+
+  .v-services-hero h1 {
+    margin-top: 58px;
+    font-size: clamp(39px, 11.5vw, 47px);
+    line-height: .97;
+  }
+
+  .v-hero-copy {
+    margin-top: 32px;
+  }
+
+  .v-hero-copy > p {
+    font-size: 16px;
+  }
+
+  .v-hero-actions {
+    margin-top: 24px;
+  }
+
+  .v-hero-facts {
+    margin-top: 40px;
+  }
+
+  .v-service-overview,
+  .v-detail,
+  .v-capabilities,
+  .v-care,
+  .v-faq {
+    padding-block: 72px;
+  }
+
+  .v-section-intro h2,
+  .v-detail-heading h2,
+  .v-capabilities-intro h2,
+  .v-faq-grid > h2 {
+    font-size: 36px;
+  }
+
+  .v-service-cards {
+    margin-top: 48px;
+  }
+
+  .v-service-card,
+  .v-service-card--essential,
+  .v-service-card--growth,
+  .v-service-card--product {
+    padding: 22px 20px;
+  }
+
+  .v-service-card h3 {
+    margin-top: 30px;
+    font-size: 37px;
+  }
+
+  .v-detail-heading > p {
+    margin-top: 22px;
+    font-size: 15px;
+  }
+
+  .v-detail-fit,
+  .v-detail-scope {
+    margin-top: 44px;
+  }
+
+  .v-detail-commercial {
+    margin-top: 44px;
+  }
+
+  .v-capability-groups {
+    margin-top: 48px;
+  }
+
+  .v-capability-groups article {
+    padding: 22px 0;
+  }
+
+  .v-care-object {
+    padding: 28px 22px;
+    display: block;
+  }
+
+  .v-care-intro h2 {
+    margin-top: 28px;
+    font-size: 38px;
+  }
+
+  .v-care-services,
+  .v-care-commercial {
+    margin-top: 42px;
+  }
+
+  .v-care-price strong {
+    font-size: 28px;
+  }
+
+  .v-faq-grid > .faq-list {
+    margin-top: 44px;
+  }
+}
