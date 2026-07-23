@@ -5,7 +5,19 @@
   const steps = [...form.querySelectorAll('[data-step]')];
   const progress = [...document.querySelectorAll('[data-progress]')];
   const status = form.querySelector('.contact-form-status');
+  const projectTypes = [...form.querySelectorAll('input[name="project_type"]')];
+  const existingUrlWrap = form.querySelector('.contact-existing-url');
+  const existingUrl = form.querySelector('#contact-website');
+  const submitButton = form.querySelector('button[type="submit"]');
+  const success = document.querySelector('#contact-success');
   let activeStep = 1;
+
+  const updateWebsiteField = () => {
+    const needsExistingUrl = projectTypes.some((input) => input.checked && input.value === 'Redesign an existing website');
+    existingUrlWrap.hidden = !needsExistingUrl;
+    existingUrl.required = needsExistingUrl;
+    if (!needsExistingUrl) existingUrl.value = '';
+  };
 
   const showStep = (step) => {
     activeStep = step;
@@ -43,29 +55,37 @@
   });
 
   form.querySelector('[data-back]')?.addEventListener('click', () => showStep(1));
+  projectTypes.forEach((input) => input.addEventListener('change', updateWebsiteField));
+  updateWebsiteField();
 
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!validateStep(activeStep)) return;
 
-    const data = new FormData(form);
-    const subject = `Project enquiry — ${data.get('company') || data.get('name')}`;
-    const body = [
-      `Name: ${data.get('name')}`,
-      `Work email: ${data.get('email')}`,
-      `Company / organisation: ${data.get('company') || 'Not provided'}`,
-      `What is needed: ${data.get('need')}`,
-      `Estimated budget: ${data.get('budget')}`,
-      `Current website: ${data.get('website') || 'Not provided'}`,
-      `Preferred start: ${data.get('start')}`,
-      '',
-      'Project details:',
-      data.get('details'),
-      '',
-      `How they found Vulcet: ${data.get('source') || 'Not provided'}`
-    ].join('\n');
+    submitButton.disabled = true;
+    submitButton.setAttribute('aria-busy', 'true');
+    status.textContent = 'Sending your project brief…';
 
-    status.textContent = 'Your project brief is ready. Continue in your email application to send it.';
-    window.location.href = `mailto:hello@vulcet.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' }
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) throw new Error(result.message || 'Submission failed');
+
+      form.reset();
+      updateWebsiteField();
+      form.hidden = true;
+      document.querySelector('.contact-progress').hidden = true;
+      success.hidden = false;
+      success.focus?.();
+    } catch (error) {
+      status.setAttribute('role', 'alert');
+      status.textContent = 'The brief could not be sent. Please try again or email hello@vulcet.com.';
+      submitButton.disabled = false;
+      submitButton.removeAttribute('aria-busy');
+    }
   });
 })();

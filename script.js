@@ -88,7 +88,6 @@ const revealGroups = [
   ['.services-hero .editorial-label, .services-hero h1, .services-hero-copy > *', 'editorial'],
   ['.service-detail-heading > *, .service-visual, .service-audience, .service-inclusions, .inclusion-groups article, .service-detail-footer', 'service'],
   ['.care-grid > *, .capabilities-grid > *, .services-process-grid > *, .services-qualification-grid > *', 'process'],
-  ['.home-services-heading, .home-service-row, .home-services-note', 'service'],
   ['.v-services-hero .editorial-label, .v-services-hero h1, .v-hero-copy, .v-hero-facts', 'editorial'],
   ['.v-section-intro > *, .v-service-card, .v-overview-pricing', 'service'],
   ['.v-detail-heading > *, .v-detail-visual, .v-detail-fit, .v-detail-scope, .v-detail-commercial', 'project'],
