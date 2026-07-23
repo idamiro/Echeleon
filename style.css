@@ -615,6 +615,12 @@ body { background: var(--paper); }
 }
 
 @media (max-width: 599px) {
+  html[data-motion="ready"] .motion-reveal[data-reveal] {
+    transform: translate3d(0,10px,0);
+    transition-property: opacity, transform;
+  }
+  html[data-motion="ready"] .motion-reveal[data-reveal].is-visible { transform: translate3d(0,0,0); }
+
   .shell { width: calc(100% - 32px); }
   .site-header { height: 68px; }
   .wordmark { font-size: 18px; }
@@ -1639,9 +1645,9 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   .project-modules { bottom: 47px; }
   .project-film-progress { bottom: 17px; }
 
-  .closing-field { display: none; }
+  .closing-field { display: block; }
   .final-cta { min-height: 540px; }
-  .footer-signal::before, .footer-signal::after, .footer-signal span, .footer-signal b { display: none; }
+  .footer-signal::before, .footer-signal::after, .footer-signal span, .footer-signal b { display: block; }
   .footer { min-height: 600px; }
   .footer-grid { min-height: 600px; }
 }
