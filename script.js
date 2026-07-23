@@ -11,6 +11,8 @@ if (headerTrigger) {
   new IntersectionObserver(([entry]) => header.classList.toggle('site-header--fixed', !entry.isIntersecting)).observe(headerTrigger);
 }
 
+let menuScrollY = 0;
+
 function setMenu(open) {
   if (!menuButton || !mobileNav) return;
   menuButton.setAttribute('aria-expanded', String(open));
@@ -18,7 +20,15 @@ function setMenu(open) {
   mobileNav.classList.toggle('mobile-nav--open', open);
   menuButton.querySelector('.menu-icon').classList.toggle('menu-icon--open', open);
   menuButton.querySelector('.sr-only').textContent = open ? 'Close menu' : 'Open menu';
-  document.body.classList.toggle('nav-open', open);
+  if (open) {
+    menuScrollY = window.scrollY;
+    document.documentElement.classList.add('nav-open');
+    document.body.classList.add('nav-open');
+  } else {
+    document.documentElement.classList.remove('nav-open');
+    document.body.classList.remove('nav-open');
+    requestAnimationFrame(() => window.scrollTo(0, menuScrollY));
+  }
   if (open) requestAnimationFrame(() => mobileNav.querySelector('a')?.focus());
 }
 
