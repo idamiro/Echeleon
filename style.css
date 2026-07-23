@@ -3046,3 +3046,206 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
     font-size: 14px;
   }
 }
+
+/* Services readability and original imagery correction */
+.service-detail-heading h2,
+.service-detail-heading > p,
+.service-audience li,
+.inclusion-groups h4,
+.inclusion-groups p {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.service-detail-heading h2,
+.inclusion-groups h4 {
+  text-wrap: balance;
+}
+
+.service-visual,
+.service-visual--product {
+  height: auto;
+  padding: 0;
+  display: block;
+  overflow: hidden;
+  background: transparent;
+  color: var(--coal);
+}
+
+.service-detail--primary .service-visual {
+  color: var(--paper-light);
+}
+
+.service-visual::after,
+.service-visual--essential::after,
+.service-visual--growth::after,
+.service-visual--product::after {
+  display: none;
+}
+
+.service-visual .service-visual-media,
+.service-visual--essential .service-visual-media {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: clamp(420px, 45vw, 640px);
+  overflow: hidden;
+  background: #111217;
+  animation: none;
+}
+
+.service-visual .service-visual-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: none;
+}
+
+.service-visual--essential .service-visual-media img {
+  animation: service-camera-drift 16s var(--ease-standard) infinite alternate;
+}
+
+.service-visual--growth .service-visual-media img {
+  animation: service-growth-drift 18s var(--ease-standard) infinite alternate;
+}
+
+.service-visual--product .service-visual-media img {
+  animation: service-product-drift 15s var(--ease-standard) infinite alternate;
+}
+
+.service-visual figcaption {
+  position: static;
+  padding: 14px 0 0;
+  border: 0;
+  display: block;
+  color: var(--graphite);
+  font-size: 10px;
+  line-height: 1.4;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.service-detail--primary .service-visual figcaption {
+  color: var(--dark-muted);
+}
+
+.service-visual-marker {
+  top: 28px;
+  right: 28px;
+}
+
+.growth-reel-interface {
+  right: 28px;
+  left: 28px;
+}
+
+.product-flow {
+  top: calc(50% - 18px);
+}
+
+.inclusion-groups article {
+  padding-left: 0;
+  grid-template-columns: 132px minmax(180px, .8fr) minmax(240px, 1.2fr);
+  align-items: start;
+}
+
+.inclusion-groups article > span {
+  position: static;
+  padding-top: 4px;
+}
+
+@keyframes service-growth-drift {
+  from { transform: scale(1.01) translate3d(-1%, 0, 0); }
+  to { transform: scale(1.07) translate3d(1.5%, -1%, 0); }
+}
+
+@keyframes service-product-drift {
+  from { transform: scale(1.015) translate3d(0, 0, 0); }
+  to { transform: scale(1.055) translate3d(-1%, -.5%, 0); }
+}
+
+@media (max-width: 899px) {
+  .service-detail-heading h2,
+  .service-detail-heading > p,
+  .service-detail-heading .service-price {
+    grid-column: 1 / 9;
+  }
+
+  .service-detail-heading .service-price {
+    grid-row: auto;
+    justify-self: start;
+    margin-top: 30px;
+  }
+
+  .service-audience,
+  .service-inclusions {
+    grid-column: 1 / 9;
+  }
+
+  .service-inclusions {
+    padding-top: 76px;
+  }
+
+  .service-visual .service-visual-media,
+  .service-visual--essential .service-visual-media {
+    height: 500px;
+  }
+
+  .inclusion-groups article {
+    min-height: 0;
+    padding: 26px 0 30px;
+    grid-template-columns: 112px minmax(180px, .8fr) minmax(220px, 1.2fr);
+  }
+}
+
+@media (max-width: 699px) {
+  .inclusion-groups article {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .inclusion-groups article > span {
+    margin-bottom: 2px;
+  }
+}
+
+@media (max-width: 599px) {
+  .service-detail-heading h2,
+  .service-detail-heading > p,
+  .service-detail-heading .service-price,
+  .service-audience,
+  .service-inclusions {
+    grid-column: 1 / 5;
+  }
+
+  .service-visual .service-visual-media,
+  .service-visual--essential .service-visual-media {
+    height: 330px;
+  }
+
+  .service-visual figcaption {
+    padding-top: 12px;
+    font-size: 9px;
+  }
+
+  .service-visual-marker {
+    top: 16px;
+    right: 16px;
+  }
+
+  .growth-reel-interface {
+    top: 16px;
+    right: 16px;
+    left: 16px;
+  }
+
+  .product-flow {
+    top: 47%;
+  }
+
+  .inclusion-groups article {
+    padding: 24px 0 28px;
+  }
+}
