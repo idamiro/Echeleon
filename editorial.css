@@ -429,6 +429,7 @@
   gap: 54px;
 }
 
+.service-scope-columns h2,
 .service-scope-columns h3 {
   margin: 0 0 24px;
   font-size: 24px;
