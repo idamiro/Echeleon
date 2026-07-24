@@ -10,7 +10,19 @@
   const existingUrl = form.querySelector('#contact-website');
   const submitButton = form.querySelector('button[type="submit"]');
   const success = document.querySelector('#contact-success');
+  const needSelect = form.querySelector('#contact-need');
   let activeStep = 1;
+
+  const requestedService = new URLSearchParams(window.location.search).get('service');
+  const serviceLabels = {
+    'business-website': 'Business Website',
+    'growth-website': 'Growth Website',
+    'custom-product': 'Custom Digital Product',
+    'website-care': 'Care & Support'
+  };
+  if (requestedService && serviceLabels[requestedService]) {
+    needSelect.value = serviceLabels[requestedService];
+  }
 
   const updateWebsiteField = () => {
     const needsExistingUrl = projectTypes.some((input) => input.checked && input.value === 'Redesign an existing website');
@@ -51,7 +63,10 @@
   };
 
   form.querySelector('[data-next]')?.addEventListener('click', () => {
-    if (validateStep(1)) showStep(2);
+    if (validateStep(1)) {
+      if (typeof window.gtag === 'function') window.gtag('event', 'form_step_complete', { form_name: 'project_brief', step: 1 });
+      showStep(2);
+    }
   });
 
   form.querySelector('[data-back]')?.addEventListener('click', () => showStep(1));
@@ -81,6 +96,7 @@
       document.querySelector('.contact-progress').hidden = true;
       success.hidden = false;
       success.focus?.();
+      if (typeof window.gtag === 'function') window.gtag('event', 'generate_lead', { form_name: 'project_brief' });
     } catch (error) {
       status.setAttribute('role', 'alert');
       status.textContent = 'The brief could not be sent. Please try again or email hello@vulcet.com.';

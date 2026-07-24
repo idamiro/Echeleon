@@ -114,6 +114,14 @@ const revealObserver = new IntersectionObserver(entries => {
 }, { rootMargin: '0px 0px -10%', threshold: .08 });
 revealItems.forEach(item => reduceMotion ? item.classList.add('is-visible') : revealObserver.observe(item));
 
+if (!reduceMotion && 'IntersectionObserver' in window) {
+  const animatedRegions = document.querySelectorAll('.hero-lens, .project-canvas, .closing-field, .footer-signal, .v-hero-system, .contact-signal, .page-hero-signal');
+  const motionObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => entry.target.classList.toggle('motion-paused', !entry.isIntersecting));
+  }, { rootMargin: '160px 0px' });
+  animatedRegions.forEach(region => motionObserver.observe(region));
+}
+
 function bindPointer(element, xName, yName, amount = 10) {
   element.addEventListener('pointermove', event => {
     const rect = element.getBoundingClientRect();

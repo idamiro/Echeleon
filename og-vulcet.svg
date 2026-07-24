@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f3f3f5"/>
+  <g opacity=".16" stroke="#07080b">
+    <path d="M80 0v630M240 0v630M400 0v630M560 0v630M720 0v630M880 0v630M1040 0v630"/>
+  </g>
+  <circle cx="942" cy="215" r="156" fill="#fff" stroke="#d2d3d8"/>
+  <circle cx="942" cy="215" r="86" fill="none" stroke="#d2d3d8"/>
+  <circle cx="942" cy="215" r="42" fill="#07080b"/>
+  <circle cx="842" cy="104" r="22" fill="#6e5cff"/>
+  <circle cx="824" cy="287" r="16" fill="#ff7557"/>
+  <text x="80" y="118" fill="#07080b" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="700" letter-spacing="5">VULCET</text>
+  <text x="80" y="382" fill="#07080b" font-family="Arial, Helvetica, sans-serif" font-size="78" font-weight="700" letter-spacing="-4">Websites and digital products</text>
+  <text x="80" y="470" fill="#07080b" font-family="Arial, Helvetica, sans-serif" font-size="78" font-weight="700" letter-spacing="-4">built with clarity.</text>
+  <text x="82" y="550" fill="#595650" font-family="Arial, Helvetica, sans-serif" font-size="25">Strategy · design · motion · engineering</text>
+</svg>

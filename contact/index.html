@@ -1,39 +1,54 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-root="../">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BD641SSN63"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});
     gtag('js', new Date());
-    gtag('config', 'G-BD641SSN63');
+    gtag('config', 'G-BD641SSN63', { anonymize_ip: true });
   </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BD641SSN63"></script>
   <meta name="description" content="Start a project with Vulcet. Share the business goal, scope and timing for your website or digital product.">
-  <meta property="og:title" content="Contact — Vulcet">
-  <meta property="og:description" content="Tell us what needs to move.">
+  <link rel="canonical" href="https://vulcet.com/contact/">
+  <meta property="og:title" content="Start a Project — Vulcet">
+  <meta property="og:description" content="Share the business goal, scope and timing for your website or digital product.">
   <meta property="og:type" content="website">
-  <title>Contact — Vulcet</title>
+  <meta property="og:url" content="https://vulcet.com/contact/">
+  <meta property="og:site_name" content="Vulcet">
+  <meta property="og:image" content="https://vulcet.com/og-vulcet.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Start a Project — Vulcet">
+  <meta name="twitter:description" content="Share the business goal, scope and timing for your website or digital product.">
+  <meta name="twitter:image" content="https://vulcet.com/og-vulcet.png">
+  <meta name="theme-color" content="#f2eee6">
+  <title>Start a Website or Digital Product Project — Vulcet</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../site.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../style.css?v=20260724-17">
   <link rel="stylesheet" href="../contact.css?v=20260724-17">
+  <link rel="stylesheet" href="../consent.css?v=20260724-18">
   <script src="../script.js?v=20260724-17" defer></script>
   <script src="../contact.js?v=20260724-17" defer></script>
+  <script src="../consent.js?v=20260724-18" defer></script>
 </head>
 <body class="contact-page">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="shell header-grid">
       <a class="wordmark" href="../" aria-label="Vulcet home"><img src="../vulcet-wordmark.svg" alt=""></a>
-      <nav class="desktop-nav" aria-label="Primary navigation"><a href="../#work">Work</a><a href="../services/">Services</a><a href="../#process">Process</a><a href="./" aria-current="page">Contact</a></nav>
+      <nav class="desktop-nav" aria-label="Primary navigation"><a href="../work/">Work</a><a href="../services/">Services</a><a href="../studio/">Studio</a><a href="./" aria-current="page">Contact</a></nav>
       <a class="button button--primary header-cta" href="#project-brief">Start a project <span aria-hidden="true">↘</span></a>
       <button class="menu-trigger" type="button" aria-expanded="false" aria-controls="mobile-nav"><span class="sr-only">Open menu</span><span class="menu-icon" aria-hidden="true"><i></i><i></i></span></button>
     </div>
     <div id="mobile-nav" class="mobile-nav" aria-hidden="true">
-      <nav aria-label="Mobile navigation"><a href="../#work">Work</a><a href="../services/">Services</a><a href="../#process">Process</a><a href="./" aria-current="page">Contact</a></nav>
+      <nav aria-label="Mobile navigation"><a href="../work/">Work</a><a href="../services/">Services</a><a href="../studio/">Studio</a><a href="./" aria-current="page">Contact</a></nav>
       <a class="button button--primary" href="#project-brief">Start a project <span aria-hidden="true">↘</span></a>
     </div>
   </header>
@@ -68,7 +83,7 @@
         </div>
 
         <div class="contact-form-wrap">
-          <div class="contact-progress" aria-label="Form progress">
+          <div class="contact-progress" role="group" aria-label="Form progress">
             <div class="is-active" data-progress="1"><span>1</span><strong>Project fit</strong></div>
             <div data-progress="2"><span>2</span><strong>Project details</strong></div>
           </div>
@@ -77,7 +92,7 @@
             <input type="hidden" name="access_key" value="471f1056-9d23-4678-b1fd-87a01108f652">
             <input type="hidden" name="subject" value="New project enquiry — Vulcet">
             <input type="hidden" name="from_name" value="Vulcet website">
-            <input class="contact-botcheck" type="checkbox" name="botcheck" tabindex="-1" autocomplete="off">
+            <input class="contact-botcheck" type="checkbox" name="botcheck" tabindex="-1">
             <fieldset data-step="1">
               <legend class="sr-only">Project fit</legend>
               <div class="contact-field">
@@ -96,7 +111,7 @@
                 <label for="contact-need">What do you need? <span aria-hidden="true">*</span></label>
                 <select id="contact-need" name="need" required>
                   <option value="">Select one</option>
-                  <option>Essential Website</option>
+                  <option>Business Website</option>
                   <option>Growth Website</option>
                   <option>Custom Digital Product</option>
                   <option>Care &amp; Support</option>
@@ -157,7 +172,7 @@
               </div>
               <div class="contact-consent contact-field--wide">
                 <input id="contact-consent" name="consent" type="checkbox" required>
-                <label for="contact-consent">I agree to send this information to Vulcet for the purpose of discussing this project. <span aria-hidden="true">*</span></label>
+                <label for="contact-consent">I agree to send this information to Vulcet for the purpose of discussing this project, as described in the <a href="../privacy/" target="_blank">privacy notice</a>. <span aria-hidden="true">*</span></label>
               </div>
               <div class="contact-form-actions contact-field--wide">
                 <button class="contact-back" type="button" data-back>← Back</button>
@@ -179,7 +194,7 @@
     <section class="contact-direct">
       <div class="shell contact-direct-grid">
         <div class="editorial-label editorial-label--dark"><span>03</span><span>Direct contact</span></div>
-        <p>Prefer to keep it simple?</p>
+        <h2>Prefer to keep it simple?</h2>
         <a href="mailto:hello@vulcet.com">hello@vulcet.com <span aria-hidden="true">↗</span></a>
       </div>
     </section>
@@ -189,7 +204,7 @@
     <div class="footer-signal" aria-hidden="true"><span></span><b></b></div>
     <div class="shell footer-grid">
       <div class="footer-brand"><a class="wordmark" href="../" aria-label="Vulcet home"><img src="../vulcet-wordmark.svg" alt=""></a><p>Strategy, design and development for businesses ready to move forward.</p></div>
-      <nav aria-label="Footer navigation"><span>Navigate</span><a href="../">Home</a><a href="../#work">Work</a><a href="../services/">Services</a><a href="../#process">Process</a><a href="./" aria-current="page">Contact</a></nav>
+      <nav aria-label="Footer navigation"><span>Navigate</span><a href="../">Home</a><a href="../work/">Work</a><a href="../services/">Services</a><a href="../studio/">Studio</a><a href="./" aria-current="page">Contact</a><a href="../privacy/">Privacy</a><button class="footer-cookie-link" type="button" data-cookie-settings>Cookie settings</button></nav>
       <div class="footer-contact"><span>Contact</span><a href="mailto:hello@vulcet.com">hello@vulcet.com</a><p>Working internationally</p></div>
       <div class="footer-utility"><small>© <span id="year"></span> Vulcet</small><small>Strategy, design and development in one direct process.</small><small>Working internationally</small></div>
     </div>

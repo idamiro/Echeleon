@@ -1,38 +1,53 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-root="../">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BD641SSN63"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});
     gtag('js', new Date());
-    gtag('config', 'G-BD641SSN63');
+    gtag('config', 'G-BD641SSN63', { anonymize_ip: true });
   </script>
-  <meta name="description" content="Vulcet services across strategy, digital design, motion and engineering for premium websites and custom digital products.">
-  <meta property="og:title" content="Services — Vulcet">
-  <meta property="og:description" content="Digital systems built to move ambitious businesses forward.">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BD641SSN63"></script>
+  <meta name="description" content="Business websites, growth websites, custom digital products and ongoing website care from Vulcet.">
+  <link rel="canonical" href="https://vulcet.com/services/">
+  <meta property="og:title" content="Website &amp; Digital Product Services — Vulcet">
+  <meta property="og:description" content="Four focused ways to create, improve and support a serious digital presence.">
   <meta property="og:type" content="website">
-  <title>Services — Vulcet</title>
+  <meta property="og:url" content="https://vulcet.com/services/">
+  <meta property="og:site_name" content="Vulcet">
+  <meta property="og:image" content="https://vulcet.com/og-vulcet.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Website &amp; Digital Product Services — Vulcet">
+  <meta name="twitter:description" content="Four focused ways to create, improve and support a serious digital presence.">
+  <meta name="twitter:image" content="https://vulcet.com/og-vulcet.png">
+  <meta name="theme-color" content="#f2eee6">
+  <title>Website &amp; Digital Product Services — Vulcet</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../site.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../style.css?v=20260724-17">
-  <link rel="stylesheet" href="../services.css?v=20260724-17">
+  <link rel="stylesheet" href="../services.css?v=20260724-18">
+  <link rel="stylesheet" href="../consent.css?v=20260724-18">
   <script src="../script.js?v=20260724-17" defer></script>
+  <script src="../consent.js?v=20260724-18" defer></script>
 </head>
 <body class="v-services-page">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="shell header-grid">
       <a class="wordmark" href="../" aria-label="Vulcet home"><img src="../vulcet-wordmark.svg" alt=""></a>
-      <nav class="desktop-nav" aria-label="Primary navigation"><a href="../#work">Work</a><a href="./" aria-current="page">Services</a><a href="../#process">Process</a><a href="../contact/">Contact</a></nav>
+      <nav class="desktop-nav" aria-label="Primary navigation"><a href="../work/">Work</a><a href="./" aria-current="page">Services</a><a href="../studio/">Studio</a><a href="../contact/">Contact</a></nav>
       <a class="button button--primary header-cta" href="../contact/">Start a project <span aria-hidden="true">↗</span></a>
       <button class="menu-trigger" type="button" aria-expanded="false" aria-controls="mobile-nav"><span class="sr-only">Open menu</span><span class="menu-icon" aria-hidden="true"><i></i><i></i></span></button>
     </div>
     <div id="mobile-nav" class="mobile-nav" aria-hidden="true">
-      <nav aria-label="Mobile navigation"><a href="../#work">Work</a><a href="./" aria-current="page">Services</a><a href="../#process">Process</a><a href="../contact/">Contact</a></nav>
+      <nav aria-label="Mobile navigation"><a href="../work/">Work</a><a href="./" aria-current="page">Services</a><a href="../studio/">Studio</a><a href="../contact/">Contact</a></nav>
       <a class="button button--primary" href="../contact/">Start a project <span aria-hidden="true">↗</span></a>
     </div>
   </header>
@@ -42,152 +57,84 @@
       <div class="v-hero-system" aria-hidden="true"><span></span><i></i><b></b><em></em></div>
       <div class="shell v-services-hero-grid">
         <div class="editorial-label"><span>01</span><span>Services</span></div>
-        <h1 data-header-trigger>Digital systems built to move ambitious businesses <em>forward.</em></h1>
-        <div class="v-hero-copy">
-          <p>Vulcet combines strategy, design, motion and engineering to create websites and digital products that communicate clearly, perform reliably and feel distinctly premium.</p>
-        </div>
-        <ul class="v-hero-facts" aria-label="Vulcet capabilities"><li>Strategy</li><li>Design</li><li>Motion</li><li>Engineering</li><li>Based in Poland — working internationally</li></ul>
+        <h1 data-header-trigger>Built around the job the business needs to <em>finish.</em></h1>
+        <div class="v-hero-copy"><p>Strategy, design and engineering stay connected from the first decision to launch. Choose a starting point; the final scope is shaped after a project review.</p></div>
+        <ul class="v-hero-facts" aria-label="Vulcet capabilities"><li>Strategy</li><li>Design</li><li>Motion</li><li>Engineering</li></ul>
       </div>
     </section>
 
     <section class="v-service-overview" id="service-overview" aria-labelledby="overview-title">
       <div class="shell">
         <div class="v-section-intro">
-          <div class="editorial-label editorial-label--dark"><span>02</span><span>Choose the right engagement</span></div>
-          <h2 id="overview-title">Three ways to build what the business needs next.</h2>
-          <p>Starting investments are provided for orientation. Final scope, timeline and pricing are confirmed after an initial project review.</p>
+          <div class="editorial-label editorial-label--dark"><span>02</span><span>Engagements</span></div>
+          <h2 id="overview-title">Four focused ways to move forward.</h2>
+          <p>Prices below are starting levels, not fixed packages. Final scope, timeline and investment are confirmed after the initial project review.</p>
         </div>
 
         <div class="v-service-cards">
           <article class="v-service-card v-service-card--essential">
             <div class="v-card-top"><span>01</span><small>Focused business presence</small></div>
-            <h3>Essential<br>Website</h3>
-            <p class="v-card-summary">A focused, professionally designed website for businesses that need a credible, modern and carefully presented digital presence.</p>
-            <div class="v-card-price"><span>Starting investment</span><strong>From $1,200</strong></div>
-            <div class="v-card-fit"><span>Best for</span><p>Consultants, professional services, established local businesses and focused launches.</p></div>
-            <div class="v-card-scope"><span>Engagement preview</span><ul><li>Custom visual direction</li><li>Up to five core pages</li><li>Responsive design and development</li><li>Launch foundations and support</li></ul></div>
-            <div class="v-card-duration"><span>Typical duration</span><strong>2–4 weeks</strong></div>
-            <a class="button button--secondary" href="#essential">Explore Essential <span aria-hidden="true">↓</span></a>
-            <p class="v-card-note">Suitable for focused business websites. Larger multilingual or content-heavy projects should use the Growth Website service.</p>
+            <h3>Business<br>Website</h3>
+            <p class="v-card-summary">A clear, credible website for a focused company, service or launch.</p>
+            <div class="v-card-price"><span>Starting level</span><strong>From $1,200</strong></div>
+            <div class="v-card-scope"><span>Core scope</span><ul><li>Content and page planning</li><li>Custom responsive design</li><li>Development and launch</li><li>SEO and analytics foundation</li></ul></div>
+            <a class="button button--secondary" href="./business-websites/">View service <span aria-hidden="true">↗</span></a>
           </article>
 
           <article class="v-service-card v-service-card--growth">
             <div class="v-card-signal" aria-hidden="true"><i></i><b></b></div>
             <div class="v-card-top"><span>02</span><small>Primary website engagement</small></div>
             <h3>Growth<br>Website</h3>
-            <p class="v-card-summary">A bespoke, multilingual and content-driven website designed for companies ready to improve their positioning, credibility and digital performance.</p>
-            <div class="v-card-price"><span>Starting investment</span><strong>From $2,100</strong></div>
-            <div class="v-card-fit"><span>Best for</span><p>Growing, international, technical and professional-service companies that need a stronger digital position.</p></div>
-            <div class="v-card-scope"><span>Engagement preview</span><ul><li>Strategy and positioning</li><li>Custom multilingual UI/UX</li><li>CMS and content systems</li><li>Premium motion and optimisation</li></ul></div>
-            <div class="v-card-duration"><span>Typical duration</span><strong>4–8 weeks</strong></div>
-            <a class="button button--light" href="#growth">Explore Growth <span aria-hidden="true">↓</span></a>
-            <p class="v-card-note">This is Vulcet’s recommended service for companies that need more than a basic online presence.</p>
+            <p class="v-card-summary">A deeper website system for a growing, international or content-led business.</p>
+            <div class="v-card-price"><span>Starting level</span><strong>From $2,000</strong></div>
+            <div class="v-card-scope"><span>Core scope</span><ul><li>Strategy and architecture</li><li>Custom multilingual UI/UX</li><li>CMS and content systems</li><li>Motion and optimisation</li></ul></div>
+            <a class="button button--light" href="./growth-websites/">View service <span aria-hidden="true">↗</span></a>
           </article>
 
           <article class="v-service-card v-service-card--product">
             <div class="v-card-top"><span>03</span><small>Purpose-built system</small></div>
             <h3>Custom Digital<br>Product</h3>
-            <p class="v-card-summary">Custom web applications, client portals, booking systems, dashboards and digital tools designed around a specific business process.</p>
-            <div class="v-card-price"><span>Starting investment</span><strong>From $4,000</strong></div>
-            <div class="v-card-fit"><span>Best for</span><p>Startups, authenticated platforms, operational tools and businesses digitising internal processes.</p></div>
-            <div class="v-card-scope"><span>Engagement preview</span><ul><li>Product discovery and flows</li><li>Interface and design system</li><li>Frontend and backend engineering</li><li>Testing, deployment and handover</li></ul></div>
-            <div class="v-card-duration"><span>Typical duration</span><strong>8–16+ weeks</strong></div>
-            <a class="button button--secondary" href="#product">Explore Custom Product <span aria-hidden="true">↓</span></a>
-            <p class="v-card-note">Final investment depends strongly on functionality, integrations, technical complexity and long-term requirements.</p>
+            <p class="v-card-summary">A web application, portal or digital tool built around a specific process.</p>
+            <div class="v-card-price"><span>Investment</span><strong>Custom quote</strong></div>
+            <div class="v-card-scope"><span>Core scope</span><ul><li>Product discovery and flows</li><li>Interface and design system</li><li>Frontend and backend engineering</li><li>Testing and deployment</li></ul></div>
+            <a class="button button--secondary" href="./custom-digital-products/">View service <span aria-hidden="true">↗</span></a>
           </article>
-        </div>
-        <p class="v-overview-pricing">Starting investments are provided for orientation. Final scope, timeline and pricing are confirmed after an initial project review.</p>
-      </div>
-    </section>
 
-    <section class="v-detail v-detail--essential" id="essential">
-      <div class="shell v-detail-grid">
-        <div class="v-detail-heading"><div class="editorial-label"><span>01</span><span>Essential Website</span></div><h2>A clear business presence without unnecessary complexity.</h2></div>
-        <div class="v-detail-fit"><h3>Who it is for</h3><ul><li>Consultants</li><li>Professional services</li><li>Established local businesses</li><li>Small companies launching or replacing a website</li><li>Businesses launching a focused digital presence</li></ul></div>
-        <div class="v-detail-scope"><h3>Included scope</h3><div class="v-scope-columns"><ul><li>Discovery call and project definition</li><li>Content and page planning</li><li>Custom visual direction</li><li>Up to five core pages</li><li>Responsive UI design</li><li>Frontend development</li><li>Contact or enquiry form</li></ul><ul><li>Basic technical SEO</li><li>Performance optimisation</li><li>Analytics setup</li><li>Domain and deployment support</li><li>Two revision rounds</li><li>Short post-launch support</li></ul></div></div>
-        <div class="v-detail-commercial"><div><span>Typical duration</span><strong>2–4 weeks</strong></div><div><span>Starting investment</span><strong>From $1,200</strong></div><p>Suitable for focused business websites. Larger multilingual or content-heavy projects should use the Growth Website service.</p><a class="button button--primary" href="mailto:hello@vulcet.com">Discuss an Essential Website <span aria-hidden="true">↗</span></a></div>
-      </div>
-    </section>
-
-    <section class="v-detail v-detail--growth" id="growth">
-      <div class="v-growth-track" aria-hidden="true"><span></span><i></i><b></b></div>
-      <div class="shell v-detail-grid">
-        <div class="v-detail-heading"><div class="editorial-label editorial-label--dark"><span>02</span><span>Growth Website / Primary</span></div><h2>A website system that evolves with the business.</h2></div>
-        <div class="v-detail-fit"><h3>Who it is for</h3><ul><li>Growing and international companies</li><li>Logistics and manufacturing companies</li><li>Technology businesses</li><li>Professional-service firms</li><li>Companies with news, projects, insights or case studies</li><li>Brands that need stronger digital positioning</li></ul></div>
-        <div class="v-detail-scope"><h3>Included scope</h3><div class="v-scope-columns"><ul><li>Strategic discovery</li><li>Competitor and positioning review</li><li>Information architecture</li><li>Content hierarchy</li><li>Custom UI/UX design</li><li>Advanced responsive composition</li><li>Up to ten page templates</li><li>Multilingual architecture</li><li>CMS or editable content structure</li><li>Case studies, news, projects or insights system</li></ul><ul><li>Premium motion and micro-interactions</li><li>Conversion and enquiry flows</li><li>Technical SEO foundation</li><li>Analytics</li><li>Performance optimisation</li><li>Accessibility review</li><li>Deployment</li><li>Quality assurance</li><li>Three revision rounds</li><li>30 days of post-launch support</li></ul></div></div>
-        <div class="v-detail-commercial"><div><span>Typical duration</span><strong>4–8 weeks</strong></div><div><span>Starting investment</span><strong>From $2,100</strong></div><p>This is Vulcet’s recommended service for companies that need more than a basic online presence.</p><a class="button button--light" href="mailto:hello@vulcet.com">Discuss a Growth Website <span aria-hidden="true">↗</span></a></div>
-      </div>
-    </section>
-
-    <section class="v-detail v-detail--product" id="product">
-      <div class="shell v-detail-grid">
-        <div class="v-detail-heading"><div class="editorial-label"><span>03</span><span>Custom Digital Product</span></div><h2>Purpose-built software for a specific operation.</h2></div>
-        <div class="v-detail-fit"><h3>Who it is for</h3><ul><li>Startups</li><li>Businesses digitising internal processes</li><li>Companies requiring authenticated platforms</li><li>Businesses that need more than a marketing website</li><li>Client-facing digital services</li><li>Custom operational tools</li></ul></div>
-        <div class="v-detail-scope"><h3>Included scope</h3><div class="v-scope-columns"><ul><li>Product discovery</li><li>Requirements definition</li><li>User-flow planning</li><li>Information architecture</li><li>Interface design</li><li>Design system</li><li>Frontend development</li></ul><ul><li>Backend development where required</li><li>Database and API planning</li><li>Authentication where required</li><li>Testing</li><li>Deployment</li><li>Technical documentation</li><li>Handover and launch support</li></ul></div></div>
-        <div class="v-detail-commercial"><div><span>Typical duration</span><strong>8–16+ weeks</strong></div><div><span>Starting investment</span><strong>From $4,000</strong></div><p>Final investment depends strongly on functionality, integrations, technical complexity and long-term requirements.</p><a class="button button--primary" href="mailto:hello@vulcet.com">Discuss a Custom Digital Product <span aria-hidden="true">↗</span></a></div>
-      </div>
-    </section>
-
-    <section class="v-capabilities">
-      <div class="shell v-capabilities-grid">
-        <div class="editorial-label editorial-label--dark"><span>04</span><span>Capabilities included across engagements</span></div>
-        <div class="v-capabilities-intro"><h2>Specialist capabilities, connected by one direction.</h2><p>The final combination depends on the project. These capabilities are integrated into the appropriate engagement rather than sold as disconnected low-cost add-ons.</p></div>
-        <div class="v-capability-groups">
-          <article><span>01</span><h3>Strategy</h3><ul><li>Project discovery</li><li>Digital positioning</li><li>Competitor review</li><li>Content strategy</li><li>Information architecture</li><li>User journeys</li></ul></article>
-          <article><span>02</span><h3>Experience Design</h3><ul><li>UI/UX design</li><li>Responsive systems</li><li>Design systems</li><li>Prototyping</li><li>Accessibility planning</li><li>Content hierarchy</li></ul></article>
-          <article><span>03</span><h3>Motion</h3><ul><li>Interaction direction</li><li>Scroll-based storytelling</li><li>Interface transitions</li><li>Micro-interactions</li><li>Motion systems</li><li>Reduced-motion alternatives</li></ul></article>
-          <article><span>04</span><h3>Engineering</h3><ul><li>Frontend development</li><li>Backend integration where required</li><li>CMS architecture</li><li>API integrations</li><li>Cloudflare deployment</li><li>Performance optimisation</li></ul></article>
-          <article><span>05</span><h3>Growth Foundations</h3><ul><li>Technical SEO</li><li>Analytics</li><li>Enquiry flows</li><li>Multilingual structure</li><li>Schema and metadata</li><li>Post-launch optimisation</li></ul></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="v-care" id="care-support">
-      <div class="shell v-care-grid">
-        <div class="editorial-label"><span>05</span><span>Recurring relationship</span></div>
-        <div class="v-care-object">
-          <div class="v-care-intro">
-            <div class="v-care-status" aria-hidden="true"><i></i><span>Available after launch</span></div>
-            <h2>Care &amp; Support</h2>
-            <p>Quiet, dependable maintenance for teams that want their website to remain secure, current and effective after launch.</p>
-          </div>
-          <div class="v-care-services">
-            <span>Ongoing essentials</span>
-            <ul><li>Technical and security updates</li><li>Uptime and form monitoring</li><li>Small content changes</li><li>Performance checks</li><li>Priority technical support</li></ul>
-          </div>
-          <div class="v-care-commercial">
-            <div class="v-care-price"><span>Monthly support from</span><strong>$130 <small>/ month</small></strong></div>
-            <p class="v-care-note">New pages, integrations and larger design changes are scoped separately.</p>
-            <a class="button button--light" href="mailto:hello@vulcet.com">Ask about support <span aria-hidden="true">↗</span></a>
-          </div>
+          <article class="v-service-card v-service-card--care">
+            <div class="v-card-top"><span>04</span><small>Ongoing relationship</small></div>
+            <h3>Care &amp;<br>Support</h3>
+            <p class="v-card-summary">Dependable maintenance and small improvements after launch.</p>
+            <div class="v-card-price"><span>Starting level</span><strong>From $110 / month</strong></div>
+            <div class="v-card-scope"><span>Core scope</span><ul><li>Technical updates</li><li>Uptime and form monitoring</li><li>Small content changes</li><li>Priority support</li></ul></div>
+            <a class="button button--secondary" href="./website-care/">View service <span aria-hidden="true">↗</span></a>
+          </article>
         </div>
       </div>
     </section>
 
     <section class="v-faq">
       <div class="shell v-faq-grid">
-        <div class="editorial-label"><span>06</span><span>Questions before we begin</span></div>
-        <h2>Clear answers,<br>before the proposal.</h2>
+        <div class="editorial-label"><span>03</span><span>Before the proposal</span></div>
+        <h2>Clear answers,<br>before we begin.</h2>
         <div class="faq-list">
-          <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>How much does a project cost?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>Website engagements currently begin from $1,200. Growth Website projects begin from $2,100, while custom digital products generally begin from $4,000. Final pricing depends on scope, complexity, content, integrations and timeline.</p></div></div>
-          <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>Are the listed prices fixed package prices?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>No. They are starting investments provided for orientation. A final proposal is prepared after the project requirements are reviewed.</p></div></div>
-          <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>How long does a project take?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>Essential websites usually take 2–4 weeks, Growth Websites generally take 4–8 weeks, and custom products commonly take 8–16 weeks or more depending on complexity.</p></div></div>
-          <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>Do you provide content writing?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>Content structure and guidance are included. Full copywriting can be included when agreed during the project review or provided through a specialist collaborator.</p></div></div>
-          <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>Can you redesign an existing website?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>Yes. Existing websites can be reviewed, restructured and redesigned. The process may include retaining useful content while improving positioning, hierarchy, performance and usability.</p></div></div>
-          <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>Do you build multilingual websites?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>Yes. Vulcet can create multilingual architecture and interfaces. English, Turkish and Azerbaijani can be supported directly, with additional languages integrated through approved translations.</p></div></div>
-          <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>What happens after launch?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>Every project includes a defined post-launch support period. Ongoing maintenance and technical care can continue through the Care &amp; Support service.</p></div></div>
-          <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>Do you use AI?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>AI tools may support research, development and production efficiency, but strategic decisions, design direction, quality control and client responsibility remain human-led.</p></div></div>
+          <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>Are the listed prices fixed packages?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>No. They are starting levels for orientation. A final proposal follows a review of the goals, content, functionality and timeline.</p></div></div>
+          <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>Can Vulcet build a new website as well as redesign one?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>Yes. Projects can begin with a new business, offer or product, or with an existing website that needs to be reconsidered.</p></div></div>
+          <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>How long does a website project take?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>A focused business website commonly takes two to four weeks. A larger growth website commonly takes four to eight weeks. Product timelines depend on functionality.</p></div></div>
+          <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>What happens after launch?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>Every project includes an agreed handover and short support period. Ongoing maintenance is available through Care &amp; Support.</p></div></div>
         </div>
       </div>
     </section>
 
+    <section class="v-services-contact">
+      <div class="shell v-services-contact-grid"><p>Have a project that does not fit a neat label?</p><a class="button button--light" href="../contact/">Describe the project <span aria-hidden="true">↗</span></a></div>
+    </section>
   </main>
 
   <footer class="footer">
     <div class="footer-signal" aria-hidden="true"><span></span><b></b></div>
     <div class="shell footer-grid">
       <div class="footer-brand"><a class="wordmark" href="../" aria-label="Vulcet home"><img src="../vulcet-wordmark.svg" alt=""></a><p>Strategy, design and development for businesses ready to move forward.</p></div>
-      <nav aria-label="Footer navigation"><span>Navigate</span><a href="../">Home</a><a href="../#work">Work</a><a href="./" aria-current="page">Services</a><a href="../#process">Process</a><a href="../contact/">Contact</a></nav>
+      <nav aria-label="Footer navigation"><span>Navigate</span><a href="../">Home</a><a href="../work/">Work</a><a href="./" aria-current="page">Services</a><a href="../studio/">Studio</a><a href="../contact/">Contact</a><a href="../privacy/">Privacy</a><button class="footer-cookie-link" type="button" data-cookie-settings>Cookie settings</button></nav>
       <div class="footer-contact"><span>Contact</span><a href="mailto:hello@vulcet.com">hello@vulcet.com</a><p>Working internationally</p></div>
       <div class="footer-utility"><small>© <span id="year"></span> Vulcet</small><small>Strategy, design and development in one direct process.</small><small>Working internationally</small></div>
     </div>

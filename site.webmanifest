@@ -1,0 +1,17 @@
+{
+  "name": "Vulcet",
+  "short_name": "Vulcet",
+  "description": "An independent digital studio for business websites and custom digital products.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f2eee6",
+  "theme_color": "#f2eee6",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

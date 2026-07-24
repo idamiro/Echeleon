@@ -1792,3 +1792,84 @@
     margin-top: 44px;
   }
 }
+
+/* Final concise-services overrides */
+.v-services-page .v-service-cards {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.v-services-page .v-service-card {
+  min-height: 560px;
+}
+
+.v-services-page .v-service-card--care {
+  color: #111319;
+  background: #e9e8ec;
+}
+
+.v-services-page .v-services-contact {
+  padding: 76px 0;
+  color: #f5f5f7;
+  background: #08090d;
+  border-top: 1px solid rgba(255,255,255,.14);
+}
+
+.v-services-page .v-services-contact-grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.v-services-page .v-services-contact p {
+  margin: 0;
+  max-width: 760px;
+  font-size: clamp(30px, 4vw, 60px);
+  line-height: .98;
+  letter-spacing: -.055em;
+}
+
+@media (max-width: 899px) {
+  .v-services-page .v-service-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .v-services-page .v-service-card {
+    min-height: 0;
+  }
+
+  .v-services-page .v-services-contact-grid {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 599px) {
+  .v-services-page .v-services-hero {
+    min-height: 680px;
+  }
+
+  .v-services-page .v-services-hero h1 {
+    font-size: clamp(46px, 14vw, 64px);
+  }
+
+  .v-services-page .v-service-overview {
+    padding-block: 72px;
+  }
+
+  .v-services-page .v-section-intro h2 {
+    font-size: clamp(38px, 11vw, 50px);
+  }
+
+  .v-services-page .v-service-card {
+    padding: 28px 22px;
+  }
+
+  .v-services-page .v-service-card h3 {
+    font-size: clamp(38px, 12vw, 52px);
+  }
+
+  .v-services-page .v-services-contact {
+    padding: 56px 0;
+  }
+}
