@@ -326,8 +326,10 @@
 
 .contact-choice {
   position: relative;
+  min-width: 0;
   min-height: 116px;
   margin: 0 !important;
+  overflow: hidden;
   cursor: pointer;
 }
 
@@ -356,6 +358,7 @@
   font-weight: 650;
   letter-spacing: -.02em;
   text-transform: none;
+  overflow-wrap: break-word;
 }
 
 .contact-choice small {
@@ -365,6 +368,7 @@
   line-height: 1.45;
   letter-spacing: 0;
   text-transform: none;
+  overflow-wrap: break-word;
 }
 
 .contact-choice:hover > span {

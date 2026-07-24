@@ -1831,11 +1831,36 @@
 
 @media (max-width: 899px) {
   .v-services-page .v-service-cards {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    overflow: visible;
   }
 
-  .v-services-page .v-service-card {
+  .v-services-page .v-service-card,
+  .v-services-page .v-service-card--essential,
+  .v-services-page .v-service-card--growth,
+  .v-services-page .v-service-card--product,
+  .v-services-page .v-service-card--care {
+    grid-column: 1;
+    width: 100%;
+    min-width: 0;
     min-height: 0;
+    margin: 0;
+    transform: none;
+  }
+
+  .v-services-page .v-service-card + .v-service-card {
+    margin-top: 0;
+  }
+
+  .v-services-page .v-service-card h3 {
+    max-width: 100%;
+    font-size: clamp(36px, 6vw, 46px);
+    line-height: 1;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
   }
 
   .v-services-page .v-services-contact-grid {
@@ -1866,7 +1891,7 @@
   }
 
   .v-services-page .v-service-card h3 {
-    font-size: clamp(38px, 12vw, 52px);
+    font-size: clamp(34px, 10.5vw, 44px);
   }
 
   .v-services-page .v-services-contact {
