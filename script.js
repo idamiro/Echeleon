@@ -7,6 +7,9 @@ const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 document.documentElement.dataset.motion = reduceMotion ? 'reduced' : 'ready';
 
+// Prevent the closed mobile navigation from leaving duplicate links in the tab order.
+if (mobileNav) mobileNav.inert = true;
+
 if (headerTrigger) {
   new IntersectionObserver(([entry]) => header.classList.toggle('site-header--fixed', !entry.isIntersecting)).observe(headerTrigger);
 }
@@ -17,6 +20,7 @@ function setMenu(open) {
   if (!menuButton || !mobileNav) return;
   menuButton.setAttribute('aria-expanded', String(open));
   mobileNav.setAttribute('aria-hidden', String(!open));
+  mobileNav.inert = !open;
   mobileNav.classList.toggle('mobile-nav--open', open);
   menuButton.querySelector('.menu-icon').classList.toggle('menu-icon--open', open);
   menuButton.querySelector('.sr-only').textContent = open ? 'Close menu' : 'Open menu';
