@@ -3955,48 +3955,69 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   }
 }
 
-/* Home — second selected case */
-.home-case-secondary {
-  grid-column: 1 / -1;
+/* Home — selected work cases */
+.work-grid--cases {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.work-cases-intro {
+  margin-bottom: 48px;
+}
+
+.work-cases-lede {
+  margin: 18px 0 0;
+  max-width: 42ch;
+  color: #b7bac5;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.home-case {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
   gap: 40px;
   align-items: center;
-  margin-top: 72px;
-  padding-top: 56px;
-  border-top: 1px solid color-mix(in srgb, var(--coal) 12%, transparent);
+  padding: 56px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.home-case-secondary__copy h2 {
+.home-case:last-child {
+  padding-bottom: 0;
+}
+
+.home-case__copy h2 {
   margin: 16px 0 12px;
   font-family: var(--font-instrument), Georgia, serif;
   font-size: clamp(36px, 4.2vw, 56px);
   line-height: 1;
   font-weight: 400;
+  color: #fff;
 }
 
-.home-case-secondary__copy > p {
+.home-case__copy > p {
   margin: 0 0 24px;
   max-width: 46ch;
-  color: var(--graphite);
+  color: #b7bac5;
   font-size: 17px;
   line-height: 1.55;
 }
 
-.home-case-secondary__meta {
+.home-case__meta {
   margin: 0 0 28px;
 }
 
-.home-case-secondary__media {
+.home-case__media {
   position: relative;
   display: block;
   overflow: hidden;
   border-radius: 18px;
-  background: var(--coal);
+  background: #0a0b10;
   aspect-ratio: 16 / 10;
 }
 
-.home-case-secondary__media img {
+.home-case__media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -4004,11 +4025,11 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   transition: transform 0.6s ease;
 }
 
-.home-case-secondary__media:hover img {
+.home-case__media:hover img {
   transform: scale(1.03);
 }
 
-.home-case-secondary__badge {
+.home-case__badge {
   position: absolute;
   left: 16px;
   bottom: 16px;
@@ -4021,18 +4042,25 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   letter-spacing: 0.02em;
 }
 
+.work-section .home-case .text-link {
+  color: #fff;
+}
+
 @media (max-width: 899px) {
-  .home-case-secondary {
+  .work-cases-intro {
+    margin-bottom: 28px;
+  }
+
+  .home-case {
     grid-template-columns: 1fr;
     gap: 28px;
-    margin-top: 48px;
-    padding-top: 40px;
+    padding: 40px 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-case-secondary__media img,
-  .home-case-secondary__media:hover img {
+  .home-case__media img,
+  .home-case__media:hover img {
     transition: none;
     transform: none;
   }
