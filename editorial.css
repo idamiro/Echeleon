@@ -786,3 +786,36 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Collision hotfix */
+.page-hero h1,
+.case-story h2,
+.page-cta h2 {
+  line-height: 1.08 !important;
+  overflow: visible !important;
+  overflow-wrap: anywhere;
+}
+
+.page-hero {
+  overflow: visible !important;
+}
+
+@media (max-width: 899px) {
+  .page-hero h1 {
+    font-size: clamp(34px, 10vw, 46px) !important;
+    line-height: 1.12 !important;
+    max-width: 100% !important;
+  }
+
+  .principle-row {
+    grid-template-columns: 40px 1fr !important;
+  }
+
+  .principle-row p {
+    grid-column: 1 / -1 !important;
+  }
+
+  .case-facts {
+    grid-template-columns: 1fr !important;
+  }
+}

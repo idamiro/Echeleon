@@ -4065,3 +4065,287 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
     transform: none;
   }
 }
+/* =========================================================
+   Collision / truncation hotfix (Aug 2026)
+   Fixes overlapping header controls, clipped headings, and
+   cramped buttons across desktop + mobile breakpoints.
+   ========================================================= */
+
+/* Headings: never use line-height below font-size */
+.hero h1,
+.hero h1 span,
+.hero h1 em,
+.final-grid h2,
+.growth-grid > h2,
+.growth-transition p,
+.growth-intro h3,
+.working-model h2,
+.faq-grid > h2,
+.studio-copy h2,
+.page-hero h1,
+.home-case__copy h2,
+.v-services-hero h1,
+.v-services-hero h1 em {
+  overflow: visible !important;
+  clip-path: none !important;
+}
+
+.hero h1 {
+  max-width: min(100%, 920px) !important;
+  font-size: clamp(40px, 6.2vw, 84px) !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.04em !important;
+}
+
+.hero h1 span {
+  display: block !important;
+  overflow: visible !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+.hero h1 span::after {
+  content: none !important;
+}
+
+.hero h1 em {
+  display: inline !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+.final-grid h2,
+.growth-grid > h2,
+.growth-transition p,
+.working-model h2,
+.faq-grid > h2,
+.studio-copy h2,
+.page-hero h1 {
+  line-height: 1.08 !important;
+  letter-spacing: -0.04em !important;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+/* Header: flex layout prevents nav/CTA overlap */
+@media (min-width: 900px) {
+  .site-header .header-grid,
+  .site-header--fixed .header-grid {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    grid-template-columns: none !important;
+  }
+
+  .site-header .wordmark,
+  .site-header--fixed .wordmark {
+    flex: 0 0 auto;
+    grid-column: auto !important;
+  }
+
+  .site-header .desktop-nav,
+  .site-header--fixed .desktop-nav {
+    display: flex !important;
+    flex: 1 1 auto;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: clamp(14px, 1.8vw, 28px);
+    grid-column: auto !important;
+    min-width: 0;
+  }
+
+  .site-header .header-cta,
+  .site-header--fixed .header-cta {
+    display: inline-flex !important;
+    flex: 0 0 auto;
+    grid-column: auto !important;
+    width: auto !important;
+    min-width: 0;
+    max-width: 100%;
+    padding-inline: 18px 16px;
+    white-space: nowrap;
+  }
+
+  .site-header .menu-trigger,
+  .site-header--fixed .menu-trigger {
+    display: none !important;
+  }
+}
+
+/* Mid desktop: keep nav readable */
+@media (min-width: 900px) and (max-width: 1099px) {
+  .site-header .desktop-nav,
+  .site-header--fixed .desktop-nav {
+    gap: 14px;
+  }
+
+  .site-header .desktop-nav a,
+  .site-header--fixed .desktop-nav a {
+    font-size: 13px;
+  }
+
+  .site-header .header-cta,
+  .site-header--fixed .header-cta {
+    font-size: 13px;
+    min-height: 44px;
+    padding-inline: 14px 12px;
+  }
+}
+
+/* Buttons: never force a cramped fixed width */
+.button,
+.header-cta,
+.hero-actions .button,
+.final-support .button,
+.page-cta .button,
+.v-hero-actions .button {
+  width: auto !important;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.hero-actions,
+.final-support > div,
+.page-cta > .shell > div,
+.v-hero-actions,
+.consent-actions {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Mobile shell + header breathing room */
+@media (max-width: 899px) {
+  .shell {
+    width: min(720px, calc(100% - 32px)) !important;
+  }
+
+  .site-header .header-grid,
+  .site-header--fixed .header-grid {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .site-header .wordmark {
+    flex: 0 0 auto;
+  }
+
+  .site-header .menu-trigger {
+    display: grid !important;
+    flex: 0 0 auto;
+    margin-left: auto;
+  }
+
+  .hero {
+    min-height: 0 !important;
+  }
+
+  .hero-grid {
+    min-height: 0 !important;
+    padding-top: 36px !important;
+    padding-bottom: 64px !important;
+  }
+
+  .hero h1 {
+    max-width: 100% !important;
+    font-size: clamp(34px, 10.5vw, 46px) !important;
+    line-height: 1.12 !important;
+    letter-spacing: -0.035em !important;
+    margin-top: 28px !important;
+  }
+
+  .hero-lens {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    width: min(220px, 58vw) !important;
+    margin: 28px 0 0;
+    opacity: 0.9;
+  }
+
+  .mobile-nav nav a {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.15 !important;
+  }
+
+  .mobile-nav > .button {
+    width: 100% !important;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .home-case__meta {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .home-case__copy > p,
+  .work-cases-lede,
+  .project-meta dd {
+    overflow-wrap: anywhere;
+  }
+
+  .text-link,
+  .project-link {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .faq-item button {
+    min-height: 64px;
+    align-items: flex-start;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .faq-item button > span:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.3;
+  }
+}
+
+@media (max-width: 599px) {
+  .shell {
+    width: calc(100% - 28px) !important;
+  }
+
+  .button {
+    white-space: normal;
+    text-align: left;
+    line-height: 1.25;
+    min-height: 48px;
+    padding-block: 12px;
+  }
+
+  .consent-panel {
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 12px !important;
+    width: auto !important;
+  }
+
+  .consent-actions {
+    flex-direction: column;
+  }
+
+  .consent-actions button {
+    width: 100%;
+    white-space: normal;
+  }
+}
+
+/* Work cases on dark band */
+.home-case__meta dt {
+  color: #9a9daa !important;
+}
+
+.home-case__meta dd {
+  color: #f4f3f0;
+  overflow-wrap: anywhere;
+}

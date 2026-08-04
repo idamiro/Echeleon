@@ -98,3 +98,14 @@
     width: 100%;
   }
 }
+
+@media (max-width: 599px) {
+  .consent-actions {
+    flex-direction: column;
+  }
+
+  .consent-actions button {
+    width: 100%;
+    white-space: normal;
+  }
+}

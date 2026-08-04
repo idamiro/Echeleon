@@ -1898,3 +1898,61 @@
     padding: 56px 0;
   }
 }
+
+/* Collision hotfix */
+.v-services-hero h1,
+.v-services-page h1,
+.v-services-page h2,
+.v-services-page h3 {
+  line-height: 1.08 !important;
+  overflow: visible !important;
+  overflow-wrap: anywhere;
+}
+
+.v-services-hero {
+  overflow: visible !important;
+  min-height: 0 !important;
+}
+
+.v-services-hero-grid {
+  min-height: 0 !important;
+  padding-bottom: 48px;
+}
+
+.v-hero-actions,
+.v-services-contact-grid,
+.v-card-scope + .button,
+.v-service-card .button {
+  max-width: 100%;
+}
+
+.v-service-card .button {
+  width: auto !important;
+  white-space: normal;
+  line-height: 1.25;
+}
+
+.v-hero-facts {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+
+@media (max-width: 899px) {
+  .v-services-hero h1 {
+    font-size: clamp(34px, 10vw, 48px) !important;
+    line-height: 1.12 !important;
+    max-width: 100% !important;
+  }
+
+  .v-hero-facts {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .v-hero-facts li {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .v-service-cards {
+    grid-template-columns: 1fr !important;
+  }
+}

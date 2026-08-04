@@ -765,3 +765,38 @@
     animation: none !important;
   }
 }
+
+/* Collision hotfix */
+.contact-choice {
+  overflow: visible !important;
+}
+
+.contact-choice > span,
+.contact-choice strong,
+.contact-choice small {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.contact-form-actions,
+.contact-progress {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.contact-form-actions .button {
+  width: auto !important;
+  max-width: 100%;
+  white-space: normal;
+}
+
+@media (max-width: 699px) {
+  .contact-choice-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .contact-progress {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
