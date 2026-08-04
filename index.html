@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en" data-root="./">
 <head>
   <meta charset="utf-8">
@@ -37,12 +37,74 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260724-17">
+  <link rel="stylesheet" href="style.css?v=20260804-1">
   <link rel="stylesheet" href="consent.css?v=20260724-18">
-  <script src="script.js?v=20260730-1" defer></script>
+  <script src="script.js?v=20260804-1" defer></script>
   <script src="consent.js?v=20260724-18" defer></script>
   <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"Organization","name":"Vulcet","url":"https://vulcet.com/","logo":"https://vulcet.com/favicon.svg","email":"hello@vulcet.com","description":"An independent digital studio creating business websites and custom digital products.","areaServed":"Worldwide"}
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://vulcet.com/#organization",
+          "name": "Vulcet",
+          "url": "https://vulcet.com/",
+          "logo": "https://vulcet.com/og-vulcet.png",
+          "email": "hello@vulcet.com",
+          "description": "An independent digital studio creating business websites and custom digital products.",
+          "areaServed": "Worldwide",
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "PL"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://vulcet.com/#website",
+          "url": "https://vulcet.com/",
+          "name": "Vulcet",
+          "publisher": {"@id": "https://vulcet.com/#organization"}
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How long does a typical project take?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "A focused business website commonly takes two to four weeks. A larger growth or multilingual website commonly takes four to eight weeks. Product timelines depend on functionality."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can you redesign an existing website?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Existing content and analytics are reviewed first, then the parts worth keeping are separated from what is holding the website back."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How are multilingual websites handled?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Language structure is planned from the beginning so navigation, hierarchy and content remain consistent."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What happens after launch?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Every project includes a short post-launch support period, with ongoing care available when the website needs regular maintenance or improvement."
+              }
+            }
+          ]
+        }
+      ]
+    }
   </script>
 </head>
 <body>
@@ -77,23 +139,23 @@
         <div class="project-film-topline" aria-hidden="true"><span>FounderClub / Digital platform</span><small>Live client project</small></div>
         <div class="annotation"><span>A.01</span><i></i><p>Business community, events and membership presented through one clear system.</p></div>
         <div class="desktop-screen founder-screen">
-          <div class="founder-site-nav"><img src="founderclub-logo.png" alt="" width="512" height="512" loading="lazy" decoding="async"><span>Founder Club</span><small>About&nbsp;&nbsp;&nbsp; Activities&nbsp;&nbsp;&nbsp; News&nbsp;&nbsp;&nbsp; Partners&nbsp;&nbsp;&nbsp; Contact</small><b>Become a Member</b></div>
+          <div class="founder-site-nav"><img src="founderclub-logo.png" alt="FounderClub logo" width="512" height="512" loading="lazy" decoding="async"><span>Founder Club</span><small>About&nbsp;&nbsp;&nbsp; Activities&nbsp;&nbsp;&nbsp; News&nbsp;&nbsp;&nbsp; Partners&nbsp;&nbsp;&nbsp; Contact</small><b>Become a Member</b></div>
           <div class="project-shot project-shot--home">
             <img src="founderclub-hero.webp" srcset="founderclub-hero-small.webp 800w, founderclub-hero.webp 1600w" sizes="(max-width: 760px) 92vw, 68vw" alt="Night view of Baku used in the FounderClub website hero." width="1600" height="1022" loading="lazy" decoding="async">
             <div class="founder-site-copy"><span>FOUNDER CLUB</span><strong>The right environment<br>for business</strong><p>A premium business platform bringing entrepreneurs, executives and partner companies together.</p></div>
           </div>
           <div class="project-shot project-shot--events" aria-hidden="true">
             <div class="project-shot-heading"><span>ACTIVITIES</span><strong>Events that bring<br>business people together.</strong></div>
-            <div class="event-card event-card--large"><img src="founderclub-event-office.webp" alt="" width="1000" height="600" loading="lazy" decoding="async"><span>Office visit</span><small>Business networking</small></div>
-            <div class="event-card event-card--small"><img src="founderclub-event-networking.webp" alt="" width="768" height="432" loading="lazy" decoding="async"><span>Founder gathering</span><small>Community event</small></div>
+            <div class="event-card event-card--large"><img src="founderclub-event-office.webp" alt="FounderClub office visit event" width="1000" height="600" loading="lazy" decoding="async"><span>Office visit</span><small>Business networking</small></div>
+            <div class="event-card event-card--small"><img src="founderclub-event-networking.webp" alt="FounderClub networking gathering" width="768" height="432" loading="lazy" decoding="async"><span>Founder gathering</span><small>Community event</small></div>
           </div>
           <div class="project-shot project-shot--news" aria-hidden="true">
-            <div class="news-feature"><img src="founderclub-news-atameken.webp" alt="" width="1280" height="960" loading="lazy" decoding="async"><div><span>NEWS / INTERNATIONAL</span><strong>Building connections beyond the local network.</strong><small>ATAMEKEN National Chamber of Entrepreneurs</small></div></div>
-            <div class="news-side"><img src="founderclub-news-seabreeze.webp" alt="" width="1280" height="852" loading="lazy" decoding="async"><span>Sea Breeze Arena</span><small>Project presentation</small></div>
+            <div class="news-feature"><img src="founderclub-news-atameken.webp" alt="FounderClub international news feature" width="1280" height="960" loading="lazy" decoding="async"><div><span>NEWS / INTERNATIONAL</span><strong>Building connections beyond the local network.</strong><small>ATAMEKEN National Chamber of Entrepreneurs</small></div></div>
+            <div class="news-side"><img src="founderclub-news-seabreeze.webp" alt="FounderClub project coverage at Sea Breeze" width="1280" height="852" loading="lazy" decoding="async"><span>Sea Breeze Arena</span><small>Project presentation</small></div>
           </div>
         </div>
         <div class="mobile-screen founder-screen founder-screen--mobile">
-          <div class="founder-site-nav"><img src="founderclub-logo.png" alt="" width="512" height="512" loading="lazy" decoding="async"><span>Founder Club</span><b>Menu</b></div>
+          <div class="founder-site-nav"><img src="founderclub-logo.png" alt="FounderClub logo" width="512" height="512" loading="lazy" decoding="async"><span>Founder Club</span><b>Menu</b></div>
           <div class="mobile-shot mobile-shot--home"><img src="founderclub-hero-small.webp" alt="Mobile presentation of the FounderClub website hero." width="800" height="511" loading="lazy" decoding="async"><div class="founder-site-copy"><span>FOUNDER CLUB</span><strong>The right environment for business</strong></div></div>
           <div class="mobile-shot mobile-shot--event" aria-hidden="true"><img src="founderclub-event-office.webp" alt="" width="1000" height="600" loading="lazy" decoding="async"><div><span>ACTIVITIES</span><strong>Office visit</strong><small>Business networking</small></div></div>
           <div class="mobile-shot mobile-shot--news" aria-hidden="true"><img src="founderclub-news-atameken-small.webp" alt="" width="800" height="600" loading="lazy" decoding="async"><div><span>NEWS</span><strong>International connections</strong><small>FounderClub community</small></div></div>
@@ -102,6 +164,20 @@
         <div class="project-film-progress" aria-hidden="true"><i></i><span class="film-index"><b>01</b><b>02</b><b>03</b><em>/ 03</em></span></div>
       </a>
       <p class="project-caption">Figure 01 — FounderClub home. The live identity and Baku imagery establish the community’s local presence while the interface keeps membership and activity clear.</p><a class="text-link project-link" href="work/founderclub/">Read the FounderClub case study <span aria-hidden="true">↗</span></a>
+
+      <article class="home-case-secondary">
+        <div class="home-case-secondary__copy">
+          <div class="editorial-label"><span>02</span><span>Client project</span></div>
+          <h2>Anadolu Qida</h2>
+          <p>A brand-led business website for a flour producer in Baku — product clarity, production story and a practical path to corporate orders.</p>
+          <dl class="project-meta home-case-secondary__meta"><div><dt>Role</dt><dd>Strategy, UI/UX, development</dd></div><div><dt>Duration</dt><dd>Approx. four weeks</dd></div><div><dt>Platform</dt><dd>Business website</dd></div><div><dt>Systems</dt><dd>Products, enquiry, brand switch</dd></div></dl>
+          <a class="text-link project-link" href="work/anadolu-qida/">Read the Anadolu Qida case study <span aria-hidden="true">↗</span></a>
+        </div>
+        <a class="home-case-secondary__media" href="https://anadoluqida.com" target="_blank" rel="noreferrer" aria-label="Visit the live Anadolu Qida website">
+          <img src="anadolu-hero.webp" srcset="anadolu-hero-small.jpg 900w, anadolu-hero.webp 1600w" sizes="(max-width: 899px) 92vw, 44vw" width="1672" height="941" alt="Wheat field hero from the live Anadolu Qida website." loading="lazy" decoding="async">
+          <span class="home-case-secondary__badge">Live / anadoluqida.com</span>
+        </a>
+      </article>
     </div></section>
 
     <section class="growth-section" id="services"><div class="growth-boundary" aria-hidden="true"></div><div class="shell growth-grid">
@@ -120,7 +196,7 @@
     </ol></div></section>
 
     <section class="faq-section" id="faq"><div class="shell faq-grid"><div class="editorial-label"><span>04</span><span>Practical questions</span></div><h2>Before we start.</h2><div class="faq-list">
-      <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>How long does a typical project take?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>A focused business website usually takes four to six weeks. Larger multilingual or content-led projects are scheduled after the initial review.</p></div></div>
+      <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>How long does a typical project take?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>A focused business website commonly takes two to four weeks. A larger growth or multilingual website commonly takes four to eight weeks. Product timelines depend on functionality.</p></div></div>
       <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>What do you need from the client before work begins?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>A clear decision-maker, access to existing brand and website materials, honest business context and timely feedback.</p></div></div>
       <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>Can you redesign an existing website?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>Yes. Existing content and analytics are reviewed first, then the parts worth keeping are separated from what is holding the website back.</p></div></div>
       <div class="faq-item"><h3><button type="button" aria-expanded="false"><span>How are multilingual websites handled?</span><span class="faq-icon" aria-hidden="true"><i></i><i></i></span></button></h3><div class="faq-answer" hidden><p>Language structure is planned from the beginning so navigation, hierarchy and content remain consistent.</p></div></div>
