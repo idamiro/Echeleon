@@ -22,3 +22,8 @@
 
 - Clear business goals, decision-maker access, honest context
 - Strategy before screens; design with engineering
+
+## Site map
+
+- HTML: https://vulcet.com/site-map/
+- XML: https://vulcet.com/sitemap.xml

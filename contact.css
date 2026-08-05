@@ -35,10 +35,11 @@
   align-self: center;
   max-width: 930px;
   margin: 42px 0 0;
-  font-size: clamp(58px, 6.2vw, 88px);
-  line-height: .93;
+  font-size: clamp(42px, 5.4vw, 78px);
+  line-height: 1.1;
   font-weight: 560;
-  letter-spacing: -.058em;
+  letter-spacing: -.04em;
+  overflow-wrap: anywhere;
 }
 
 .contact-hero h1 em {
@@ -329,7 +330,7 @@
   min-width: 0;
   min-height: 116px;
   margin: 0 !important;
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
 }
 

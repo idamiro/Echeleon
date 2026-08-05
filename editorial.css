@@ -10,7 +10,7 @@
   position: relative;
   min-height: 610px;
   padding: 70px 0 84px;
-  overflow: hidden;
+  overflow: visible;
   border-bottom: 1px solid var(--rule);
 }
 
@@ -34,10 +34,11 @@
   grid-column: 2 / 11;
   margin: 112px 0 0;
   max-width: 1040px;
-  font-size: clamp(64px, 7vw, 106px);
-  line-height: .9;
+  font-size: clamp(42px, 6vw, 84px);
+  line-height: 1.1;
   font-weight: 560;
-  letter-spacing: -.065em;
+  letter-spacing: -.04em;
+  overflow-wrap: anywhere;
 }
 
 .page-hero h1 em {

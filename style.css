@@ -39,7 +39,7 @@ img { display: block; }
 .desktop-nav a::after, .text-link::after, .footer a:not(.wordmark)::after { content: ""; position: absolute; left: 0; bottom: -4px; width: 100%; height: 1px; background: var(--signal); transform: scaleX(0); transform-origin: left; transition: transform 180ms var(--ease-control); }
 .desktop-nav a:hover::after, .desktop-nav a:focus-visible::after, .text-link:hover::after, .text-link:focus-visible::after, .footer a:not(.wordmark):hover::after, .footer a:not(.wordmark):focus-visible::after { transform: scaleX(1); }
 .locale-button { grid-column: 10; justify-self: end; border: 0; background: transparent; font-size: 12px; font-weight: 650; letter-spacing: .06em; cursor: pointer; }
-.header-cta { grid-column: 11 / 13; justify-self: end; width: 154px; }
+.header-cta { grid-column: 11 / 13; justify-self: end; width: auto; min-width: 0; }
 .menu-trigger { display: none; }
 .mobile-nav { display: none; }
 
@@ -513,7 +513,7 @@ body { background: var(--paper); }
 .desktop-nav a { font-size: 15px; font-weight: 600; }
 .desktop-nav a::after, .text-link::after, .footer a:not(.wordmark)::after { background: currentColor; }
 .locale-button { color: var(--graphite); }
-.header-cta { width: 166px; }
+.header-cta { width: auto; min-width: 166px; }
 
 .button { min-height: 58px; padding-inline: 26px; border-radius: 999px; font-size: 15px; }
 .button--primary { background: var(--coal); color: white; }
@@ -3988,12 +3988,13 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 }
 
 .home-case__copy h2 {
-  margin: 16px 0 12px;
+  margin: 16px 0 14px;
   font-family: var(--font-instrument), Georgia, serif;
-  font-size: clamp(36px, 4.2vw, 56px);
-  line-height: 1;
+  font-size: clamp(34px, 4.2vw, 52px);
+  line-height: 1.12;
   font-weight: 400;
   color: #fff;
+  overflow-wrap: anywhere;
 }
 
 .home-case__copy > p {
@@ -4002,10 +4003,19 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   color: #b7bac5;
   font-size: 17px;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .home-case__meta {
   margin: 0 0 28px;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 20px;
+}
+
+@media (max-width: 899px) {
+  .home-case__meta {
+    grid-template-columns: 1fr;
+  }
 }
 
 .home-case__media {
@@ -4066,12 +4076,12 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   }
 }
 /* =========================================================
-   Collision / truncation hotfix (Aug 2026)
-   Fixes overlapping header controls, clipped headings, and
-   cramped buttons across desktop + mobile breakpoints.
+   Collision / truncation hotfix (Aug 2026) — pass 2
+   Source line-heights, header flex, buttons, facts, and
+   decorative layers that sat on top of readable text.
    ========================================================= */
 
-/* Headings: never use line-height below font-size */
+/* Headings: never clip or crash into themselves */
 .hero h1,
 .hero h1 span,
 .hero h1 em,
@@ -4085,15 +4095,22 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 .page-hero h1,
 .home-case__copy h2,
 .v-services-hero h1,
-.v-services-hero h1 em {
+.v-services-hero h1 em,
+.v-section-intro h2,
+.v-service-card h3,
+.contact-hero h1,
+.services-intro,
+.service-row h3,
+.project-heading h2 {
   overflow: visible !important;
   clip-path: none !important;
+  text-wrap: balance;
 }
 
 .hero h1 {
   max-width: min(100%, 920px) !important;
   font-size: clamp(40px, 6.2vw, 84px) !important;
-  line-height: 1.08 !important;
+  line-height: 1.1 !important;
   letter-spacing: -0.04em !important;
 }
 
@@ -4120,11 +4137,42 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 .working-model h2,
 .faq-grid > h2,
 .studio-copy h2,
-.page-hero h1 {
-  line-height: 1.08 !important;
+.page-hero h1,
+.v-section-intro h2,
+.contact-hero h1,
+.services-intro,
+.service-row h3,
+.project-heading h2,
+.home-case__copy h2 {
+  line-height: 1.1 !important;
   letter-spacing: -0.04em !important;
   overflow-wrap: anywhere;
   word-break: normal;
+}
+
+/* Decorative layers must never cover copy */
+.hero-lens,
+.final-orbit,
+.v-hero-system,
+.v-card-signal,
+.page-hero-signal,
+.footer-signal,
+.contact-hero-field {
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+.hero h1,
+.hero-support,
+.v-services-hero h1,
+.v-hero-copy,
+.v-hero-facts,
+.page-hero h1,
+.page-hero-copy,
+.contact-hero h1,
+.contact-hero-copy {
+  position: relative;
+  z-index: 2;
 }
 
 /* Header: flex layout prevents nav/CTA overlap */
@@ -4191,6 +4239,18 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
     min-height: 44px;
     padding-inline: 14px 12px;
   }
+
+  .service-row {
+    grid-template-columns: 1.4fr 1.2fr auto auto !important;
+    gap: 16px !important;
+    align-items: start !important;
+  }
+
+  .service-row h3,
+  .service-row p,
+  .service-row strong {
+    overflow-wrap: anywhere;
+  }
 }
 
 /* Buttons: never force a cramped fixed width */
@@ -4212,6 +4272,12 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 .consent-actions {
   flex-wrap: wrap;
   gap: 12px;
+}
+
+/* Homepage work cases */
+.home-case__meta {
+  grid-template-columns: 1fr 1fr !important;
+  gap: 18px 20px !important;
 }
 
 /* Mobile shell + header breathing room */
@@ -4251,7 +4317,7 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   .hero h1 {
     max-width: 100% !important;
     font-size: clamp(34px, 10.5vw, 46px) !important;
-    line-height: 1.12 !important;
+    line-height: 1.14 !important;
     letter-spacing: -0.035em !important;
     margin-top: 28px !important;
   }
@@ -4284,7 +4350,11 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 
   .home-case__copy > p,
   .work-cases-lede,
-  .project-meta dd {
+  .project-meta dd,
+  .service-row p,
+  .service-row strong,
+  .diagnostic-row strong,
+  .diagnostic-row p {
     overflow-wrap: anywhere;
   }
 
@@ -4292,6 +4362,13 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   .project-link {
     max-width: 100%;
     white-space: normal;
+  }
+
+  .service-row {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    align-content: start !important;
+    padding: 24px 0 !important;
   }
 
   .faq-item button {
@@ -4307,6 +4384,30 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
     white-space: normal;
     overflow-wrap: anywhere;
     line-height: 1.3;
+  }
+
+  .footer-utility {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .footer nav {
+    gap: 10px;
+  }
+
+  .scope-grid,
+  .growth-intro,
+  .diagnostic-row {
+    min-width: 0;
+  }
+
+  .diagnostic-row {
+    grid-template-columns: 40px 1fr !important;
+    gap: 12px !important;
+  }
+
+  .diagnostic-row p {
+    grid-column: 1 / -1;
   }
 }
 
@@ -4337,6 +4438,10 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   .consent-actions button {
     width: 100%;
     white-space: normal;
+  }
+
+  .positioning-list {
+    grid-template-columns: 1fr !important;
   }
 }
 
