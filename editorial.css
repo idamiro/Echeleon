@@ -623,13 +623,36 @@
   }
 
   .work-index-card {
-    grid-template-columns: 34px 1fr auto;
-    min-height: 126px;
-    gap: 12px;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    min-height: 0;
+    gap: 8px 12px;
+    padding: 22px 0;
+  }
+
+  .work-index-card small {
+    grid-column: 1;
+    grid-row: 1;
+    max-width: 100%;
+    font-size: 10px;
+    line-height: 1.35;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .work-index-card h2 {
-    font-size: 32px;
+    grid-column: 1;
+    grid-row: 2;
+    font-size: clamp(28px, 8vw, 36px);
+    line-height: 1.08;
+    overflow-wrap: anywhere;
+  }
+
+  .work-index-card i {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
   }
 
   .work-index-card p {
@@ -741,50 +764,62 @@
 
 .studio-facts {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 28px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px 32px;
+  align-items: start;
 }
 
-.studio-facts > div {
-  padding: 8px 0;
+.editorial-page .studio-facts > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 20px 0 0;
+  border-top: 1px solid color-mix(in srgb, var(--paper) 22%, transparent);
+  border-bottom: 0;
+  grid-template-columns: none;
 }
 
-.studio-facts span {
+.editorial-page .studio-facts span {
   display: block;
-  margin-bottom: 10px;
+  margin: 0;
   color: color-mix(in srgb, var(--paper) 55%, transparent);
   font-size: 12px;
+  line-height: 1.3;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.studio-facts strong {
+.editorial-page .studio-facts strong {
   display: block;
-  margin-bottom: 10px;
+  margin: 0;
   color: var(--paper);
-  font-size: 22px;
-  line-height: 1.15;
+  font-size: clamp(20px, 2vw, 26px);
+  line-height: 1.2;
   font-weight: 650;
+  overflow-wrap: anywhere;
 }
 
-.studio-facts p {
+.editorial-page .studio-facts p {
   margin: 0;
   color: color-mix(in srgb, var(--paper) 72%, transparent);
   font-size: 15px;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 899px) {
   .studio-facts {
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
-}
-
-@media (max-width: 599px) {
-  .studio-facts {
     grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .editorial-page .studio-facts > div {
+    padding: 22px 0;
   }
 }
 
