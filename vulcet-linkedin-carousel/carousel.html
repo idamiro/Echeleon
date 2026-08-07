@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vulcet × LinkedIn Carousel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07080b;
+      --fg: #f3f3f5;
+      --muted: rgba(243,243,245,.62);
+      --line: rgba(243,243,245,.16);
+      --soft: #121318;
+      --paper: #f2eee6;
+      --coal: #171715;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #000; font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+    .slide {
+      width: 1080px;
+      height: 1350px;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--fg);
+      display: flex;
+      flex-direction: column;
+      padding: 64px 72px;
+    }
+
+    .chrome {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 3;
+    }
+    .mark {
+      width: 44px; height: 44px; border-radius: 11px;
+      background: var(--fg); display: grid; place-items: center; gap: 4px; padding: 10px 9px;
+    }
+    .mark i { display:block; width:26px; height:4.5px; border-radius:1px; background: var(--bg); }
+
+    .brand-lock {
+      font-size: 15px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+    }
+    .brand-lock span { opacity: .45; margin: 0 10px; }
+
+    .foot {
+      margin-top: auto;
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 28px; border-top: 1px solid var(--line); z-index: 3;
+      font-size: 16px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .foot b { color: var(--fg); letter-spacing: .04em; }
+
+    .wordmark {
+      width: min(820px, 100%);
+      height: auto;
+      display: block;
+      filter: invert(1) brightness(1.2);
+    }
+
+    h1 {
+      font-size: 96px;
+      line-height: .95;
+      letter-spacing: -0.04em;
+      font-weight: 600;
+      max-width: 920px;
+    }
+    h1 em, h2 em {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+    }
+    h2 {
+      font-size: 78px;
+      line-height: .96;
+      letter-spacing: -0.035em;
+      font-weight: 600;
+      max-width: 920px;
+    }
+    .line {
+      width: 56px; height: 1px; background: var(--fg); margin: 36px 0;
+    }
+    .support {
+      font-size: 28px; line-height: 1.4; color: var(--muted); max-width: 700px; font-weight: 450;
+    }
+    .swipe {
+      margin-top: 48px;
+      font-size: 18px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--fg); display: inline-flex; align-items: center; gap: 12px;
+    }
+
+    /* ===== SLIDE 1 ===== */
+    .s1-main {
+      flex: 1; display: flex; flex-direction: column; justify-content: center;
+      padding-bottom: 40px;
+    }
+    .s1-kicker {
+      font-size: 18px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 40px;
+    }
+
+    /* ===== SLIDE 2 ===== */
+    .s2-main { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 0; }
+    .big-claim {
+      font-size: 88px; line-height: .96; letter-spacing: -0.04em; font-weight: 600;
+    }
+    .split {
+      margin-top: 56px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    .split article {
+      padding: 28px 0 0;
+      border-top: 1px solid var(--line);
+    }
+    .split strong {
+      display: block; font-size: 26px; font-weight: 650; margin-bottom: 12px; letter-spacing: -0.02em;
+    }
+    .split p { font-size: 22px; line-height: 1.4; color: var(--muted); }
+
+    /* ===== SLIDE 3 ===== */
+    .s3-main { flex: 1; display: flex; flex-direction: column; padding-top: 40px; min-height: 0; }
+    .work-stack {
+      margin-top: 32px;
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 16px;
+      flex: 1;
+      min-height: 0;
+    }
+    .work-card {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      min-height: 0;
+    }
+    .work-card img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      filter: saturate(.92) contrast(1.05);
+      position: absolute; inset: 0;
+    }
+    .work-card::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, rgba(7,8,11,.78) 0%, rgba(7,8,11,.2) 70%, transparent 100%);
+    }
+    .work-meta {
+      position: absolute; left: 28px; bottom: 26px; z-index: 2;
+    }
+    .work-meta small {
+      display: block; font-size: 14px; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: rgba(243,243,245,.7); margin-bottom: 8px;
+    }
+    .work-meta b {
+      font-size: 30px; font-weight: 650; letter-spacing: -0.02em;
+    }
+
+    /* ===== SLIDE 4 ===== */
+    .s4-main { flex: 1; display: flex; flex-direction: column; padding-top: 48px; }
+    .pillars {
+      margin-top: 48px;
+      display: grid;
+      gap: 0;
+      flex: 1;
+    }
+    .pillar {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 20px;
+      align-items: center;
+      padding: 42px 0;
+      border-top: 1px solid var(--line);
+    }
+    .pillar:last-child { border-bottom: 1px solid var(--line); }
+    .pillar span {
+      font-size: 42px; font-weight: 700; letter-spacing: -0.04em; color: var(--fg);
+    }
+    .pillar h3 {
+      font-size: 40px; font-weight: 600; letter-spacing: -0.03em; margin-bottom: 10px;
+    }
+    .pillar p { font-size: 24px; line-height: 1.35; color: var(--muted); max-width: 680px; }
+
+    /* ===== SLIDE 5 ===== */
+    .s5-main {
+      flex: 1; display: flex; flex-direction: column; justify-content: center;
+    }
+    .cta-mail {
+      margin-top: 48px;
+      font-size: 36px; font-weight: 650; letter-spacing: -0.02em;
+    }
+    .cta-row {
+      margin-top: 36px;
+      display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 14px;
+      min-height: 64px; padding: 0 28px; border-radius: 999px;
+      background: var(--fg); color: var(--bg);
+      font-size: 20px; font-weight: 750;
+    }
+    .ghost {
+      font-size: 20px; font-weight: 650; color: var(--muted); letter-spacing: .04em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 01 COVER — billboard hook -->
+  <section class="slide" id="slide-1">
+    <div class="chrome">
+      <div class="mark" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="brand-lock">Vulcet <span>·</span> Studio</div>
+    </div>
+    <div class="s1-main">
+      <p class="s1-kicker">Digital studio</p>
+      <img class="wordmark" src="./wordmark-dark.png" alt="Vulcet">
+      <div class="line"></div>
+      <h1>Websites that make the next step <em>obvious.</em></h1>
+      <p class="swipe">Swipe to see what we build <span aria-hidden="true">→</span></p>
+    </div>
+    <div class="foot"><span>LinkedIn</span><b>01 / 05</b></div>
+  </section>
+
+  <!-- 02 POSITION — short, social -->
+  <section class="slide" id="slide-2">
+    <div class="chrome">
+      <div class="mark" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="brand-lock">Vulcet <span>·</span> Studio</div>
+    </div>
+    <div class="s2-main">
+      <p class="big-claim">Not another pretty homepage.<br>A clearer way to get <em>chosen.</em></p>
+      <div class="split">
+        <article>
+          <strong>Who it’s for</strong>
+          <p>Founders and teams whose offer is strong — but the site still makes people hesitate.</p>
+        </article>
+        <article>
+          <strong>What changes</strong>
+          <p>Positioning gets sharp. Structure gets clear. The ask becomes easy to act on.</p>
+        </article>
+      </div>
+    </div>
+    <div class="foot"><span>Clarity over decoration</span><b>02 / 05</b></div>
+  </section>
+
+  <!-- 03 WORK — visual proof -->
+  <section class="slide" id="slide-3">
+    <div class="chrome">
+      <div class="mark" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="brand-lock">Vulcet <span>·</span> Work</div>
+    </div>
+    <div class="s3-main">
+      <h2>Recent work, shipped <em>live.</em></h2>
+      <p class="support" style="margin-top:20px">Real client projects — not concept decks.</p>
+      <div class="work-stack">
+        <div class="work-card">
+          <img src="../founderclub-hero.webp" alt="FounderClub">
+          <div class="work-meta">
+            <small>Community platform</small>
+            <b>FounderClub</b>
+          </div>
+        </div>
+        <div class="work-card">
+          <img src="../anadolu-hero.webp" alt="Anadolu Qida">
+          <div class="work-meta">
+            <small>Business website</small>
+            <b>Anadolu Qida</b>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span>Selected work</span><b>03 / 05</b></div>
+  </section>
+
+  <!-- 04 OFFER — punchy pillars -->
+  <section class="slide" id="slide-4">
+    <div class="chrome">
+      <div class="mark" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="brand-lock">Vulcet <span>·</span> Offer</div>
+    </div>
+    <div class="s4-main">
+      <h2>Three ways we help brands show <em>up.</em></h2>
+      <div class="pillars">
+        <div class="pillar">
+          <span>01</span>
+          <div>
+            <h3>New websites</h3>
+            <p>From a blank page to a credible presence people can trust.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <span>02</span>
+          <div>
+            <h3>Redesigns</h3>
+            <p>Keep what works. Replace what holds the business back.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <span>03</span>
+          <div>
+            <h3>Digital products</h3>
+            <p>Portals, platforms and tools built around a real process.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span>Strategy · Design · Build</span><b>04 / 05</b></div>
+  </section>
+
+  <!-- 05 CLOSE -->
+  <section class="slide" id="slide-5">
+    <div class="chrome">
+      <div class="mark" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="brand-lock">Vulcet <span>·</span> Contact</div>
+    </div>
+    <div class="s5-main">
+      <img class="wordmark" src="./wordmark-dark.png" alt="Vulcet" style="width:640px;margin-bottom:8px">
+      <div class="line"></div>
+      <h1>If the site doesn’t match the business — <em>let’s fix that.</em></h1>
+      <p class="cta-mail">hello@vulcet.com</p>
+      <div class="cta-row">
+        <div class="btn">Start a project <span aria-hidden="true">↗</span></div>
+        <div class="ghost">vulcet.com</div>
+      </div>
+    </div>
+    <div class="foot"><span>Working internationally</span><b>05 / 05</b></div>
+  </section>
+
+</body>
+</html>
