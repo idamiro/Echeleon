@@ -1,15 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 140" role="img" aria-labelledby="vulcet-title vulcet-description">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 160" role="img" aria-labelledby="vulcet-title vulcet-description">
   <title id="vulcet-title">Vulcet</title>
   <desc id="vulcet-description">Vulcet signature wordmark with proprietary three-bar E.</desc>
+  <!-- Clean geometric caps, original craft + signature E -->
   <g fill="#07080b">
-    <path d="M20 20h36l50 100 50-100h36L128 130H84L20 20z"/>
-    <path d="M220 20h34v68c0 22 12 36 34 36s34-14 34-36V20h34v70c0 42-28 64-68 64s-68-22-68-64V20z"/>
-    <path d="M390 20h34v90h70v30H390V20z"/>
-    <path d="M520 20h120v30H554c-18 0-30 12-30 32s12 32 30 32h86v30H520c-42 0-70-30-70-62s28-62 70-62z"/>
-    <!-- Signature E: three bars, no vertical stem -->
-    <rect x="670" y="20" width="100" height="28" rx="2"/>
-    <rect x="670" y="61" width="88" height="28" rx="2"/>
-    <rect x="670" y="102" width="100" height="28" rx="2"/>
-    <path d="M800 20h100v28h-33v92h-34V48h-33V20z"/>
+    <!-- V -->
+    <path d="M12 28h28l34 88 34-88h28L88 148H48L12 28z"/>
+    <!-- U -->
+    <path d="M156 28h26v76c0 16 8 26 24 26s24-10 24-26V28h26v78c0 32-20 48-50 48s-50-16-50-48V28z"/>
+    <!-- L -->
+    <path d="M286 28h26v94h62v26H286V28z"/>
+    <!-- C -->
+    <path d="M400 28h92v26h-66c-14 0-24 10-24 24s10 24 24 24h66v26h-70c-36 0-58-24-58-50s22-50 58-50z"/>
+    <!-- E — three equal bars, no stem (signature) -->
+    <rect x="520" y="28" width="86" height="26" rx="1"/>
+    <rect x="520" y="67" width="86" height="26" rx="1"/>
+    <rect x="520" y="106" width="86" height="26" rx="1"/>
+    <!-- T -->
+    <path d="M634 28h120v26h-47v94h-26V54h-47V28z"/>
   </g>
 </svg>

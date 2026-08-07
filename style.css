@@ -1688,7 +1688,7 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 
 /* Vulcet signature wordmark (three-bar E) */
 .wordmark {
-  width: 168px;
+  width: 132px;
   height: auto;
   display: flex;
   align-items: center;
@@ -1707,7 +1707,7 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 
 @media (max-width: 899px) {
   .wordmark {
-    width: 148px;
+    width: 118px;
   }
 }
 
