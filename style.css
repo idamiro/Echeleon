@@ -487,7 +487,7 @@ img { display: block; }
   .process-stage h3 { opacity: 1; }
 }
 
-/* Clay-inspired neutral art direction — original Damirov composition */
+/* Clay-inspired neutral art direction â€” original Damirov composition */
 :root {
   --paper: #f3f3f5;
   --paper-light: #ffffff;
@@ -647,7 +647,7 @@ body { background: var(--paper); }
   .final-grid h2 { font-size: 54px; }
 }
 
-/* The Working Edition — In Motion */
+/* The Working Edition â€” In Motion */
 :root { --page-progress: 0; --motion-duration: 760ms; --motion-stagger: 72ms; }
 body::before { content: ""; position: fixed; z-index: 300; inset: 0 auto auto 0; width: calc(var(--page-progress) * 100%); height: 2px; background: var(--signal); transform-origin: left; pointer-events: none; }
 .site-header { transition: height 360ms var(--ease-standard), background-color 360ms var(--ease-control), border-color 360ms var(--ease-control); }
@@ -827,7 +827,7 @@ html[data-motion="ready"] .motion-reveal.is-visible { opacity: 1; transform: tra
   .final-motion { transform: none; }
 }
 
-/* Damirov Signal Field — compact hero and sculptural closing */
+/* Damirov Signal Field â€” compact hero and sculptural closing */
 :root { --violet: #7657ff; --cobalt: #2f6cff; --coral: #ff6b4a; --lilac: #c9baff; }
 
 .hero { min-height: 680px; }
@@ -1076,7 +1076,7 @@ html[data-motion="ready"] .motion-reveal.is-visible { opacity: 1; transform: tra
   .project-film-progress i::after { transform: scaleX(1); }
 }
 
-/* Canonical responsive pass — keeps the project film intact on every viewport */
+/* Canonical responsive pass â€” keeps the project film intact on every viewport */
 html, body { max-width: 100%; overflow-x: clip; }
 .work-grid > *, .growth-grid > *, .services-grid > *, .process-grid > *, .faq-grid > *, .final-grid > * { min-width: 0; }
 
@@ -1209,7 +1209,7 @@ html, body { max-width: 100%; overflow-x: clip; }
   .footer-grid { padding-top: 58px; }
 }
 
-/* FounderClub multi-scene film — authentic home, events and news views */
+/* FounderClub multi-scene film â€” authentic home, events and news views */
 .project-canvas .founder-screen::after { display: none; }
 .project-canvas .founder-screen { background: #f2f1ed; }
 .project-canvas .founder-site-nav { z-index: 20; }
@@ -1378,7 +1378,7 @@ html, body { max-width: 100%; overflow-x: clip; }
   .footer-signal span, .footer-signal b { animation: none !important; }
 }
 
-/* Minimal footer motion — no duplicate wordmark, grids or orbital tracks */
+/* Minimal footer motion â€” no duplicate wordmark, grids or orbital tracks */
 .footer { min-height: 540px; background: #07080c; }
 .footer::before { display: none; }
 .footer-grid { min-height: 540px; padding-top: 82px; border-top: 0; align-content: start; }
@@ -1414,7 +1414,7 @@ html, body { max-width: 100%; overflow-x: clip; }
   .footer-signal::before, .footer-signal::after { animation: none !important; }
 }
 
-/* Mobile composition — designed independently from the desktop motion system */
+/* Mobile composition â€” designed independently from the desktop motion system */
 @media (max-width: 599px) {
   html { scroll-padding-top: 64px; }
   body { overflow-x: clip; }
@@ -1568,7 +1568,7 @@ html, body { max-width: 100%; overflow-x: clip; }
   .closing-field::before, .footer-signal::before, .footer-signal::after { animation: none !important; }
 }
 
-/* Clean mobile edition — no scaled-down desktop scenes */
+/* Clean mobile edition â€” no scaled-down desktop scenes */
 html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 
 @media (max-width: 899px) {
@@ -1601,7 +1601,7 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   .mobile-nav nav a { min-height: 64px; display: flex; align-items: center; border-bottom: 1px solid rgba(7,8,11,.14); font-size: 30px; }
   .mobile-nav > .button { margin-top: auto; min-height: 54px; }
 
-  /* Fixed header traps position:fixed children — expand while menu is open */
+  /* Fixed header traps position:fixed children â€” expand while menu is open */
   html.nav-open .site-header,
   html.nav-open .site-header--fixed,
   body.nav-open .site-header,
@@ -1688,7 +1688,7 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 
 /* Vulcet signature wordmark (three-bar E) */
 .wordmark {
-  width: 118px;
+  width: 148px;
   height: auto;
   display: flex;
   align-items: center;
@@ -1707,7 +1707,7 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 
 @media (max-width: 899px) {
   .wordmark {
-    width: 108px;
+    width: 128px;
   }
 }
 
@@ -1875,12 +1875,12 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 
 @media (max-width: 599px) {
   .wordmark {
-    width: 108px;
+    width: 128px;
   }
 }
 
 /* =========================================================
-   SERVICES — DEDICATED CAPABILITIES PAGE
+   SERVICES â€” DEDICATED CAPABILITIES PAGE
    ========================================================= */
 .desktop-nav a[aria-current="page"]::after,
 .footer a[aria-current="page"]::after {
@@ -3981,7 +3981,7 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   }
 }
 
-/* Home — selected work cases */
+/* Home â€” selected work cases */
 .work-grid--cases {
   display: flex;
   flex-direction: column;
@@ -4102,7 +4102,7 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   }
 }
 /* =========================================================
-   Collision / truncation hotfix (Aug 2026) — pass 2
+   Collision / truncation hotfix (Aug 2026) â€” pass 2
    Source line-heights, header flex, buttons, facts, and
    decorative layers that sat on top of readable text.
    ========================================================= */
