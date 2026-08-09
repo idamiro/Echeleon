@@ -1,12 +1,19 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 40" role="img" aria-label="Vulcet">
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 36" role="img" aria-label="Vulcet">
+  <!-- Exact brand lockup used on LinkedIn case-study posts: wide tracking + three-bar E -->
   <g fill="#07080b">
-    <path d="M2 5h8L20 33 30 5h8L24 35h-8L2 5z"/>
-    <path d="M54 5h7.5v20c0 5.5 2.8 8.8 7.8 8.8s7.8-3.3 7.8-8.8V5H85v20.8c0 10-6 15.7-15.5 15.7S54 35.8 54 25.8V5z"/>
-    <path d="M104 5h7.5v21H136v9h-32V5z"/>
-    <path d="M152 5h30v8h-21.5c-5 0-8.5 3.2-8.5 8.2s3.5 8.2 8.5 8.2H182v8h-23c-10.5 0-17.5-7-17.5-16S148.5 5 159 5h-7z"/>
-    <rect x="202" y="5" width="26" height="7"/>
-    <rect x="202" y="16.5" width="26" height="7"/>
-    <rect x="202" y="28" width="26" height="7"/>
-    <path d="M246 5h40v8h-16v22h-8V13h-16V5z"/>
+    <!-- V -->
+    <path d="M1 3h7.2L18 30 27.8 3H35L22.2 33h-8.4L1 3z"/>
+    <!-- U -->
+    <path d="M54 3h6.8v18.5c0 5 2.5 8 7 8s7-3 7-8V3h6.8v19c0 9.2-5.5 14.5-13.8 14.5S54 31.2 54 22V3z"/>
+    <!-- L -->
+    <path d="M102 3h6.8v19.5H132v9.5h-30V3z"/>
+    <!-- C -->
+    <path d="M152 3h28v7.5h-20c-4.6 0-7.8 2.9-7.8 7.4s3.2 7.4 7.8 7.4H180v7.5h-21.5c-9.6 0-16-6.4-16-14.9S149 3 158.5 3H152z"/>
+    <!-- E — three bars -->
+    <rect x="204" y="3" width="24" height="6.5"/>
+    <rect x="204" y="14.75" width="24" height="6.5"/>
+    <rect x="204" y="26.5" width="24" height="6.5"/>
+    <!-- T -->
+    <path d="M248 3h38v7.5h-15.6V33h-6.8V10.5H248V3z"/>
   </g>
 </svg>
