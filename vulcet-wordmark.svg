@@ -1,19 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 140" role="img" aria-label="Vulcet">
-  <!-- Signature wordmark: proprietary three-bar E  the Vulcet DNA -->
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 40" role="img" aria-label="Vulcet">
   <g fill="#07080b">
-    <!-- V -->
-    <path d="M20 20h36l50 100 50-100h36L128 130H84L20 20z"/>
-    <!-- U -->
-    <path d="M220 20h34v68c0 22 12 36 34 36s34-14 34-36V20h34v70c0 42-28 64-68 64s-68-22-68-64V20z"/>
-    <!-- L -->
-    <path d="M390 20h34v90h70v30H390V20z"/>
-    <!-- C -->
-    <path d="M520 20h120v30H554c-18 0-30 12-30 32s12 32 30 32h86v30H520c-42 0-70-30-70-62s28-62 70-62z"/>
-    <!-- E  signature: three bars, no vertical stem -->
-    <rect x="670" y="20" width="100" height="28" rx="2"/>
-    <rect x="670" y="61" width="88" height="28" rx="2"/>
-    <rect x="670" y="102" width="100" height="28" rx="2"/>
-    <!-- T -->
-    <path d="M800 20h100v28h-33v92h-34V48h-33V20z"/>
+    <path d="M2 5h8L20 33 30 5h8L24 35h-8L2 5z"/>
+    <path d="M54 5h7.5v20c0 5.5 2.8 8.8 7.8 8.8s7.8-3.3 7.8-8.8V5H85v20.8c0 10-6 15.7-15.5 15.7S54 35.8 54 25.8V5z"/>
+    <path d="M104 5h7.5v21H136v9h-32V5z"/>
+    <path d="M152 5h30v8h-21.5c-5 0-8.5 3.2-8.5 8.2s3.5 8.2 8.5 8.2H182v8h-23c-10.5 0-17.5-7-17.5-16S148.5 5 159 5h-7z"/>
+    <rect x="202" y="5" width="26" height="7"/>
+    <rect x="202" y="16.5" width="26" height="7"/>
+    <rect x="202" y="28" width="26" height="7"/>
+    <path d="M246 5h40v8h-16v22h-8V13h-16V5z"/>
   </g>
 </svg>
