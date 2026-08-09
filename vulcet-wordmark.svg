@@ -1,19 +1,19 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 36" role="img" aria-label="Vulcet">
-  <!-- Exact brand lockup used on LinkedIn case-study posts: wide tracking + three-bar E -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 140" role="img" aria-label="Vulcet">
+  <!-- Signature wordmark: proprietary three-bar E  the Vulcet DNA -->
   <g fill="#07080b">
     <!-- V -->
-    <path d="M1 3h7.2L18 30 27.8 3H35L22.2 33h-8.4L1 3z"/>
+    <path d="M20 20h36l50 100 50-100h36L128 130H84L20 20z"/>
     <!-- U -->
-    <path d="M54 3h6.8v18.5c0 5 2.5 8 7 8s7-3 7-8V3h6.8v19c0 9.2-5.5 14.5-13.8 14.5S54 31.2 54 22V3z"/>
+    <path d="M220 20h34v68c0 22 12 36 34 36s34-14 34-36V20h34v70c0 42-28 64-68 64s-68-22-68-64V20z"/>
     <!-- L -->
-    <path d="M102 3h6.8v19.5H132v9.5h-30V3z"/>
+    <path d="M390 20h34v90h70v30H390V20z"/>
     <!-- C -->
-    <path d="M152 3h28v7.5h-20c-4.6 0-7.8 2.9-7.8 7.4s3.2 7.4 7.8 7.4H180v7.5h-21.5c-9.6 0-16-6.4-16-14.9S149 3 158.5 3H152z"/>
-    <!-- E — three bars -->
-    <rect x="204" y="3" width="24" height="6.5"/>
-    <rect x="204" y="14.75" width="24" height="6.5"/>
-    <rect x="204" y="26.5" width="24" height="6.5"/>
+    <path d="M520 20h120v30H554c-18 0-30 12-30 32s12 32 30 32h86v30H520c-42 0-70-30-70-62s28-62 70-62z"/>
+    <!-- E  signature: three bars, no vertical stem -->
+    <rect x="670" y="20" width="100" height="28" rx="2"/>
+    <rect x="670" y="61" width="88" height="28" rx="2"/>
+    <rect x="670" y="102" width="100" height="28" rx="2"/>
     <!-- T -->
-    <path d="M248 3h38v7.5h-15.6V33h-6.8V10.5H248V3z"/>
+    <path d="M800 20h100v28h-33v92h-34V48h-33V20z"/>
   </g>
 </svg>

@@ -1686,9 +1686,9 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   .hero-lens span { animation: none !important; }
 }
 
-/* Vulcet signature wordmark — LinkedIn case-study lockup */
+/* Vulcet signature wordmark — brand board / LinkedIn lockup */
 .wordmark {
-  width: 118px;
+  width: 168px;
   height: auto;
   display: flex;
   align-items: center;
@@ -1707,7 +1707,7 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 
 @media (max-width: 899px) {
   .wordmark {
-    width: 102px;
+    width: 140px;
   }
 }
 
