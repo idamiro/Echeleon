@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vulcet × Founder Club Azerbaijan — LinkedIn Carousel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f2eee6;
+      --paper-light: #faf8f3;
+      --coal: #171715;
+      --graphite: #595650;
+      --rule: #c9c2b7;
+      --signal: #07080b;
+      --dark-text: #ddd8cf;
+      --dark-muted: #c9c4bb;
+      --dark-rule: #4a4843;
+      --fc-gold: #c9a24a;
+      --fc-blue: #1e3a6e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #111; }
+    body {
+      font-family: Inter, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      color: var(--coal);
+    }
+
+    .deck {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+      padding: 48px;
+      width: max-content;
+    }
+
+    .slide {
+      width: 1080px;
+      height: 1350px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide--paper { background: var(--paper); color: var(--coal); }
+    .slide--coal { background: var(--signal); color: var(--paper-light); }
+
+    .pad {
+      padding: 72px 80px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 2;
+    }
+
+    .chrome {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 44px;
+    }
+
+    .wordmark {
+      height: 28px;
+      width: auto;
+      display: block;
+    }
+    .wordmark--light { filter: invert(1) brightness(1.15); }
+
+    .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 15px;
+      font-weight: 650;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .label i {
+      font-style: normal;
+      color: var(--graphite);
+    }
+    .slide--coal .label i { color: var(--dark-muted); }
+    .label b {
+      font-weight: 650;
+      letter-spacing: .12em;
+    }
+
+    .rule {
+      width: 56px;
+      height: 1px;
+      background: var(--signal);
+      margin: 36px 0;
+    }
+    .slide--coal .rule { background: var(--paper-light); }
+
+    h1, h2 {
+      font-weight: 560;
+      letter-spacing: -.04em;
+      line-height: .96;
+    }
+    h1 { font-size: 96px; max-width: 920px; }
+    h2 { font-size: 78px; max-width: 900px; }
+    h1 em, h2 em {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .support {
+      font-size: 28px;
+      line-height: 1.4;
+      font-weight: 450;
+      max-width: 720px;
+    }
+    .slide--paper .support { color: var(--graphite); }
+    .slide--coal .support { color: var(--dark-muted); }
+
+    .foot {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 28px;
+      border-top: 1px solid var(--rule);
+      font-size: 15px;
+      font-weight: 650;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--graphite);
+    }
+    .slide--coal .foot {
+      border-top-color: var(--dark-rule);
+      color: var(--dark-muted);
+    }
+    .foot strong {
+      color: inherit;
+      font-weight: 650;
+      letter-spacing: .08em;
+    }
+    .slide--paper .foot strong { color: var(--coal); }
+    .slide--coal .foot strong { color: var(--paper-light); }
+
+    /* ========== SLIDE 1 ========== */
+    .s1-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-bottom: 48px;
+    }
+    .s1-kicker {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--dark-muted);
+      margin-bottom: 40px;
+    }
+    .s1-partners {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      margin-top: 48px;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: var(--paper-light);
+    }
+    .s1-partners span {
+      opacity: .4;
+      font-weight: 500;
+    }
+    .s1-fc-mark {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ========== SLIDE 2 ========== */
+    .s2-media {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .s2-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 40%;
+      filter: saturate(.9) contrast(1.05);
+    }
+    .s2-media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(7,8,11,.72) 0%, rgba(7,8,11,.28) 38%, rgba(7,8,11,.55) 62%, rgba(7,8,11,.92) 100%);
+    }
+    .s2-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding-bottom: 8px;
+      max-width: 880px;
+    }
+    .s2-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .s2-badge img {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .s2-badge span {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--dark-muted);
+    }
+
+    /* ========== SLIDE 3 ========== */
+    .s3-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding-top: 28px;
+    }
+    .s3-grid {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+    .s3-grid div {
+      padding: 28px 28px 28px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .s3-grid div:nth-child(even) {
+      padding-left: 28px;
+      border-left: 1px solid var(--rule);
+    }
+    .s3-grid div:nth-last-child(-n+2) { border-bottom: 0; }
+    .s3-grid dt {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--graphite);
+      margin-bottom: 10px;
+    }
+    .s3-grid dd {
+      font-size: 26px;
+      font-weight: 560;
+      letter-spacing: -.02em;
+      line-height: 1.2;
+    }
+    .s3-frame {
+      margin-top: 36px;
+      flex: 1;
+      min-height: 0;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+      background: var(--paper-light);
+    }
+    .s3-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 55%;
+      display: block;
+    }
+    .s3-frame figcaption {
+      position: absolute;
+      left: 20px;
+      bottom: 18px;
+      padding: 10px 14px;
+      background: rgba(7,8,11,.78);
+      color: var(--paper-light);
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      border-radius: 2px;
+    }
+
+    /* ========== SLIDE 4 ========== */
+    .s4-layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 0;
+    }
+    .s4-copy {
+      padding: 72px 56px 64px 80px;
+      display: flex;
+      flex-direction: column;
+      background: var(--paper);
+    }
+    .s4-foot {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 22px;
+      border-top: 1px solid var(--rule);
+      font-size: 14px;
+      font-weight: 650;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--graphite);
+    }
+    .s4-foot strong { color: var(--coal); font-weight: 650; }
+    .s4-copy h2 { font-size: 64px; max-width: 420px; }
+    .s4-copy .support {
+      font-size: 24px;
+      max-width: 400px;
+      margin-top: 8px;
+    }
+    .s4-points {
+      margin-top: 40px;
+      border-top: 1px solid var(--rule);
+    }
+    .s4-points li {
+      list-style: none;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--rule);
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    .s4-points span {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--signal);
+      letter-spacing: .06em;
+      padding-top: 3px;
+    }
+    .s4-points p {
+      font-size: 22px;
+      line-height: 1.35;
+      font-weight: 520;
+      letter-spacing: -.015em;
+    }
+    .s4-media {
+      position: relative;
+      background: var(--signal);
+      overflow: hidden;
+    }
+    .s4-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      filter: saturate(.92) contrast(1.04);
+    }
+    .s4-media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(7,8,11,.15), rgba(7,8,11,.55));
+    }
+    .s4-brand-stack {
+      position: absolute;
+      left: 36px;
+      right: 36px;
+      bottom: 40px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .s4-brand-stack img.fc {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .s4-brand-stack p {
+      color: var(--paper-light);
+      font-size: 20px;
+      line-height: 1.35;
+      font-weight: 500;
+      max-width: 320px;
+    }
+
+    /* ========== SLIDE 5 ========== */
+    .s5-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-bottom: 24px;
+    }
+    .s5-marks {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-bottom: 56px;
+    }
+    .s5-marks .wordmark { height: 32px; }
+    .s5-marks .divider {
+      width: 1px;
+      height: 36px;
+      background: var(--dark-rule);
+    }
+    .s5-marks .fc {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .s5-links {
+      margin-top: 48px;
+      display: grid;
+      gap: 14px;
+    }
+    .s5-links a,
+    .s5-links span {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: var(--paper-light);
+      text-decoration: none;
+    }
+    .s5-links small {
+      display: block;
+      margin-top: 6px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--dark-muted);
+      letter-spacing: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+
+    <!-- SLIDE 1: Cover -->
+    <section class="slide slide--coal" id="slide-1">
+      <div class="pad">
+        <div class="chrome">
+          <img class="wordmark wordmark--light" src="./vulcet-wordmark.png" alt="Vulcet">
+          <div class="label"><b>01</b><i>Case study</i></div>
+        </div>
+        <div class="s1-main">
+          <p class="s1-kicker">Vulcet’s first client project</p>
+          <h1>The first<br>project.</h1>
+          <div class="rule"></div>
+          <p class="support">Product structure, UI/UX and development for Founder Club Azerbaijan — a live community platform.</p>
+          <div class="s1-partners">
+            <img class="s1-fc-mark" src="./founderclub-logo.png" alt="Founder Club">
+            <div>Vulcet <span>×</span> Founder Club Azerbaijan</div>
+          </div>
+        </div>
+        <div class="foot">
+          <strong>Vulcet</strong>
+          <span>01 / 05</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: Founder Club -->
+    <section class="slide slide--coal" id="slide-2">
+      <div class="s2-media" aria-hidden="true">
+        <img src="./founderclub-event-networking.jpg" alt="">
+      </div>
+      <div class="pad">
+        <div class="chrome">
+          <img class="wordmark wordmark--light" src="./vulcet-wordmark.png" alt="Vulcet">
+          <div class="label"><b>02</b><i>The client</i></div>
+        </div>
+        <div class="s2-main">
+          <div class="s2-badge">
+            <img src="./founderclub-logo.png" alt="">
+            <span>Founder Club Azerbaijan</span>
+          </div>
+          <h2>A business community with a local centre of gravity.</h2>
+          <div class="rule"></div>
+          <p class="support">Founder Club brings founders, events, editorial news and membership into one shared context — with a premium identity rooted in Baku.</p>
+        </div>
+        <div class="foot">
+          <strong>founderclub.az</strong>
+          <span>02 / 05</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: What we built -->
+    <section class="slide slide--paper" id="slide-3">
+      <div class="pad">
+        <div class="chrome">
+          <img class="wordmark" src="./vulcet-wordmark.png" alt="Vulcet">
+          <div class="label"><b>03</b><i>Behind the work</i></div>
+        </div>
+        <div class="s3-main">
+          <h2>What we <em>built.</em></h2>
+          <p class="support" style="margin-top:24px;">A structured editorial system so membership, events, news and community activity share one clear hierarchy.</p>
+          <dl class="s3-grid">
+            <div><dt>Role</dt><dd>Product structure, UI/UX, development</dd></div>
+            <div><dt>Duration</dt><dd>Approx. six weeks</dd></div>
+            <div><dt>Systems</dt><dd>News · Events · Membership · Community</dd></div>
+            <div><dt>Status</dt><dd>Live client project</dd></div>
+          </dl>
+          <figure class="s3-frame">
+            <img src="./founderclub-hero.jpg" alt="FounderClub website hero featuring the Baku skyline.">
+            <figcaption>Live · founderclub.az</figcaption>
+          </figure>
+        </div>
+        <div class="foot">
+          <strong>Case study</strong>
+          <span>03 / 05</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: Collaboration -->
+    <section class="slide slide--paper" id="slide-4">
+      <div class="s4-layout">
+        <div class="s4-copy">
+          <div class="label"><b>04</b><i>Why this project</i></div>
+          <h2 style="margin-top:36px;">Where Vulcet’s approach met a real community.</h2>
+          <div class="rule"></div>
+          <p class="support">The first engagement had to be precise: structure before styling, identity preserved, and a platform people could actually use.</p>
+          <ul class="s4-points">
+            <li><span>01</span><p>One coherent home for different kinds of community content.</p></li>
+            <li><span>02</span><p>Strong local imagery with restrained, navigable typography.</p></li>
+            <li><span>03</span><p>A live system — not a portfolio concept.</p></li>
+          </ul>
+          <div class="s4-foot">
+            <strong>Vulcet</strong>
+            <span>04 / 05</span>
+          </div>
+        </div>
+        <div class="s4-media">
+          <img src="./founderclub-event-office.jpg" alt="Founder Club office visit and community meeting.">
+          <div class="s4-brand-stack">
+            <img class="fc" src="./founderclub-logo.png" alt="Founder Club">
+            <p>Vulcet × Founder Club Azerbaijan</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: Close -->
+    <section class="slide slide--coal" id="slide-5">
+      <div class="pad">
+        <div class="chrome">
+          <div class="label"><b>05</b><i>Next</i></div>
+          <div class="label"><i>Vulcet</i></div>
+        </div>
+        <div class="s5-main">
+          <div class="s5-marks">
+            <img class="wordmark wordmark--light" src="./vulcet-wordmark.png" alt="Vulcet">
+            <div class="divider" aria-hidden="true"></div>
+            <img class="fc" src="./founderclub-logo.png" alt="Founder Club">
+          </div>
+          <h1>First project.<br><em>First step.</em></h1>
+          <div class="rule"></div>
+          <p class="support">The platform is live. The studio is just getting started.</p>
+          <div class="s5-links">
+            <span>founderclub.az<small>Visit the live platform</small></span>
+            <span>vulcet.com/work/founderclub<small>Read the case study</small></span>
+          </div>
+        </div>
+        <div class="foot">
+          <strong>hello@vulcet.com</strong>
+          <span>05 / 05</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
