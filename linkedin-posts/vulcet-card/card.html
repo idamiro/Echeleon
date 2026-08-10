@@ -2,284 +2,162 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Vulcet — Black Metal Card</title>
+  <title>Vulcet — Embossed Black Card</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Inter, system-ui, sans-serif; background: #0a0a0a; }
-
+    body { font-family: Inter, system-ui, sans-serif; background: #111; }
     .frame {
       width: 1600px;
       height: 1200px;
-      position: relative;
-      overflow: hidden;
       display: grid;
       place-items: center;
-      /* soft studio like the reference: warm grey / cool cream split */
-      background: linear-gradient(135deg, #e6e2da 0%, #e6e2da 47.6%, #f2efe9 47.6%, #f5f2ec 100%);
+      background: linear-gradient(135deg, #e4e0d8 0%, #e4e0d8 47.5%, #f1eee8 47.5%, #f4f1eb 100%);
+      position: relative;
+      overflow: hidden;
     }
     .frame::before {
       content: "";
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse 70% 55% at 32% 68%, rgba(0,0,0,.06), transparent 58%),
-        radial-gradient(ellipse 45% 35% at 72% 28%, rgba(255,255,255,.45), transparent 55%);
-      pointer-events: none;
+        radial-gradient(ellipse 70% 55% at 30% 70%, rgba(0,0,0,.05), transparent 58%),
+        radial-gradient(ellipse 45% 35% at 75% 25%, rgba(255,255,255,.4), transparent 55%);
     }
-
     .card-wrap {
       position: relative;
-      width: 960px;
-      height: 605px;
-      transform: rotate(-17deg) translate(10px, 8px);
+      z-index: 1;
+      width: 980px;
+      height: 618px;
+      transform: rotate(-16deg) translate(8px, 4px);
       filter:
-        drop-shadow(28px 48px 36px rgba(20,18,14,.28))
-        drop-shadow(8px 14px 18px rgba(20,18,14,.16));
+        drop-shadow(28px 48px 38px rgba(20,18,14,.28))
+        drop-shadow(8px 14px 18px rgba(20,18,14,.14));
     }
-
     .card {
       width: 100%;
       height: 100%;
-      border-radius: 28px;
+      border-radius: 26px;
       position: relative;
       overflow: hidden;
       background:
-        /* soft brushed metal */
         linear-gradient(112deg,
           rgba(255,255,255,.00) 0%,
-          rgba(255,255,255,.06) 26%,
-          rgba(255,255,255,.00) 40%,
-          rgba(255,255,255,.035) 58%,
-          rgba(255,255,255,.00) 74%,
-          rgba(255,255,255,.05) 90%,
+          rgba(255,255,255,.05) 28%,
+          rgba(255,255,255,.00) 44%,
+          rgba(255,255,255,.03) 62%,
+          rgba(255,255,255,.00) 78%,
+          rgba(255,255,255,.04) 92%,
           rgba(255,255,255,.00) 100%),
-        radial-gradient(115% 85% at 10% -15%, rgba(255,255,255,.1), transparent 40%),
-        linear-gradient(152deg, #1a1a18 0%, #0e0e0c 42%, #070707 100%);
-      border: 1px solid rgba(255,255,255,.1);
+        radial-gradient(115% 85% at 12% -10%, rgba(255,255,255,.07), transparent 42%),
+        linear-gradient(152deg, #1c1b19 0%, #121110 48%, #0a0a09 100%);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.1), inset 0 -1px 0 rgba(0,0,0,.4);
+    }
+
+    /* Large tone-on-tone embossed mark — like SELECT's S */
+    .emboss {
+      position: absolute;
+      left: 64px;
+      top: 50%;
+      transform: translateY(-58%);
+      width: 220px;
+      height: 220px;
+      border-radius: 40px;
+      background:
+        linear-gradient(155deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,.015) 42%, rgba(0,0,0,.1) 100%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.14),
-        inset 0 -1px 0 rgba(0,0,0,.45);
+        3px 4px 6px rgba(0,0,0,.4),
+        -1.5px -1.5px 3px rgba(255,255,255,.08),
+        inset 0 1px 0 rgba(255,255,255,.1),
+        inset 0 -2px 0 rgba(0,0,0,.3);
+      display: grid;
+      place-items: center;
+      gap: 20px;
+      padding: 50px 44px;
     }
-
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background: linear-gradient(140deg, rgba(255,255,255,.07), transparent 32%, transparent 68%, rgba(0,0,0,.18));
-      pointer-events: none;
-      z-index: 1;
+    .emboss i {
+      display: block;
+      width: 100%;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04) 38%, rgba(0,0,0,.16));
+      box-shadow:
+        0 1px 0 rgba(255,255,255,.1),
+        0 3px 4px rgba(0,0,0,.3),
+        inset 0 -1px 0 rgba(0,0,0,.25);
     }
-
-    /* Fine engraved lines — like the reference nahış */
-    .etch {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      opacity: .92;
-    }
-    .etch svg { width: 100%; height: 100%; display: block; }
 
     .chip {
       position: absolute;
-      left: 90px;
-      top: 198px;
-      width: 84px;
-      height: 64px;
-      border-radius: 10px;
-      z-index: 2;
-      background:
-        linear-gradient(145deg,
-          #efeae1 0%,
-          #c4bdb1 24%,
-          #e8e2d8 42%,
-          #a39c90 60%,
-          #d8d1c6 80%,
-          #968f83 100%);
-      box-shadow:
-        0 1px 0 rgba(255,255,255,.4),
-        0 8px 18px rgba(0,0,0,.4),
-        inset 0 0 0 1px rgba(0,0,0,.2),
-        inset 0 2px 2px rgba(255,255,255,.3);
+      right: 280px;
+      top: 210px;
+      width: 78px;
+      height: 60px;
+      border-radius: 9px;
+      background: linear-gradient(145deg, #ddd8cf, #b0a99d 40%, #ebe6dc 55%, #968f83);
+      box-shadow: 0 1px 0 rgba(255,255,255,.35), 0 6px 14px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.18);
       overflow: hidden;
+      opacity: .85;
     }
     .chip::before {
       content: "";
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 50% 0 / 1.15px 100% no-repeat,
-        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 0 31% / 100% 1.15px no-repeat,
-        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 0 69% / 100% 1.15px no-repeat,
-        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 27% 0 / 1.15px 100% no-repeat,
-        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 73% 0 / 1.15px 100% no-repeat;
-      opacity: .68;
+        linear-gradient(rgba(80,74,64,.5), rgba(80,74,64,.5)) 50% 0 / 1px 100% no-repeat,
+        linear-gradient(rgba(80,74,64,.5), rgba(80,74,64,.5)) 0 33% / 100% 1px no-repeat,
+        linear-gradient(rgba(80,74,64,.5), rgba(80,74,64,.5)) 0 66% / 100% 1px no-repeat,
+        linear-gradient(rgba(80,74,64,.5), rgba(80,74,64,.5)) 28% 0 / 1px 100% no-repeat,
+        linear-gradient(rgba(80,74,64,.5), rgba(80,74,64,.5)) 72% 0 / 1px 100% no-repeat;
+      opacity: .55;
     }
-    .chip::after {
-      content: "";
+
+    .name {
+      position: absolute;
+      right: 56px;
+      bottom: 48px;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: .36em;
+      text-transform: uppercase;
+      color: rgba(242,238,230,.4);
+      padding-left: .36em;
+    }
+    .member {
+      position: absolute;
+      left: 64px;
+      bottom: 52px;
+      font-size: 11px;
+      font-weight: 550;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(242,238,230,.22);
+    }
+
+    .etch {
       position: absolute;
       inset: 0;
-      background: linear-gradient(118deg, rgba(255,255,255,.32), transparent 42%, transparent 62%, rgba(255,255,255,.1));
+      pointer-events: none;
+      opacity: .5;
     }
-
-    .contactless {
-      position: absolute;
-      left: 198px;
-      top: 210px;
-      width: 30px;
-      height: 40px;
-      opacity: .55;
-      z-index: 2;
-    }
-
-    /* Brand lockup: icon box + Vulcet */
-    .brand {
-      position: absolute;
-      top: 52px;
-      right: 64px;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .mark {
-      width: 72px;
-      height: 72px;
-      border-radius: 18px;
-      background:
-        linear-gradient(160deg, #1f1f1d 0%, #0a0a09 55%, #050505 100%);
-      border: 1px solid rgba(201,194,183,.28);
-      box-shadow:
-        0 10px 22px rgba(0,0,0,.35),
-        inset 0 1px 0 rgba(255,255,255,.12),
-        inset 0 -1px 0 rgba(0,0,0,.4);
-      display: grid;
-      place-items: center;
-      gap: 7px;
-      padding: 16px 15px;
-    }
-    .mark i {
-      display: block;
-      width: 100%;
-      height: 7px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #f7f3ea, #d6d0c4 40%, #f2eee6 70%, #c9c2b7);
-      box-shadow: 0 0 6px rgba(242,238,230,.18);
-    }
-
-    .brand span {
-      font-size: 15px;
-      font-weight: 650;
-      letter-spacing: .28em;
-      text-transform: uppercase;
-      color: rgba(242,238,230,.88);
-      padding-left: .28em; /* optical balance with letter-spacing */
-    }
-
-    .mastercard {
-      position: absolute;
-      right: 68px;
-      bottom: 52px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 9px;
-      z-index: 2;
-    }
-    .mc-marks {
-      position: relative;
-      width: 90px;
-      height: 54px;
-      filter: drop-shadow(0 2px 5px rgba(0,0,0,.3));
-    }
-    .mc-marks i {
-      position: absolute;
-      top: 0;
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-    }
-    .mc-marks i:first-child {
-      left: 0;
-      background: radial-gradient(circle at 30% 28%, #efeae1, #c4bdb1 48%, #8a8377 100%);
-      opacity: .9;
-    }
-    .mc-marks i:last-child {
-      right: 0;
-      background: radial-gradient(circle at 35% 30%, #d6d0c4, #9e978b 50%, #6a645a 100%);
-      opacity: .78;
-    }
-    .mastercard span {
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: .05em;
-      color: rgba(201,194,183,.52);
-      text-transform: lowercase;
-    }
+    .etch svg { width: 100%; height: 100%; }
   </style>
 </head>
 <body>
   <div class="frame" id="shot">
     <div class="card-wrap">
       <div class="card">
-        <!-- Fine silver engraving — reference-style nahış -->
         <div class="etch" aria-hidden="true">
-          <svg viewBox="0 0 960 605" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="engrave" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#f5f1e8" stop-opacity=".55"/>
-                <stop offset="28%" stop-color="#c9c2b7" stop-opacity=".22"/>
-                <stop offset="55%" stop-color="#ebe6dc" stop-opacity=".38"/>
-                <stop offset="100%" stop-color="#a8a195" stop-opacity=".48"/>
-              </linearGradient>
-              <linearGradient id="engraveSoft" x1="1" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#efebe3" stop-opacity=".32"/>
-                <stop offset="100%" stop-color="#c9c2b7" stop-opacity=".08"/>
-              </linearGradient>
-            </defs>
-
-            <!-- Large left semicircle family — thin, quiet, premium -->
-            <g stroke-linecap="round" fill="none">
-              <path d="M-120 620 C -20 -20, 300 -160, 680 40" stroke="url(#engrave)" stroke-width="1.15"/>
-              <path d="M-90 635 C 20 10, 330 -135, 700 70" stroke="url(#engrave)" stroke-width=".85" opacity=".55"/>
-              <path d="M-55 650 C 60 45, 360 -105, 720 100" stroke="url(#engraveSoft)" stroke-width=".7" opacity=".4"/>
-
-              <!-- Long elegant diagonal -->
-              <path d="M40 640 L 980 -10" stroke="url(#engrave)" stroke-width="1.05"/>
-              <path d="M75 655 L 1015 5" stroke="url(#engraveSoft)" stroke-width=".75" opacity=".45"/>
-
-              <!-- Quiet secondary arcs -->
-              <path d="M520 -50 C 760 30, 900 200, 990 430" stroke="url(#engrave)" stroke-width=".9" opacity=".42"/>
-              <path d="M580 -20 C 790 70, 910 240, 1000 470" stroke="url(#engraveSoft)" stroke-width=".65" opacity=".28"/>
-
-              <!-- Micro near-chip engraving -->
-              <path d="M30 250 C 140 165, 240 145, 330 175" stroke="url(#engraveSoft)" stroke-width=".65" opacity=".3"/>
-            </g>
+          <svg viewBox="0 0 980 618" fill="none">
+            <path d="M300 650 C 480 280, 680 80, 1040 -40" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+            <path d="M340 670 C 520 300, 720 100, 1080 -20" stroke="rgba(255,255,255,.05)" stroke-width=".7"/>
           </svg>
         </div>
-
-        <div class="brand">
-          <div class="mark" aria-label="Vulcet mark">
-            <i></i><i></i><i></i>
-          </div>
-          <span>Vulcet</span>
-        </div>
-
+        <div class="emboss" aria-label="Vulcet mark"><i></i><i></i><i></i></div>
         <div class="chip" aria-hidden="true"></div>
-        <svg class="contactless" viewBox="0 0 24 32" fill="none" aria-hidden="true">
-          <path d="M8 8c3.5 3 3.5 13 0 16" stroke="#c9c2b7" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M12.5 5c5 4.2 5 17.6 0 22" stroke="#c9c2b7" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M17 2c6.5 5.5 6.5 22 0 28" stroke="#c9c2b7" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-
-        <div class="mastercard" aria-label="Mastercard">
-          <div class="mc-marks"><i></i><i></i></div>
-          <span>mastercard</span>
-        </div>
+        <div class="member">Member</div>
+        <div class="name">Vulcet</div>
       </div>
     </div>
   </div>
