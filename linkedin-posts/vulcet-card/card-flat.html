@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Vulcet — Black Metal Card Flat</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Inter, system-ui, sans-serif; background: #111; }
@@ -12,13 +12,12 @@
       height: 900px;
       display: grid;
       place-items: center;
-      background:
-        radial-gradient(ellipse 80% 60% at 50% 50%, #1a1916, #0e0d0c 70%, #090908 100%);
+      background: #f2eee6;
     }
     .card-wrap {
       width: 1040px;
       height: 656px;
-      filter: drop-shadow(0 40px 70px rgba(0,0,0,.55));
+      filter: drop-shadow(0 32px 56px rgba(23,23,21,.22));
     }
     .card {
       width: 100%;
@@ -27,80 +26,90 @@
       position: relative;
       overflow: hidden;
       background:
-        linear-gradient(105deg,
+        linear-gradient(112deg,
           rgba(255,255,255,.00) 0%,
-          rgba(255,255,255,.05) 30%,
-          rgba(255,255,255,.00) 45%,
-          rgba(255,255,255,.03) 62%,
-          rgba(255,255,255,.00) 78%,
-          rgba(255,255,255,.045) 92%,
+          rgba(255,255,255,.06) 26%,
+          rgba(255,255,255,.00) 40%,
+          rgba(255,255,255,.035) 58%,
+          rgba(255,255,255,.00) 74%,
+          rgba(255,255,255,.05) 90%,
           rgba(255,255,255,.00) 100%),
-        radial-gradient(120% 90% at 8% -20%, rgba(255,255,255,.12), transparent 38%),
-        linear-gradient(155deg, #1c1c1a 0%, #10100e 35%, #080808 70%, #050505 100%);
-      border: 1px solid rgba(201,194,183,.2);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.16),
-        inset 0 -1px 0 rgba(0,0,0,.5);
+        radial-gradient(115% 85% at 10% -15%, rgba(255,255,255,.1), transparent 40%),
+        linear-gradient(152deg, #1a1a18 0%, #0e0e0c 42%, #070707 100%);
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.45);
     }
     .card::before {
       content: "";
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      background: linear-gradient(135deg, rgba(255,255,255,.08), transparent 35%, transparent 65%, rgba(0,0,0,.2));
+      background: linear-gradient(140deg, rgba(255,255,255,.07), transparent 32%, transparent 68%, rgba(0,0,0,.18));
       pointer-events: none;
       z-index: 1;
     }
-    .etch { position: absolute; inset: 0; z-index: 0; }
+    .etch { position: absolute; inset: 0; z-index: 0; opacity: .92; }
     .etch svg { width: 100%; height: 100%; }
     .chip {
-      position: absolute; left: 96px; top: 220px; width: 94px; height: 72px;
+      position: absolute; left: 98px; top: 220px; width: 92px; height: 70px;
       border-radius: 11px; z-index: 2;
-      background: linear-gradient(145deg, #f0ebe2 0%, #c9c2b7 22%, #ebe6dc 40%, #a8a195 58%, #ddd7cd 78%, #9a9386 100%);
-      box-shadow: 0 1px 0 rgba(255,255,255,.45), 0 10px 22px rgba(0,0,0,.45), inset 0 0 0 1px rgba(0,0,0,.22), inset 0 2px 3px rgba(255,255,255,.35);
+      background: linear-gradient(145deg, #efeae1 0%, #c4bdb1 24%, #e8e2d8 42%, #a39c90 60%, #d8d1c6 80%, #968f83 100%);
+      box-shadow: 0 1px 0 rgba(255,255,255,.4), 0 8px 18px rgba(0,0,0,.4), inset 0 0 0 1px rgba(0,0,0,.2), inset 0 2px 2px rgba(255,255,255,.3);
       overflow: hidden;
     }
     .chip::before {
       content: ""; position: absolute; inset: 0;
       background:
-        linear-gradient(rgba(90,84,74,.55), rgba(90,84,74,.55)) 50% 0 / 1.2px 100% no-repeat,
-        linear-gradient(rgba(90,84,74,.55), rgba(90,84,74,.55)) 0 30% / 100% 1.2px no-repeat,
-        linear-gradient(rgba(90,84,74,.55), rgba(90,84,74,.55)) 0 70% / 100% 1.2px no-repeat,
-        linear-gradient(rgba(90,84,74,.55), rgba(90,84,74,.55)) 26% 0 / 1.2px 100% no-repeat,
-        linear-gradient(rgba(90,84,74,.55), rgba(90,84,74,.55)) 74% 0 / 1.2px 100% no-repeat;
-      opacity: .7;
+        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 50% 0 / 1.15px 100% no-repeat,
+        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 0 31% / 100% 1.15px no-repeat,
+        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 0 69% / 100% 1.15px no-repeat,
+        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 27% 0 / 1.15px 100% no-repeat,
+        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 73% 0 / 1.15px 100% no-repeat;
+      opacity: .68;
     }
     .chip::after {
       content: ""; position: absolute; inset: 0;
-      background: linear-gradient(120deg, rgba(255,255,255,.35), transparent 40%, transparent 60%, rgba(255,255,255,.12));
+      background: linear-gradient(118deg, rgba(255,255,255,.32), transparent 42%, transparent 62%, rgba(255,255,255,.1));
     }
-    .wordmark {
-      position: absolute; top: 68px; right: 80px; width: 310px; height: auto; z-index: 2;
-      filter: invert(1) brightness(1.05) drop-shadow(0 1px 0 rgba(255,255,255,.15)) drop-shadow(0 0 12px rgba(242,238,230,.12));
-      opacity: .98;
+    .contactless { position: absolute; left: 218px; top: 234px; width: 32px; height: 42px; opacity: .55; z-index: 2; }
+    .brand {
+      position: absolute; top: 58px; right: 72px; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 15px;
     }
-    .contactless {
-      position: absolute; left: 218px; top: 234px; width: 34px; height: 44px; opacity: .62; z-index: 2;
-      filter: drop-shadow(0 0 4px rgba(201,194,183,.25));
+    .mark {
+      width: 80px; height: 80px; border-radius: 20px;
+      background: linear-gradient(160deg, #1f1f1d 0%, #0a0a09 55%, #050505 100%);
+      border: 1px solid rgba(201,194,183,.28);
+      box-shadow: 0 10px 22px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12), inset 0 -1px 0 rgba(0,0,0,.4);
+      display: grid; place-items: center; gap: 8px; padding: 18px 17px;
+    }
+    .mark i {
+      display: block; width: 100%; height: 7.5px; border-radius: 999px;
+      background: linear-gradient(90deg, #f7f3ea, #d6d0c4 40%, #f2eee6 70%, #c9c2b7);
+      box-shadow: 0 0 6px rgba(242,238,230,.18);
+    }
+    .brand span {
+      font-size: 16px; font-weight: 650; letter-spacing: .28em; text-transform: uppercase;
+      color: rgba(242,238,230,.88); padding-left: .28em;
     }
     .mastercard {
-      position: absolute; right: 80px; bottom: 62px;
-      display: flex; flex-direction: column; align-items: center; gap: 11px; z-index: 2;
+      position: absolute; right: 76px; bottom: 58px;
+      display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 2;
     }
-    .mc-marks { position: relative; width: 104px; height: 64px; filter: drop-shadow(0 2px 6px rgba(0,0,0,.35)); }
-    .mc-marks i { position: absolute; top: 0; width: 64px; height: 64px; border-radius: 50%; }
+    .mc-marks { position: relative; width: 98px; height: 58px; filter: drop-shadow(0 2px 5px rgba(0,0,0,.3)); }
+    .mc-marks i { position: absolute; top: 0; width: 58px; height: 58px; border-radius: 50%; }
     .mc-marks i:first-child {
       left: 0;
-      background: radial-gradient(circle at 30% 28%, #f4efe6, #c9c2b7 45%, #8f877b 100%);
-      opacity: .92;
+      background: radial-gradient(circle at 30% 28%, #efeae1, #c4bdb1 48%, #8a8377 100%);
+      opacity: .9;
     }
     .mc-marks i:last-child {
       right: 0;
-      background: radial-gradient(circle at 35% 30%, #ddd7cd, #a8a195 48%, #6f695f 100%);
+      background: radial-gradient(circle at 35% 30%, #d6d0c4, #9e978b 50%, #6a645a 100%);
       opacity: .78;
     }
     .mastercard span {
-      font-size: 14px; font-weight: 500; letter-spacing: .06em; color: rgba(201,194,183,.55);
+      font-size: 13px; font-weight: 500; letter-spacing: .05em; color: rgba(201,194,183,.52);
     }
   </style>
 </head>
@@ -111,39 +120,38 @@
         <div class="etch" aria-hidden="true">
           <svg viewBox="0 0 1040 656" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <linearGradient id="foil" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#f7f3ea" stop-opacity=".85"/>
-                <stop offset="35%" stop-color="#c9c2b7" stop-opacity=".42"/>
-                <stop offset="70%" stop-color="#ebe6dc" stop-opacity=".55"/>
-                <stop offset="100%" stop-color="#a8a195" stop-opacity=".7"/>
+              <linearGradient id="engrave" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#f5f1e8" stop-opacity=".55"/>
+                <stop offset="28%" stop-color="#c9c2b7" stop-opacity=".22"/>
+                <stop offset="55%" stop-color="#ebe6dc" stop-opacity=".38"/>
+                <stop offset="100%" stop-color="#a8a195" stop-opacity=".48"/>
               </linearGradient>
-              <linearGradient id="foilSoft" x1="1" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#efebe3" stop-opacity=".5"/>
-                <stop offset="100%" stop-color="#c9c2b7" stop-opacity=".15"/>
+              <linearGradient id="engraveSoft" x1="1" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#efebe3" stop-opacity=".32"/>
+                <stop offset="100%" stop-color="#c9c2b7" stop-opacity=".08"/>
               </linearGradient>
-              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="0.6" result="b"/>
-                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
             </defs>
-            <g filter="url(#glow)" stroke-linecap="round">
-              <path d="M-80 600 C 0 50, 300 -110, 670 55" stroke="url(#foil)" stroke-width="1.7"/>
-              <path d="M-40 620 C 55 90, 335 -75, 700 90" stroke="url(#foil)" stroke-width="1.2" opacity=".55"/>
-              <path d="M15 640 C 110 135, 370 -40, 730 125" stroke="url(#foilSoft)" stroke-width=".95" opacity=".4"/>
-              <path d="M80 680 L 1020 15" stroke="url(#foil)" stroke-width="1.55"/>
-              <path d="M125 695 L 1065 30" stroke="url(#foilSoft)" stroke-width="1.05" opacity=".45"/>
-              <path d="M600 -35 C 840 45, 970 220, 1060 460" stroke="url(#foil)" stroke-width="1.25" opacity=".55"/>
-              <path d="M645 -10 C 860 80, 980 250, 1070 490" stroke="url(#foilSoft)" stroke-width=".9" opacity=".35"/>
-              <path d="M45 300 C 135 215, 220 185, 305 205" stroke="url(#foilSoft)" stroke-width=".85" opacity=".35"/>
+            <g stroke-linecap="round" fill="none">
+              <path d="M-130 670 C -20 -10, 320 -170, 730 45" stroke="url(#engrave)" stroke-width="1.2"/>
+              <path d="M-95 690 C 25 20, 355 -145, 755 80" stroke="url(#engrave)" stroke-width=".9" opacity=".55"/>
+              <path d="M-55 705 C 70 55, 390 -110, 780 115" stroke="url(#engraveSoft)" stroke-width=".75" opacity=".4"/>
+              <path d="M45 700 L 1060 -5" stroke="url(#engrave)" stroke-width="1.1"/>
+              <path d="M85 715 L 1100 10" stroke="url(#engraveSoft)" stroke-width=".8" opacity=".45"/>
+              <path d="M560 -55 C 820 35, 970 220, 1070 470" stroke="url(#engrave)" stroke-width=".95" opacity=".42"/>
+              <path d="M625 -20 C 850 80, 980 260, 1080 510" stroke="url(#engraveSoft)" stroke-width=".7" opacity=".28"/>
+              <path d="M35 270 C 150 180, 260 155, 355 190" stroke="url(#engraveSoft)" stroke-width=".7" opacity=".3"/>
             </g>
           </svg>
         </div>
-        <img class="wordmark" src="./vulcet-wordmark.png" alt="Vulcet">
+        <div class="brand">
+          <div class="mark" aria-label="Vulcet mark"><i></i><i></i><i></i></div>
+          <span>Vulcet</span>
+        </div>
         <div class="chip"></div>
         <svg class="contactless" viewBox="0 0 24 32" fill="none">
-          <path d="M8 8c3.5 3 3.5 13 0 16" stroke="#d6d0c4" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M12.5 5c5 4.2 5 17.6 0 22" stroke="#d6d0c4" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M17 2c6.5 5.5 6.5 22 0 28" stroke="#d6d0c4" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M8 8c3.5 3 3.5 13 0 16" stroke="#c9c2b7" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M12.5 5c5 4.2 5 17.6 0 22" stroke="#c9c2b7" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M17 2c6.5 5.5 6.5 22 0 28" stroke="#c9c2b7" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
         <div class="mastercard"><div class="mc-marks"><i></i><i></i></div><span>mastercard</span></div>
       </div>

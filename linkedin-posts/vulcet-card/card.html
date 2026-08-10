@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Vulcet — Black Metal Card</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Inter, system-ui, sans-serif; background: #0a0a0a; }
@@ -15,16 +15,16 @@
       overflow: hidden;
       display: grid;
       place-items: center;
-      background:
-        radial-gradient(ellipse 90% 70% at 50% 45%, #2a2824 0%, #141311 48%, #0c0b0a 100%);
+      /* soft studio like the reference: warm grey / cool cream split */
+      background: linear-gradient(135deg, #e6e2da 0%, #e6e2da 47.6%, #f2efe9 47.6%, #f5f2ec 100%);
     }
     .frame::before {
       content: "";
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse 55% 40% at 30% 35%, rgba(201,194,183,.08), transparent 60%),
-        radial-gradient(ellipse 40% 30% at 70% 70%, rgba(255,255,255,.03), transparent 55%);
+        radial-gradient(ellipse 70% 55% at 32% 68%, rgba(0,0,0,.06), transparent 58%),
+        radial-gradient(ellipse 45% 35% at 72% 28%, rgba(255,255,255,.45), transparent 55%);
       pointer-events: none;
     }
 
@@ -32,10 +32,10 @@
       position: relative;
       width: 960px;
       height: 605px;
-      transform: rotate(-16deg) translate(8px, 6px);
+      transform: rotate(-17deg) translate(10px, 8px);
       filter:
-        drop-shadow(0 60px 80px rgba(0,0,0,.65))
-        drop-shadow(20px 30px 40px rgba(0,0,0,.35));
+        drop-shadow(28px 48px 36px rgba(20,18,14,.28))
+        drop-shadow(8px 14px 18px rgba(20,18,14,.16));
     }
 
     .card {
@@ -45,66 +45,64 @@
       position: relative;
       overflow: hidden;
       background:
-        /* brushed metal sheen */
-        linear-gradient(105deg,
+        /* soft brushed metal */
+        linear-gradient(112deg,
           rgba(255,255,255,.00) 0%,
-          rgba(255,255,255,.045) 28%,
-          rgba(255,255,255,.00) 42%,
-          rgba(255,255,255,.025) 58%,
-          rgba(255,255,255,.00) 72%,
-          rgba(255,255,255,.04) 88%,
+          rgba(255,255,255,.06) 26%,
+          rgba(255,255,255,.00) 40%,
+          rgba(255,255,255,.035) 58%,
+          rgba(255,255,255,.00) 74%,
+          rgba(255,255,255,.05) 90%,
           rgba(255,255,255,.00) 100%),
-        radial-gradient(120% 90% at 8% -20%, rgba(255,255,255,.11), transparent 38%),
-        radial-gradient(90% 70% at 100% 120%, rgba(201,194,183,.06), transparent 45%),
-        linear-gradient(155deg, #1c1c1a 0%, #10100e 35%, #080808 70%, #050505 100%);
-      border: 1px solid rgba(201,194,183,.18);
+        radial-gradient(115% 85% at 10% -15%, rgba(255,255,255,.1), transparent 40%),
+        linear-gradient(152deg, #1a1a18 0%, #0e0e0c 42%, #070707 100%);
+      border: 1px solid rgba(255,255,255,.1);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.16),
-        inset 0 -1px 0 rgba(0,0,0,.5),
-        inset 1px 0 0 rgba(255,255,255,.04),
-        inset -1px 0 0 rgba(0,0,0,.25);
+        inset 0 1px 0 rgba(255,255,255,.14),
+        inset 0 -1px 0 rgba(0,0,0,.45);
     }
 
-    /* soft edge bevel */
     .card::before {
       content: "";
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      background: linear-gradient(135deg, rgba(255,255,255,.07), transparent 35%, transparent 65%, rgba(0,0,0,.2));
+      background: linear-gradient(140deg, rgba(255,255,255,.07), transparent 32%, transparent 68%, rgba(0,0,0,.18));
       pointer-events: none;
       z-index: 1;
     }
 
+    /* Fine engraved lines — like the reference nahış */
     .etch {
       position: absolute;
       inset: 0;
-      pointer-events: none;
       z-index: 0;
+      pointer-events: none;
+      opacity: .92;
     }
     .etch svg { width: 100%; height: 100%; display: block; }
 
     .chip {
       position: absolute;
-      left: 88px;
+      left: 90px;
       top: 198px;
-      width: 86px;
-      height: 66px;
+      width: 84px;
+      height: 64px;
       border-radius: 10px;
       z-index: 2;
       background:
         linear-gradient(145deg,
-          #f0ebe2 0%,
-          #c9c2b7 22%,
-          #ebe6dc 40%,
-          #a8a195 58%,
-          #ddd7cd 78%,
-          #9a9386 100%);
+          #efeae1 0%,
+          #c4bdb1 24%,
+          #e8e2d8 42%,
+          #a39c90 60%,
+          #d8d1c6 80%,
+          #968f83 100%);
       box-shadow:
-        0 1px 0 rgba(255,255,255,.45),
-        0 10px 22px rgba(0,0,0,.45),
-        inset 0 0 0 1px rgba(0,0,0,.22),
-        inset 0 2px 3px rgba(255,255,255,.35);
+        0 1px 0 rgba(255,255,255,.4),
+        0 8px 18px rgba(0,0,0,.4),
+        inset 0 0 0 1px rgba(0,0,0,.2),
+        inset 0 2px 2px rgba(255,255,255,.3);
       overflow: hidden;
     }
     .chip::before {
@@ -112,87 +110,114 @@
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(rgba(90,84,74,.55), rgba(90,84,74,.55)) 50% 0 / 1.2px 100% no-repeat,
-        linear-gradient(rgba(90,84,74,.55), rgba(90,84,74,.55)) 0 30% / 100% 1.2px no-repeat,
-        linear-gradient(rgba(90,84,74,.55), rgba(90,84,74,.55)) 0 70% / 100% 1.2px no-repeat,
-        linear-gradient(rgba(90,84,74,.55), rgba(90,84,74,.55)) 26% 0 / 1.2px 100% no-repeat,
-        linear-gradient(rgba(90,84,74,.55), rgba(90,84,74,.55)) 74% 0 / 1.2px 100% no-repeat;
-      opacity: .7;
+        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 50% 0 / 1.15px 100% no-repeat,
+        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 0 31% / 100% 1.15px no-repeat,
+        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 0 69% / 100% 1.15px no-repeat,
+        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 27% 0 / 1.15px 100% no-repeat,
+        linear-gradient(rgba(86,80,70,.55), rgba(86,80,70,.55)) 73% 0 / 1.15px 100% no-repeat;
+      opacity: .68;
     }
     .chip::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(120deg, rgba(255,255,255,.35), transparent 40%, transparent 60%, rgba(255,255,255,.12));
-      pointer-events: none;
-    }
-
-    .wordmark {
-      position: absolute;
-      top: 62px;
-      right: 72px;
-      width: 280px;
-      height: auto;
-      z-index: 2;
-      filter:
-        invert(1)
-        brightness(1.05)
-        drop-shadow(0 1px 0 rgba(255,255,255,.15))
-        drop-shadow(0 0 12px rgba(242,238,230,.12));
-      opacity: .98;
+      background: linear-gradient(118deg, rgba(255,255,255,.32), transparent 42%, transparent 62%, rgba(255,255,255,.1));
     }
 
     .contactless {
       position: absolute;
       left: 198px;
       top: 210px;
-      width: 32px;
-      height: 42px;
-      opacity: .62;
+      width: 30px;
+      height: 40px;
+      opacity: .55;
       z-index: 2;
-      filter: drop-shadow(0 0 4px rgba(201,194,183,.25));
+    }
+
+    /* Brand lockup: icon box + Vulcet */
+    .brand {
+      position: absolute;
+      top: 52px;
+      right: 64px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .mark {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      background:
+        linear-gradient(160deg, #1f1f1d 0%, #0a0a09 55%, #050505 100%);
+      border: 1px solid rgba(201,194,183,.28);
+      box-shadow:
+        0 10px 22px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.12),
+        inset 0 -1px 0 rgba(0,0,0,.4);
+      display: grid;
+      place-items: center;
+      gap: 7px;
+      padding: 16px 15px;
+    }
+    .mark i {
+      display: block;
+      width: 100%;
+      height: 7px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #f7f3ea, #d6d0c4 40%, #f2eee6 70%, #c9c2b7);
+      box-shadow: 0 0 6px rgba(242,238,230,.18);
+    }
+
+    .brand span {
+      font-size: 15px;
+      font-weight: 650;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: rgba(242,238,230,.88);
+      padding-left: .28em; /* optical balance with letter-spacing */
     }
 
     .mastercard {
       position: absolute;
-      right: 72px;
-      bottom: 56px;
+      right: 68px;
+      bottom: 52px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
       z-index: 2;
     }
     .mc-marks {
       position: relative;
-      width: 96px;
-      height: 58px;
-      filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
+      width: 90px;
+      height: 54px;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,.3));
     }
     .mc-marks i {
       position: absolute;
       top: 0;
-      width: 58px;
-      height: 58px;
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
     }
     .mc-marks i:first-child {
       left: 0;
-      background:
-        radial-gradient(circle at 30% 28%, #f4efe6, #c9c2b7 45%, #8f877b 100%);
-      opacity: .92;
+      background: radial-gradient(circle at 30% 28%, #efeae1, #c4bdb1 48%, #8a8377 100%);
+      opacity: .9;
     }
     .mc-marks i:last-child {
       right: 0;
-      background:
-        radial-gradient(circle at 35% 30%, #ddd7cd, #a8a195 48%, #6f695f 100%);
+      background: radial-gradient(circle at 35% 30%, #d6d0c4, #9e978b 50%, #6a645a 100%);
       opacity: .78;
     }
     .mastercard span {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
-      letter-spacing: .06em;
-      color: rgba(201,194,183,.55);
+      letter-spacing: .05em;
+      color: rgba(201,194,183,.52);
       text-transform: lowercase;
     }
   </style>
@@ -201,51 +226,54 @@
   <div class="frame" id="shot">
     <div class="card-wrap">
       <div class="card">
+        <!-- Fine silver engraving — reference-style nahış -->
         <div class="etch" aria-hidden="true">
           <svg viewBox="0 0 960 605" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <linearGradient id="foil" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#f7f3ea" stop-opacity=".85"/>
-                <stop offset="35%" stop-color="#c9c2b7" stop-opacity=".42"/>
-                <stop offset="70%" stop-color="#ebe6dc" stop-opacity=".55"/>
-                <stop offset="100%" stop-color="#a8a195" stop-opacity=".7"/>
+              <linearGradient id="engrave" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#f5f1e8" stop-opacity=".55"/>
+                <stop offset="28%" stop-color="#c9c2b7" stop-opacity=".22"/>
+                <stop offset="55%" stop-color="#ebe6dc" stop-opacity=".38"/>
+                <stop offset="100%" stop-color="#a8a195" stop-opacity=".48"/>
               </linearGradient>
-              <linearGradient id="foilSoft" x1="1" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#efebe3" stop-opacity=".5"/>
-                <stop offset="100%" stop-color="#c9c2b7" stop-opacity=".15"/>
+              <linearGradient id="engraveSoft" x1="1" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#efebe3" stop-opacity=".32"/>
+                <stop offset="100%" stop-color="#c9c2b7" stop-opacity=".08"/>
               </linearGradient>
-              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="0.6" result="b"/>
-                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
             </defs>
 
-            <!-- Large etched arc family — metal engraving feel -->
-            <g filter="url(#glow)" stroke-linecap="round">
-              <path d="M-80 560 C 0 40, 280 -100, 620 50" stroke="url(#foil)" stroke-width="1.6"/>
-              <path d="M-40 575 C 50 80, 310 -70, 650 80" stroke="url(#foil)" stroke-width="1.15" opacity=".55"/>
-              <path d="M10 590 C 100 120, 340 -40, 680 110" stroke="url(#foilSoft)" stroke-width=".9" opacity=".4"/>
+            <!-- Large left semicircle family — thin, quiet, premium -->
+            <g stroke-linecap="round" fill="none">
+              <path d="M-120 620 C -20 -20, 300 -160, 680 40" stroke="url(#engrave)" stroke-width="1.15"/>
+              <path d="M-90 635 C 20 10, 330 -135, 700 70" stroke="url(#engrave)" stroke-width=".85" opacity=".55"/>
+              <path d="M-55 650 C 60 45, 360 -105, 720 100" stroke="url(#engraveSoft)" stroke-width=".7" opacity=".4"/>
 
-              <!-- Primary diagonal -->
-              <path d="M70 620 L 940 10" stroke="url(#foil)" stroke-width="1.5"/>
-              <path d="M110 635 L 980 25" stroke="url(#foilSoft)" stroke-width="1" opacity=".45"/>
+              <!-- Long elegant diagonal -->
+              <path d="M40 640 L 980 -10" stroke="url(#engrave)" stroke-width="1.05"/>
+              <path d="M75 655 L 1015 5" stroke="url(#engraveSoft)" stroke-width=".75" opacity=".45"/>
 
-              <!-- Counter arc top-right -->
-              <path d="M560 -30 C 780 40, 900 200, 980 420" stroke="url(#foil)" stroke-width="1.2" opacity=".55"/>
-              <path d="M600 -10 C 800 70, 910 230, 990 450" stroke="url(#foilSoft)" stroke-width=".85" opacity=".35"/>
+              <!-- Quiet secondary arcs -->
+              <path d="M520 -50 C 760 30, 900 200, 990 430" stroke="url(#engrave)" stroke-width=".9" opacity=".42"/>
+              <path d="M580 -20 C 790 70, 910 240, 1000 470" stroke="url(#engraveSoft)" stroke-width=".65" opacity=".28"/>
 
-              <!-- Micro accent near chip zone -->
-              <path d="M40 280 C 120 200, 200 170, 280 190" stroke="url(#foilSoft)" stroke-width=".8" opacity=".35"/>
+              <!-- Micro near-chip engraving -->
+              <path d="M30 250 C 140 165, 240 145, 330 175" stroke="url(#engraveSoft)" stroke-width=".65" opacity=".3"/>
             </g>
           </svg>
         </div>
 
-        <img class="wordmark" src="./vulcet-wordmark.png" alt="Vulcet">
+        <div class="brand">
+          <div class="mark" aria-label="Vulcet mark">
+            <i></i><i></i><i></i>
+          </div>
+          <span>Vulcet</span>
+        </div>
+
         <div class="chip" aria-hidden="true"></div>
         <svg class="contactless" viewBox="0 0 24 32" fill="none" aria-hidden="true">
-          <path d="M8 8c3.5 3 3.5 13 0 16" stroke="#d6d0c4" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M12.5 5c5 4.2 5 17.6 0 22" stroke="#d6d0c4" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M17 2c6.5 5.5 6.5 22 0 28" stroke="#d6d0c4" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M8 8c3.5 3 3.5 13 0 16" stroke="#c9c2b7" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M12.5 5c5 4.2 5 17.6 0 22" stroke="#c9c2b7" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M17 2c6.5 5.5 6.5 22 0 28" stroke="#c9c2b7" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
 
         <div class="mastercard" aria-label="Mastercard">
