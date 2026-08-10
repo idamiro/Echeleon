@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Vulcet — Black Card</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, system-ui, sans-serif; background: #111; }
+
+    .frame {
+      width: 1600px;
+      height: 1200px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #e8e4dc 0%, #e8e4dc 47.5%, #f3f0ea 47.5%, #f6f3ee 100%);
+      display: grid;
+      place-items: center;
+    }
+    .frame::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 55% at 28% 72%, rgba(0,0,0,.05), transparent 58%),
+        radial-gradient(ellipse 45% 35% at 78% 22%, rgba(255,255,255,.4), transparent 55%);
+      pointer-events: none;
+    }
+
+    .card-wrap {
+      position: relative;
+      width: 940px;
+      height: 592px;
+      transform: rotate(-17deg) translate(12px, 8px);
+      filter:
+        drop-shadow(32px 52px 42px rgba(18, 16, 12, .30))
+        drop-shadow(10px 16px 20px rgba(18, 16, 12, .16));
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      border-radius: 30px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(120% 85% at 12% -10%, rgba(255,255,255,.09), transparent 40%),
+        radial-gradient(80% 60% at 100% 110%, rgba(255,255,255,.04), transparent 42%),
+        linear-gradient(150deg, #161614 0%, #0b0b0a 48%, #050505 100%);
+      border: 1px solid rgba(255,255,255,.07);
+    }
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 -1px 0 rgba(0,0,0,.4);
+      pointer-events: none;
+    }
+
+    .etch { position: absolute; inset: 0; pointer-events: none; }
+    .etch svg { width: 100%; height: 100%; display: block; }
+
+    .chip {
+      position: absolute;
+      left: 84px;
+      top: 178px;
+      width: 82px;
+      height: 64px;
+      border-radius: 11px;
+      background: linear-gradient(145deg, #ddd8cf 0%, #b8b1a4 38%, #efebe3 58%, #9c9588 100%);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,.4),
+        0 8px 16px rgba(0,0,0,.4),
+        inset 0 0 0 1px rgba(0,0,0,.2);
+      overflow: hidden;
+    }
+    .chip::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(#8a8376, #8a8376) 50% 0 / 1px 100% no-repeat,
+        linear-gradient(#8a8376, #8a8376) 0 32% / 100% 1px no-repeat,
+        linear-gradient(#8a8376, #8a8376) 0 68% / 100% 1px no-repeat,
+        linear-gradient(#8a8376, #8a8376) 27% 0 / 1px 100% no-repeat,
+        linear-gradient(#8a8376, #8a8376) 73% 0 / 1px 100% no-repeat;
+      opacity: .5;
+    }
+
+    .wordmark {
+      position: absolute;
+      top: 58px;
+      right: 68px;
+      width: 268px;
+      height: auto;
+      filter: invert(1) brightness(1.08);
+      opacity: .97;
+    }
+
+    .contactless {
+      position: absolute;
+      left: 188px;
+      top: 188px;
+      width: 30px;
+      height: 40px;
+      opacity: .58;
+    }
+
+    .mastercard {
+      position: absolute;
+      right: 68px;
+      bottom: 54px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 9px;
+    }
+    .mc-marks {
+      position: relative;
+      width: 92px;
+      height: 56px;
+    }
+    .mc-marks i {
+      position: absolute;
+      top: 0;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+    }
+    .mc-marks i:first-child {
+      left: 0;
+      background: linear-gradient(160deg, #e2ddd4, #a8a195 55%, #d2cdc3);
+      opacity: .9;
+    }
+    .mc-marks i:last-child {
+      right: 0;
+      background: linear-gradient(160deg, #c9c2b7, #8f877b 55%, #b8b1a5);
+      opacity: .82;
+    }
+    .mastercard span {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: .03em;
+      color: rgba(214, 209, 199, .72);
+      text-transform: lowercase;
+    }
+
+    .fine {
+      position: absolute;
+      left: 84px;
+      bottom: 62px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: rgba(214, 209, 199, .38);
+    }
+  </style>
+</head>
+<body>
+  <div class="frame" id="shot">
+    <div class="card-wrap">
+      <div class="card">
+        <div class="etch" aria-hidden="true">
+          <svg viewBox="0 0 940 592" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#f5f1e8" stop-opacity=".72"/>
+                <stop offset="40%" stop-color="#c9c2b7" stop-opacity=".38"/>
+                <stop offset="100%" stop-color="#efebe3" stop-opacity=".65"/>
+              </linearGradient>
+            </defs>
+            <!-- Primary large left arc (like reference) -->
+            <path d="M-60 540 C 20 80, 260 -80, 560 60" stroke="url(#silver)" stroke-width="1.4"/>
+            <path d="M-20 560 C 60 120, 290 -40, 590 90" stroke="url(#silver)" stroke-width="1.1" opacity=".55"/>
+            <!-- Strong diagonal etch -->
+            <path d="M90 600 L 900 20" stroke="url(#silver)" stroke-width="1.35"/>
+            <path d="M130 615 L 940 35" stroke="url(#silver)" stroke-width="1" opacity=".42"/>
+            <!-- Soft right arc -->
+            <path d="M640 -40 C 820 60, 900 220, 960 420" stroke="url(#silver)" stroke-width="1.1" opacity=".4"/>
+          </svg>
+        </div>
+
+        <img class="wordmark" src="./vulcet-wordmark.png" alt="Vulcet">
+        <div class="chip" aria-hidden="true"></div>
+        <svg class="contactless" viewBox="0 0 24 32" fill="none" aria-hidden="true">
+          <path d="M8 8c3.5 3 3.5 13 0 16" stroke="#c9c2b7" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M12.5 5c5 4.2 5 17.6 0 22" stroke="#c9c2b7" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M17 2c6.5 5.5 6.5 22 0 28" stroke="#c9c2b7" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <div class="fine">Vulcet</div>
+        <div class="mastercard" aria-label="Mastercard">
+          <div class="mc-marks"><i></i><i></i></div>
+          <span>mastercard</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

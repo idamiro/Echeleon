@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 140" role="img" aria-label="Vulcet">
+  <!-- Signature wordmark: proprietary three-bar E  the Vulcet DNA -->
+  <g fill="#07080b">
+    <!-- V -->
+    <path d="M20 20h36l50 100 50-100h36L128 130H84L20 20z"/>
+    <!-- U -->
+    <path d="M220 20h34v68c0 22 12 36 34 36s34-14 34-36V20h34v70c0 42-28 64-68 64s-68-22-68-64V20z"/>
+    <!-- L -->
+    <path d="M390 20h34v90h70v30H390V20z"/>
+    <!-- C -->
+    <path d="M520 20h120v30H554c-18 0-30 12-30 32s12 32 30 32h86v30H520c-42 0-70-30-70-62s28-62 70-62z"/>
+    <!-- E  signature: three bars, no vertical stem -->
+    <rect x="670" y="20" width="100" height="28" rx="2"/>
+    <rect x="670" y="61" width="88" height="28" rx="2"/>
+    <rect x="670" y="102" width="100" height="28" rx="2"/>
+    <!-- T -->
+    <path d="M800 20h100v28h-33v92h-34V48h-33V20z"/>
+  </g>
+</svg>
