@@ -2,162 +2,216 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Vulcet — Embossed Black Card</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Vulcet Card</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Inter, system-ui, sans-serif; background: #111; }
+    body { background: #050505; }
+
     .frame {
       width: 1600px;
       height: 1200px;
       display: grid;
       place-items: center;
-      background: linear-gradient(135deg, #e4e0d8 0%, #e4e0d8 47.5%, #f1eee8 47.5%, #f4f1eb 100%);
+      background: radial-gradient(ellipse 70% 55% at 50% 48%, #1a1a1a 0%, #0a0a0a 55%, #050505 100%);
       position: relative;
       overflow: hidden;
     }
-    .frame::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 70% 55% at 30% 70%, rgba(0,0,0,.05), transparent 58%),
-        radial-gradient(ellipse 45% 35% at 75% 25%, rgba(255,255,255,.4), transparent 55%);
-    }
+
     .card-wrap {
-      position: relative;
-      z-index: 1;
       width: 980px;
       height: 618px;
-      transform: rotate(-16deg) translate(8px, 4px);
+      transform: rotate(-18deg) translate(10px, 8px);
       filter:
-        drop-shadow(28px 48px 38px rgba(20,18,14,.28))
-        drop-shadow(8px 14px 18px rgba(20,18,14,.14));
+        drop-shadow(0 50px 70px rgba(0,0,0,.75))
+        drop-shadow(20px 30px 40px rgba(0,0,0,.4));
     }
+
     .card {
       width: 100%;
       height: 100%;
-      border-radius: 26px;
+      border-radius: 28px;
       position: relative;
       overflow: hidden;
       background:
-        linear-gradient(112deg,
-          rgba(255,255,255,.00) 0%,
-          rgba(255,255,255,.05) 28%,
-          rgba(255,255,255,.00) 44%,
-          rgba(255,255,255,.03) 62%,
-          rgba(255,255,255,.00) 78%,
-          rgba(255,255,255,.04) 92%,
-          rgba(255,255,255,.00) 100%),
-        radial-gradient(115% 85% at 12% -10%, rgba(255,255,255,.07), transparent 42%),
-        linear-gradient(152deg, #1c1b19 0%, #121110 48%, #0a0a09 100%);
-      border: 1px solid rgba(255,255,255,.08);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.1), inset 0 -1px 0 rgba(0,0,0,.4);
+        radial-gradient(120% 90% at 15% -10%, rgba(255,255,255,.06), transparent 40%),
+        linear-gradient(155deg, #1a1a1a 0%, #0e0e0e 45%, #080808 100%);
+      border: 1px solid rgba(255,255,255,.06);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.1),
+        inset 0 -1px 0 rgba(0,0,0,.5);
     }
 
-    /* Large tone-on-tone embossed mark — like SELECT's S */
-    .emboss {
+    /* Silver chrome wavy nahış — matching reference */
+    .waves {
       position: absolute;
-      left: 64px;
-      top: 50%;
-      transform: translateY(-58%);
-      width: 220px;
-      height: 220px;
-      border-radius: 40px;
-      background:
-        linear-gradient(155deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,.015) 42%, rgba(0,0,0,.1) 100%);
-      box-shadow:
-        3px 4px 6px rgba(0,0,0,.4),
-        -1.5px -1.5px 3px rgba(255,255,255,.08),
-        inset 0 1px 0 rgba(255,255,255,.1),
-        inset 0 -2px 0 rgba(0,0,0,.3);
-      display: grid;
-      place-items: center;
-      gap: 20px;
-      padding: 50px 44px;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
     }
-    .emboss i {
-      display: block;
+    .waves svg {
       width: 100%;
-      height: 18px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04) 38%, rgba(0,0,0,.16));
-      box-shadow:
-        0 1px 0 rgba(255,255,255,.1),
-        0 3px 4px rgba(0,0,0,.3),
-        inset 0 -1px 0 rgba(0,0,0,.25);
+      height: 100%;
+      display: block;
+      overflow: visible;
     }
 
     .chip {
       position: absolute;
-      right: 280px;
+      left: 92px;
       top: 210px;
-      width: 78px;
-      height: 60px;
-      border-radius: 9px;
-      background: linear-gradient(145deg, #ddd8cf, #b0a99d 40%, #ebe6dc 55%, #968f83);
-      box-shadow: 0 1px 0 rgba(255,255,255,.35), 0 6px 14px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.18);
+      width: 82px;
+      height: 64px;
+      border-radius: 10px;
+      z-index: 3;
+      background: linear-gradient(145deg, #e8e4dc 0%, #b8b1a5 30%, #f0ece4 48%, #9e978b 70%, #d4cec4 100%);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,.4),
+        0 8px 18px rgba(0,0,0,.45),
+        inset 0 0 0 1px rgba(0,0,0,.2),
+        inset 0 2px 2px rgba(255,255,255,.3);
       overflow: hidden;
-      opacity: .85;
     }
     .chip::before {
       content: "";
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(rgba(80,74,64,.5), rgba(80,74,64,.5)) 50% 0 / 1px 100% no-repeat,
-        linear-gradient(rgba(80,74,64,.5), rgba(80,74,64,.5)) 0 33% / 100% 1px no-repeat,
-        linear-gradient(rgba(80,74,64,.5), rgba(80,74,64,.5)) 0 66% / 100% 1px no-repeat,
-        linear-gradient(rgba(80,74,64,.5), rgba(80,74,64,.5)) 28% 0 / 1px 100% no-repeat,
-        linear-gradient(rgba(80,74,64,.5), rgba(80,74,64,.5)) 72% 0 / 1px 100% no-repeat;
-      opacity: .55;
+        linear-gradient(rgba(90,84,74,.5), rgba(90,84,74,.5)) 50% 0 / 1.1px 100% no-repeat,
+        linear-gradient(rgba(90,84,74,.5), rgba(90,84,74,.5)) 0 32% / 100% 1.1px no-repeat,
+        linear-gradient(rgba(90,84,74,.5), rgba(90,84,74,.5)) 0 68% / 100% 1.1px no-repeat,
+        linear-gradient(rgba(90,84,74,.5), rgba(90,84,74,.5)) 28% 0 / 1.1px 100% no-repeat,
+        linear-gradient(rgba(90,84,74,.5), rgba(90,84,74,.5)) 72% 0 / 1.1px 100% no-repeat;
+      opacity: .65;
     }
 
-    .name {
+    /* Vulcet 3-bar mark — top right, replaces reference logo */
+    .logo {
       position: absolute;
-      right: 56px;
+      top: 56px;
+      right: 64px;
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      z-index: 3;
+      background: linear-gradient(160deg, #2a2a2a 0%, #0a0a0a 55%, #050505 100%);
+      box-shadow:
+        0 4px 10px rgba(0,0,0,.5),
+        1px 2px 3px rgba(0,0,0,.4),
+        -1px -1px 2px rgba(255,255,255,.08),
+        inset 0 1px 0 rgba(255,255,255,.12),
+        inset 0 -1px 0 rgba(0,0,0,.4);
+      display: grid;
+      place-items: center;
+      gap: 6.5px;
+      padding: 14px 13px;
+    }
+    .logo i {
+      display: block;
+      width: 100%;
+      height: 6.5px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #f5f5f5 0%, #c8c8c8 45%, #8a8a8a 100%);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,.35),
+        0 2px 3px rgba(0,0,0,.35);
+    }
+
+    .mastercard {
+      position: absolute;
+      right: 64px;
       bottom: 48px;
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: .36em;
-      text-transform: uppercase;
-      color: rgba(242,238,230,.4);
-      padding-left: .36em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 3;
+      font-family: Inter, system-ui, sans-serif;
     }
-    .member {
+    .mc {
+      position: relative;
+      width: 88px;
+      height: 54px;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,.4));
+    }
+    .mc i {
       position: absolute;
-      left: 64px;
-      bottom: 52px;
-      font-size: 11px;
-      font-weight: 550;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: rgba(242,238,230,.22);
+      top: 0;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
     }
-
-    .etch {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      opacity: .5;
+    .mc i:first-child {
+      left: 0;
+      background: radial-gradient(circle at 32% 28%, #f0ece4, #c0b9ad 50%, #8a8377);
+      opacity: .92;
     }
-    .etch svg { width: 100%; height: 100%; }
+    .mc i:last-child {
+      right: 0;
+      background: radial-gradient(circle at 35% 30%, #d4cec4, #9a9387 50%, #5e5850);
+      opacity: .8;
+    }
+    .mastercard span {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      color: rgba(200,195,185,.55);
+      text-transform: lowercase;
+    }
   </style>
 </head>
 <body>
   <div class="frame" id="shot">
     <div class="card-wrap">
       <div class="card">
-        <div class="etch" aria-hidden="true">
-          <svg viewBox="0 0 980 618" fill="none">
-            <path d="M300 650 C 480 280, 680 80, 1040 -40" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
-            <path d="M340 670 C 520 300, 720 100, 1080 -20" stroke="rgba(255,255,255,.05)" stroke-width=".7"/>
+        <!-- Chrome wavy lines like the reference -->
+        <div class="waves" aria-hidden="true">
+          <svg viewBox="0 0 980 618" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="chrome" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#f5f2eb" stop-opacity=".95"/>
+                <stop offset="25%" stop-color="#a8a195" stop-opacity=".7"/>
+                <stop offset="50%" stop-color="#ebe6dc" stop-opacity=".9"/>
+                <stop offset="75%" stop-color="#8f877b" stop-opacity=".65"/>
+                <stop offset="100%" stop-color="#f0ece4" stop-opacity=".85"/>
+              </linearGradient>
+              <filter id="metal" x="-5%" y="-5%" width="110%" height="110%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="1.2" result="b"/>
+                <feOffset dy="1" result="o"/>
+                <feFlood flood-color="#000" flood-opacity=".35"/>
+                <feComposite in2="o" operator="in" result="s"/>
+                <feMerge>
+                  <feMergeNode in="s"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+
+            <g filter="url(#metal)" stroke="url(#chrome)" stroke-linecap="round" fill="none">
+              <!-- Thick left arc framing chip — like reference -->
+              <path d="M-40 520 C 20 180, 120 40, 280 80 C 380 105, 420 200, 380 300" stroke-width="7"/>
+              <path d="M-20 540 C 40 200, 140 60, 290 100 C 385 122, 420 210, 385 305" stroke-width="3.5" opacity=".55"/>
+
+              <!-- Flowing waves from bottom toward right -->
+              <path d="M120 640 C 280 480, 420 420, 580 460 C 720 495, 820 420, 920 280" stroke-width="6.5"/>
+              <path d="M160 660 C 310 510, 450 450, 600 485 C 740 515, 840 445, 940 310" stroke-width="3.2" opacity=".5"/>
+
+              <path d="M200 680 C 360 560, 500 520, 640 540 C 780 560, 880 500, 1000 360" stroke-width="5.5"/>
+              <path d="M240 695 C 390 580, 520 545, 655 560 C 790 575, 890 520, 1010 385" stroke-width="2.8" opacity=".45"/>
+            </g>
           </svg>
         </div>
-        <div class="emboss" aria-label="Vulcet mark"><i></i><i></i><i></i></div>
+
         <div class="chip" aria-hidden="true"></div>
-        <div class="member">Member</div>
-        <div class="name">Vulcet</div>
+
+        <!-- ONLY change from reference: Vulcet 3 lines here -->
+        <div class="logo" aria-label="Vulcet">
+          <i></i><i></i><i></i>
+        </div>
+
+        <div class="mastercard">
+          <div class="mc"><i></i><i></i></div>
+          <span>mastercard</span>
+        </div>
       </div>
     </div>
   </div>
