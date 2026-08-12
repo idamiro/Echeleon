@@ -406,6 +406,19 @@ body[data-theme-ink="dark"] .ghost-name {
   display: grid;
   place-items: center;
   min-height: 420px;
+  position: relative;
+}
+
+.detail-hero::before {
+  content: "";
+  position: absolute;
+  width: min(420px, 70%);
+  height: min(420px, 70%);
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--swatch-glow, var(--theme-a)) 45%, transparent), transparent 70%);
+  filter: blur(8px);
+  transition: background 0.45s var(--ease);
+  pointer-events: none;
 }
 
 .float-shoe {
@@ -655,8 +668,8 @@ body[data-theme-ink="dark"] .ghost-name {
 
 .page-foot {
   text-align: center;
-  padding: 0 1rem 1.5rem;
-  font-size: 0.8rem;
+  padding: 0 1rem 0.85rem;
+  font-size: 0.75rem;
   color: var(--muted);
 }
 .page-foot a { font-weight: 700; color: var(--ink); }

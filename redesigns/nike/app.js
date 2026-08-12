@@ -17,15 +17,15 @@
         detail: "assets/nike/free-rn-red.jpg",
         angles: [
           "assets/nike/free-rn-red.jpg",
-          "assets/nike/airmax-orange.jpg",
-          "assets/nike/airmax-blue.jpg",
-          "assets/nike/dunk-premium.jpg",
+          "assets/nike/free-rn-red.jpg",
+          "assets/nike/free-rn-red.jpg",
+          "assets/nike/free-rn-red.jpg",
         ],
         theme: { a: "#ff5252", b: "#b71c1c", page: "#f0a39c", ink: "#ffffff" },
         colors: [
           { id: "crimson", hex: "#e53935", image: "assets/nike/free-rn-red.jpg", theme: { a: "#ff5252", b: "#b71c1c", page: "#f0a39c" } },
-          { id: "orange", hex: "#fb8c00", image: "assets/nike/airmax-orange.jpg", theme: { a: "#ffb74d", b: "#ef6c00", page: "#f3c49a", ink: "#16181c" } },
-          { id: "cream", hex: "#ffe0b2", image: "assets/nike/dunk-premium.jpg", theme: { a: "#ffe0b2", b: "#ff9800", page: "#f0d2b0", ink: "#16181c" } },
+          { id: "berry", hex: "#c2185b", image: "assets/nike/free-rn-red.jpg", theme: { a: "#f06292", b: "#880e4f", page: "#e8a0bc" } },
+          { id: "ember", hex: "#ff7043", image: "assets/nike/free-rn-red.jpg", theme: { a: "#ff8a65", b: "#d84315", page: "#f0b49a" } },
         ],
       },
       {
@@ -39,15 +39,15 @@
         detail: "assets/nike/airmax-orange.jpg",
         angles: [
           "assets/nike/airmax-orange.jpg",
-          "assets/nike/dunk-premium.jpg",
-          "assets/nike/airmax97.jpg",
-          "assets/nike/airmax-blue.jpg",
+          "assets/nike/airmax-orange.jpg",
+          "assets/nike/airmax-orange.jpg",
+          "assets/nike/airmax-orange.jpg",
         ],
         theme: { a: "#ffcc80", b: "#ff7043", page: "#f0c9a8", ink: "#16181c" },
         colors: [
           { id: "orange", hex: "#ff7043", image: "assets/nike/airmax-orange.jpg", theme: { a: "#ffcc80", b: "#ff5722", page: "#f0c9a8", ink: "#16181c" } },
-          { id: "silver", hex: "#90a4ae", image: "assets/nike/airmax97.jpg", theme: { a: "#cfd8dc", b: "#607d8b", page: "#b9c5cc", ink: "#16181c" } },
-          { id: "blue", hex: "#1e88e5", image: "assets/nike/airmax-blue.jpg", theme: { a: "#64b5f6", b: "#1565c0", page: "#9fc0e0" } },
+          { id: "amber", hex: "#ffb300", image: "assets/nike/airmax-orange.jpg", theme: { a: "#ffe082", b: "#ff8f00", page: "#f0d8a0", ink: "#16181c" } },
+          { id: "coral", hex: "#ff8a65", image: "assets/nike/airmax-orange.jpg", theme: { a: "#ffab91", b: "#e64a19", page: "#f0c4b0", ink: "#16181c" } },
         ],
       },
       {
@@ -61,15 +61,15 @@
         detail: "assets/nike/af1-react.jpg",
         angles: [
           "assets/nike/af1-react.jpg",
-          "assets/nike/af1-classic.jpg",
-          "assets/nike/af1-white.jpg",
-          "assets/nike/af1-carhartt.jpg",
+          "assets/nike/af1-react.jpg",
+          "assets/nike/af1-react.jpg",
+          "assets/nike/af1-react.jpg",
         ],
         theme: { a: "#64b5f6", b: "#1565c0", page: "#9bbfe0", ink: "#ffffff" },
         colors: [
           { id: "court", hex: "#1e88e5", image: "assets/nike/af1-react.jpg", theme: { a: "#64b5f6", b: "#0d47a1", page: "#9bbfe0" } },
-          { id: "white", hex: "#f5f5f5", image: "assets/nike/af1-classic.jpg", theme: { a: "#ffffff", b: "#bdbdbd", page: "#ddd2c8", ink: "#16181c" } },
-          { id: "canvas", hex: "#a1887f", image: "assets/nike/af1-carhartt.jpg", theme: { a: "#d7ccc8", b: "#6d4c41", page: "#d2bda8", ink: "#16181c" } },
+          { id: "navy", hex: "#283593", image: "assets/nike/af1-react.jpg", theme: { a: "#7986cb", b: "#1a237e", page: "#9aa6d4" } },
+          { id: "ice", hex: "#4fc3f7", image: "assets/nike/af1-react.jpg", theme: { a: "#81d4fa", b: "#0277bd", page: "#a7d7ef", ink: "#16181c" } },
         ],
       },
     ],
@@ -85,15 +85,15 @@
         detail: "assets/nike/jordan1-chicago.jpg",
         angles: [
           "assets/nike/jordan1-chicago.jpg",
-          "assets/nike/jordan1-bred.jpg",
-          "assets/nike/jordan1-low-orange.jpg",
-          "assets/nike/jordan-red.jpg",
+          "assets/nike/jordan1-chicago.jpg",
+          "assets/nike/jordan1-chicago.jpg",
+          "assets/nike/jordan1-chicago.jpg",
         ],
         theme: { a: "#e53935", b: "#111111", page: "#c98984", ink: "#ffffff" },
         colors: [
           { id: "bred", hex: "#c62828", image: "assets/nike/jordan1-chicago.jpg", theme: { a: "#e53935", b: "#111111", page: "#c98984" } },
-          { id: "low", hex: "#ff6d00", image: "assets/nike/jordan1-low-orange.jpg", theme: { a: "#ffab40", b: "#e65100", page: "#e8b892", ink: "#16181c" } },
-          { id: "red", hex: "#d32f2f", image: "assets/nike/jordan-red.jpg", theme: { a: "#ef5350", b: "#b71c1c", page: "#e0a09a" } },
+          { id: "black", hex: "#212121", image: "assets/nike/jordan1-chicago.jpg", theme: { a: "#616161", b: "#000000", page: "#9e9e9e" } },
+          { id: "heat", hex: "#d32f2f", image: "assets/nike/jordan1-chicago.jpg", theme: { a: "#ef5350", b: "#b71c1c", page: "#e0a09a" } },
         ],
       },
       {
@@ -107,15 +107,15 @@
         detail: "assets/nike/af1-carhartt.jpg",
         angles: [
           "assets/nike/af1-carhartt.jpg",
-          "assets/nike/af1-classic.jpg",
-          "assets/nike/dunk-low.jpg",
-          "assets/nike/af1-white.jpg",
+          "assets/nike/af1-carhartt.jpg",
+          "assets/nike/af1-carhartt.jpg",
+          "assets/nike/af1-carhartt.jpg",
         ],
         theme: { a: "#d7ccc8", b: "#6d4c41", page: "#d2b89f", ink: "#16181c" },
         colors: [
           { id: "hamilton", hex: "#8d6e63", image: "assets/nike/af1-carhartt.jpg", theme: { a: "#d7ccc8", b: "#5d4037", page: "#d2b89f", ink: "#16181c" } },
-          { id: "white", hex: "#eeeeee", image: "assets/nike/af1-classic.jpg", theme: { a: "#ffffff", b: "#9e9e9e", page: "#ddd2c8", ink: "#16181c" } },
-          { id: "dunk", hex: "#6d4c41", image: "assets/nike/dunk-low.jpg", theme: { a: "#a1887f", b: "#3e2723", page: "#cbb3a3" } },
+          { id: "sand", hex: "#a1887f", image: "assets/nike/af1-carhartt.jpg", theme: { a: "#efebe9", b: "#795548", page: "#ddd0c0", ink: "#16181c" } },
+          { id: "oak", hex: "#6d4c41", image: "assets/nike/af1-carhartt.jpg", theme: { a: "#bcaaa4", b: "#3e2723", page: "#c4a990" } },
         ],
       },
       {
@@ -129,15 +129,15 @@
         detail: "assets/nike/airmax97.jpg",
         angles: [
           "assets/nike/airmax97.jpg",
-          "assets/nike/airmax-orange.jpg",
-          "assets/nike/dunk-premium.jpg",
-          "assets/nike/vomero-green.jpg",
+          "assets/nike/airmax97.jpg",
+          "assets/nike/airmax97.jpg",
+          "assets/nike/airmax97.jpg",
         ],
         theme: { a: "#b0bec5", b: "#455a64", page: "#b7c2c8", ink: "#16181c" },
         colors: [
           { id: "silver", hex: "#90a4ae", image: "assets/nike/airmax97.jpg", theme: { a: "#cfd8dc", b: "#546e7a", page: "#b7c2c8", ink: "#16181c" } },
-          { id: "heat", hex: "#ff7043", image: "assets/nike/airmax-orange.jpg", theme: { a: "#ffab91", b: "#e64a19", page: "#f0c4b0", ink: "#16181c" } },
-          { id: "volt", hex: "#c0ca33", image: "assets/nike/vomero-green.jpg", theme: { a: "#dce775", b: "#9e9d24", page: "#cdd99a", ink: "#16181c" } },
+          { id: "steel", hex: "#607d8b", image: "assets/nike/airmax97.jpg", theme: { a: "#90a4ae", b: "#37474f", page: "#9aadb8" } },
+          { id: "chrome", hex: "#eceff1", image: "assets/nike/airmax97.jpg", theme: { a: "#fafafa", b: "#90a4ae", page: "#d5dce0", ink: "#16181c" } },
         ],
       },
     ],
@@ -153,15 +153,15 @@
         detail: "assets/nike/kids-bright.jpg",
         angles: [
           "assets/nike/kids-bright.jpg",
-          "assets/nike/kids-lifestyle.jpg",
-          "assets/nike/kids-blue.jpg",
-          "assets/nike/af1-classic.jpg",
+          "assets/nike/kids-bright.jpg",
+          "assets/nike/kids-bright.jpg",
+          "assets/nike/kids-bright.jpg",
         ],
         theme: { a: "#ff8a65", b: "#f9a825", page: "#f0c29a", ink: "#16181c" },
         colors: [
           { id: "bright", hex: "#ff7043", image: "assets/nike/kids-bright.jpg", theme: { a: "#ff8a65", b: "#f9a825", page: "#f0c29a", ink: "#16181c" } },
-          { id: "life", hex: "#ffb74d", image: "assets/nike/kids-lifestyle.jpg", theme: { a: "#ffe082", b: "#fb8c00", page: "#f0d4a8", ink: "#16181c" } },
-          { id: "blue", hex: "#29b6f6", image: "assets/nike/kids-blue.jpg", theme: { a: "#4fc3f7", b: "#0288d1", page: "#a6d4ef" } },
+          { id: "sun", hex: "#ffb300", image: "assets/nike/kids-bright.jpg", theme: { a: "#ffd54f", b: "#ff8f00", page: "#f0d4a0", ink: "#16181c" } },
+          { id: "punch", hex: "#ec407a", image: "assets/nike/kids-bright.jpg", theme: { a: "#f48fb1", b: "#c2185b", page: "#e8b0c4", ink: "#16181c" } },
         ],
       },
       {
@@ -175,15 +175,15 @@
         detail: "assets/nike/kids-blue.jpg",
         angles: [
           "assets/nike/kids-blue.jpg",
-          "assets/nike/vomero-green.jpg",
-          "assets/nike/react-orange.jpg",
-          "assets/nike/kids-bright.jpg",
+          "assets/nike/kids-blue.jpg",
+          "assets/nike/kids-blue.jpg",
+          "assets/nike/kids-blue.jpg",
         ],
         theme: { a: "#4fc3f7", b: "#0277bd", page: "#9ecae8", ink: "#ffffff" },
         colors: [
           { id: "sky", hex: "#039be5", image: "assets/nike/kids-blue.jpg", theme: { a: "#4fc3f7", b: "#01579b", page: "#9ecae8" } },
-          { id: "green", hex: "#7cb342", image: "assets/nike/vomero-green.jpg", theme: { a: "#aed581", b: "#558b2f", page: "#c5d9a0", ink: "#16181c" } },
-          { id: "orange", hex: "#fb8c00", image: "assets/nike/react-orange.jpg", theme: { a: "#ffb74d", b: "#ef6c00", page: "#f0c79a", ink: "#16181c" } },
+          { id: "aqua", hex: "#26c6da", image: "assets/nike/kids-blue.jpg", theme: { a: "#4dd0e1", b: "#00838f", page: "#9ad4dc", ink: "#16181c" } },
+          { id: "navy", hex: "#3949ab", image: "assets/nike/kids-blue.jpg", theme: { a: "#7986cb", b: "#1a237e", page: "#9aa6d4" } },
         ],
       },
       {
@@ -197,15 +197,15 @@
         detail: "assets/nike/af1-classic.jpg",
         angles: [
           "assets/nike/af1-classic.jpg",
-          "assets/nike/af1-white.jpg",
-          "assets/nike/jordan-white.jpg",
-          "assets/nike/kids-lifestyle.jpg",
+          "assets/nike/af1-classic.jpg",
+          "assets/nike/af1-classic.jpg",
+          "assets/nike/af1-classic.jpg",
         ],
         theme: { a: "#f5f5f5", b: "#757575", page: "#d9cfc6", ink: "#16181c" },
         colors: [
           { id: "white", hex: "#f5f5f5", image: "assets/nike/af1-classic.jpg", theme: { a: "#ffffff", b: "#9e9e9e", page: "#d9cfc6", ink: "#16181c" } },
-          { id: "clean", hex: "#eeeeee", image: "assets/nike/af1-white.jpg", theme: { a: "#fafafa", b: "#bdbdbd", page: "#e2d6cc", ink: "#16181c" } },
-          { id: "jordan", hex: "#e0e0e0", image: "assets/nike/jordan-white.jpg", theme: { a: "#fafafa", b: "#90a4ae", page: "#d5cfc8", ink: "#16181c" } },
+          { id: "grey", hex: "#bdbdbd", image: "assets/nike/af1-classic.jpg", theme: { a: "#eeeeee", b: "#616161", page: "#cfcfcf", ink: "#16181c" } },
+          { id: "bone", hex: "#d7ccc8", image: "assets/nike/af1-classic.jpg", theme: { a: "#efebe9", b: "#8d6e63", page: "#ddd2c8", ink: "#16181c" } },
         ],
       },
     ],
@@ -426,6 +426,8 @@
     if (color) {
       state.colorIndex = Number(color.dataset.color);
       renderDetail();
+      const swatch = activeColor();
+      document.documentElement.style.setProperty("--swatch-glow", swatch.hex);
       if (!reduced) {
         els.card.classList.add("is-theme-flash");
         els.shoe.style.transform = "rotate(-6deg) scale(1.04)";
