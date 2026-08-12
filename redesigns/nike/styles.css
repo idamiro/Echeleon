@@ -291,9 +291,7 @@ body[data-theme-ink="dark"] .seg {
   width: 100%;
   height: 250px;
   object-fit: contain;
-  filter:
-    drop-shadow(0 0 0.55px rgba(40, 22, 28, 0.45))
-    drop-shadow(0 28px 34px rgba(20, 10, 30, 0.45));
+  filter: drop-shadow(0 26px 32px rgba(20, 10, 30, 0.42));
   transform: rotate(-12deg) translateY(-6px);
   transition: transform 0.55s var(--ease);
   animation: floatY 4.5s ease-in-out infinite;
@@ -442,9 +440,7 @@ body[data-theme-ink="dark"] .ghost-name {
   max-height: 420px;
   object-fit: contain;
   background: transparent;
-  filter:
-    drop-shadow(0 0 0.55px rgba(40, 22, 28, 0.45))
-    drop-shadow(0 36px 48px rgba(20, 10, 30, 0.5));
+  filter: drop-shadow(0 34px 44px rgba(20, 10, 30, 0.48));
   transform: rotate(-12deg);
   animation: floatShoe 5s ease-in-out infinite;
   transition: opacity 0.35s ease, transform 0.55s var(--ease);
