@@ -284,8 +284,7 @@ body[data-theme-ink="dark"] .seg {
   display: grid;
   place-items: center;
   border-radius: 18px;
-  background:
-    radial-gradient(circle at 50% 70%, color-mix(in srgb, var(--glow, #fff) 35%, transparent), transparent 65%);
+  background: transparent;
 }
 
 .product-card img {
