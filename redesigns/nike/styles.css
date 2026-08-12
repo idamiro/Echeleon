@@ -747,21 +747,6 @@ body[data-theme-ink="dark"] .ghost-name {
   .detail-bar { justify-content: center; }
 }
 
-  .detail-grid,
-  .sizes-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .ghost-name { font-size: clamp(3.5rem, 22vw, 6rem); top: 48%; }
-
-  .detail-bar { justify-content: center; }
-
-  .card-chrome {
-    grid-template-columns: auto auto;
-  }
-  .seg { grid-column: 1 / -1; order: 3; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation: none !important;
