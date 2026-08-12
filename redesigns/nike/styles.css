@@ -82,7 +82,7 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.1rem clamp(1rem, 3vw, 2rem);
+  padding: 0.75rem clamp(0.85rem, 2vw, 1.5rem) 0.35rem;
 }
 
 .brand {
@@ -111,16 +111,16 @@ a { color: inherit; text-decoration: none; }
 }
 
 .shell {
-  min-height: calc(100vh - 110px);
+  min-height: calc(100vh - 78px);
   display: grid;
   place-items: center;
-  padding: 0.5rem 1rem 2rem;
+  padding: 0.25rem clamp(0.5rem, 1.5vw, 1rem) 1rem;
 }
 
 /* —— STAGE —— */
 .stage {
-  width: min(1100px, 100%);
-  perspective: 1400px;
+  width: min(1520px, 98vw);
+  perspective: 1600px;
 }
 
 .stage-tilt {
@@ -131,8 +131,9 @@ a { color: inherit; text-decoration: none; }
 
 .stage-card {
   position: relative;
-  min-height: min(640px, 78vh);
-  border-radius: var(--radius);
+  min-height: min(860px, calc(100vh - 96px));
+  height: min(860px, calc(100vh - 96px));
+  border-radius: calc(var(--radius) + 4px);
   overflow: hidden;
   box-shadow: var(--shadow);
   background:
@@ -249,9 +250,9 @@ body[data-theme-ink="dark"] .seg {
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  min-height: 420px;
-  padding: 1rem 0.75rem 1.1rem;
-  border-radius: 22px;
+  min-height: 520px;
+  padding: 1.1rem 0.9rem 1.25rem;
+  border-radius: 24px;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.12);
   text-align: center;
@@ -267,8 +268,8 @@ body[data-theme-ink="dark"] .seg {
 }
 
 .product-media {
-  width: min(100%, 280px);
-  height: 220px;
+  width: min(100%, 360px);
+  height: 280px;
   display: grid;
   place-items: center;
   border-radius: 18px;
@@ -278,7 +279,7 @@ body[data-theme-ink="dark"] .seg {
 
 .product-card img {
   width: 100%;
-  height: 220px;
+  height: 280px;
   object-fit: contain;
   filter: drop-shadow(0 22px 28px rgba(40, 10, 30, 0.35));
   transform: rotate(-12deg) translateY(-6px);
@@ -398,7 +399,24 @@ body[data-theme-ink="dark"] .ghost-name {
   grid-template-columns: 0.85fr 1.15fr;
   gap: 1rem;
   align-items: center;
-  min-height: 380px;
+  min-height: 480px;
+}
+
+.detail-hero {
+  display: grid;
+  place-items: center;
+  min-height: 420px;
+}
+
+.float-shoe {
+  width: min(640px, 100%);
+  height: auto;
+  max-height: 460px;
+  object-fit: contain;
+  filter: drop-shadow(0 30px 40px rgba(40, 10, 30, 0.4));
+  transform: rotate(-12deg);
+  animation: floatShoe 5s ease-in-out infinite;
+  transition: opacity 0.35s ease, transform 0.55s var(--ease);
 }
 
 .detail-info { padding-left: 0.35rem; }
@@ -460,22 +478,6 @@ body[data-theme-ink="dark"] .ghost-name {
 .swatch.is-active {
   transform: scale(1.15);
   box-shadow: 0 0 0 2px var(--white), inset 0 0 0 2px rgba(0,0,0,0.08);
-}
-
-.detail-hero {
-  display: grid;
-  place-items: center;
-  min-height: 320px;
-}
-
-.float-shoe {
-  width: min(520px, 100%);
-  height: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 30px 40px rgba(40, 10, 30, 0.4));
-  transform: rotate(-12deg);
-  animation: floatShoe 5s ease-in-out infinite;
-  transition: opacity 0.35s ease, transform 0.55s var(--ease);
 }
 
 @keyframes floatShoe {
@@ -663,12 +665,20 @@ body[data-theme-ink="dark"] .ghost-name {
 @media (max-width: 900px) {
   .disclaimer { display: none; }
 
-  .stage-card { min-height: auto; }
+  .stage {
+    width: 100%;
+  }
+
+  .stage-card {
+    min-height: calc(100vh - 88px);
+    height: auto;
+    border-radius: 22px;
+  }
 
   .view {
     position: relative;
     inset: auto;
-    min-height: 520px;
+    min-height: 560px;
   }
 
   .view:not(.is-active) {
@@ -680,7 +690,8 @@ body[data-theme-ink="dark"] .ghost-name {
     gap: 0.75rem;
   }
 
-  .product-card { min-height: 280px; }
+  .product-card { min-height: 340px; }
+  .product-media, .product-card img { height: 240px; }
 
   .detail-grid,
   .sizes-layout {
