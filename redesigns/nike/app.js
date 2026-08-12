@@ -484,10 +484,10 @@
       ty = y;
       if (!raf) {
         raf = requestAnimationFrame(() => {
-          root.style.transform = `rotateY(${tx * 8}deg) rotateX(${-ty * 6}deg)`;
+          root.style.transform = `rotateY(${tx * 4}deg) rotateX(${-ty * 3}deg)`;
           if (state.view === "detail") {
-            ghost.style.transform = `translate(calc(-50% + ${tx * -28}px), calc(-50% + ${ty * -18}px))`;
-            shoe.style.translate = `${tx * 18}px ${ty * 12}px`;
+            ghost.style.transform = `translate(calc(-50% + ${tx * -14}px), calc(-50% + ${ty * -10}px))`;
+            shoe.style.translate = `${tx * 10}px ${ty * 6}px`;
           }
           raf = 0;
         });
