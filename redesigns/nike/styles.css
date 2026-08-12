@@ -228,7 +228,8 @@ body[data-theme-ink="dark"] .seg {
 .view {
   position: absolute;
   inset: 72px 0 0;
-  padding: 0.35rem 1.5rem 1.25rem;
+  padding: 0.85rem 1.35rem 1.25rem;
+  overflow: visible;
   opacity: 0;
   visibility: hidden;
   transform: translateY(18px) scale(0.985);
@@ -249,10 +250,11 @@ body[data-theme-ink="dark"] .seg {
 .carousel {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  gap: 1.35rem;
   height: calc(100% - 36px);
   align-items: stretch;
-  padding-bottom: 0.5rem;
+  padding: 0.75rem 0.35rem 0.5rem;
+  overflow: visible;
 }
 
 .product-card {
@@ -264,46 +266,48 @@ body[data-theme-ink="dark"] .seg {
   justify-content: flex-end;
   min-height: 0;
   height: 100%;
-  padding: 1.1rem 0.9rem 1.15rem;
+  padding: 0.5rem 0.55rem 1.2rem;
   border-radius: 24px;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.12);
   text-align: center;
-  overflow: hidden;
-  isolation: isolate;
+  overflow: visible;
   transition: transform 0.45s var(--ease), background 0.35s ease, box-shadow 0.45s ease, z-index 0s;
   cursor: pointer;
 }
 
 .product-card:hover,
 .product-card.is-hot {
-  z-index: 3;
-  transform: translateY(-6px);
+  z-index: 4;
+  transform: translateY(-8px);
   background: rgba(255,255,255,0.16);
   box-shadow: 0 24px 50px rgba(60, 20, 40, 0.22);
 }
 
 .product-media {
-  width: min(100%, 340px);
-  height: 250px;
+  width: 100%;
+  height: 320px;
   display: grid;
   place-items: center;
   border-radius: 18px;
   background: transparent;
-  overflow: hidden;
+  overflow: visible;
   flex: 1 1 auto;
-  max-height: 280px;
+  max-height: none;
+  margin-bottom: 0.35rem;
 }
 
 .product-card img {
-  width: 100%;
-  height: 230px;
+  width: 118%;
+  max-width: none;
+  height: 300px;
   object-fit: contain;
-  filter: drop-shadow(0 26px 32px rgba(20, 10, 30, 0.42));
-  transform: rotate(-10deg);
+  filter: drop-shadow(0 28px 36px rgba(20, 10, 30, 0.42));
+  transform: rotate(-12deg) translateY(-10px);
   transition: transform 0.55s var(--ease);
   animation: floatY 4.5s ease-in-out infinite;
   background: transparent;
+  pointer-events: none;
 }
 
 .product-card:nth-child(2) img { animation-delay: -1.2s; }
@@ -311,16 +315,18 @@ body[data-theme-ink="dark"] .seg {
 
 .product-card:hover img,
 .product-card.is-hot img {
-  transform: rotate(-4deg) translateY(-8px) scale(1.03);
+  transform: rotate(-5deg) translateY(-18px) scale(1.05);
 }
 
 @keyframes floatY {
   0%, 100% { translate: 0 0; }
-  50% { translate: 0 -6px; }
+  50% { translate: 0 -12px; }
 }
 
 .product-card h2 {
-  margin: 0.85rem 0 0.25rem;
+  position: relative;
+  z-index: 2;
+  margin: 0.35rem 0 0.25rem;
   font-family: var(--font-d);
   font-size: 1.05rem;
   font-weight: 800;
@@ -328,6 +334,8 @@ body[data-theme-ink="dark"] .seg {
 }
 
 .product-card p {
+  position: relative;
+  z-index: 2;
   margin: 0 0 0.75rem;
   font-size: 0.78rem;
   color: rgba(255,255,255,0.78);
@@ -335,18 +343,19 @@ body[data-theme-ink="dark"] .seg {
 }
 
 .know-more {
+  position: relative;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 36px;
-  padding: 0 1.1rem;
+  padding: 0.62rem 1.2rem;
   border-radius: 999px;
   background: rgba(255,255,255,0.94);
   color: #16181c;
   font-weight: 700;
   font-size: 0.78rem;
   line-height: 1;
-  margin-top: 0.15rem;
+  margin-top: 0.1rem;
 }
 
 body[data-theme-ink="dark"] .product-card h2,
@@ -706,20 +715,20 @@ body[data-theme-ink="dark"] .ghost-name {
   color: var(--ink);
 }
 
-/* mobile */
+/* tablet */
 @media (max-width: 1100px) and (min-width: 901px) {
   .carousel {
-    gap: 0.75rem;
+    gap: 1rem;
   }
 
   .product-media {
-    height: 210px;
-    max-height: 220px;
+    height: 260px;
   }
 
   .product-card img {
-    height: 200px;
-    transform: rotate(-8deg);
+    width: 112%;
+    height: 240px;
+    transform: rotate(-10deg) translateY(-6px);
   }
 }
 
@@ -765,11 +774,14 @@ body[data-theme-ink="dark"] .ghost-name {
     gap: 1rem;
     height: auto;
     align-items: stretch;
+    padding: 0.35rem 0 0.5rem;
   }
 
   .product-card {
     min-height: 300px;
     height: auto;
+    overflow: hidden;
+    padding: 1rem 0.9rem 1.15rem;
     transform: none !important;
   }
 
@@ -779,18 +791,16 @@ body[data-theme-ink="dark"] .ghost-name {
   }
 
   .product-media {
-    height: 200px;
-    max-height: 200px;
+    height: 210px;
+    max-height: 210px;
     flex: 0 0 auto;
-  }
-
-  .product-media,
-  .product-card img {
-    height: 190px;
+    overflow: hidden;
   }
 
   .product-card img {
-    transform: rotate(-6deg);
+    width: 100%;
+    height: 200px;
+    transform: rotate(-6deg) translateY(0);
     animation: none;
   }
 
