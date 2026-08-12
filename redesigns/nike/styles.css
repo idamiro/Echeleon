@@ -292,10 +292,11 @@ body[data-theme-ink="dark"] .seg {
   width: 100%;
   height: 250px;
   object-fit: contain;
-  filter: drop-shadow(0 22px 28px rgba(40, 10, 30, 0.35));
+  filter: drop-shadow(0 28px 34px rgba(20, 10, 30, 0.45));
   transform: rotate(-12deg) translateY(-6px);
   transition: transform 0.55s var(--ease);
   animation: floatY 4.5s ease-in-out infinite;
+  background: transparent;
 }
 
 .product-card:nth-child(2) img { animation-delay: -1.2s; }
@@ -439,7 +440,8 @@ body[data-theme-ink="dark"] .ghost-name {
   height: auto;
   max-height: 420px;
   object-fit: contain;
-  filter: drop-shadow(0 30px 40px rgba(40, 10, 30, 0.4));
+  background: transparent;
+  filter: drop-shadow(0 36px 48px rgba(20, 10, 30, 0.5));
   transform: rotate(-12deg);
   animation: floatShoe 5s ease-in-out infinite;
   transition: opacity 0.35s ease, transform 0.55s var(--ease);
@@ -594,10 +596,11 @@ body[data-theme-ink="dark"] .ghost-name {
   width: 100%;
   aspect-ratio: 1.2;
   object-fit: contain;
-  background: #f6f1ee;
+  background: transparent;
   border-radius: 16px;
   padding: 0.6rem;
   transition: transform 0.35s var(--ease);
+  filter: drop-shadow(0 12px 18px rgba(20,10,30,0.18));
 }
 .angle-grid img:hover { transform: scale(1.03); }
 
