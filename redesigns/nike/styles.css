@@ -3,16 +3,15 @@
    Unofficial concept — original UI, fictional products */
 
 :root {
-  --peach: #f4b8a4;
-  --peach-deep: #e89a86;
-  --blush: #f7cfc2;
-  --card-a: #f3a894;
-  --card-b: #e9889c;
+  --theme-a: #f3a894;
+  --theme-b: #e9889c;
+  --theme-page: #f4b8a4;
+  --theme-ink: #ffffff;
   --ink: #16181c;
   --muted: rgba(22, 24, 28, 0.55);
   --white: #ffffff;
   --volt: #c8f135;
-  --shadow: 0 40px 100px rgba(90, 40, 50, 0.28), 0 12px 30px rgba(90, 40, 50, 0.16);
+  --shadow: 0 40px 100px rgba(40, 30, 50, 0.28), 0 12px 30px rgba(40, 30, 50, 0.14);
   --radius: 28px;
   --font-d: "Syne", system-ui, sans-serif;
   --font-b: "Manrope", system-ui, sans-serif;
@@ -29,7 +28,8 @@ html, body {
   min-height: 100%;
   font-family: var(--font-b);
   color: var(--ink);
-  background: var(--peach);
+  background: var(--theme-page);
+  transition: background-color 0.55s var(--ease);
 }
 
 body {
@@ -64,9 +64,10 @@ a { color: inherit; text-decoration: none; }
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(80% 60% at 20% 10%, #ffd5c8, transparent 55%),
-    radial-gradient(70% 50% at 90% 80%, #f0a090, transparent 50%),
-    linear-gradient(160deg, #f8cbb8, #f0a892 45%, #e99890);
+    radial-gradient(80% 60% at 18% 12%, color-mix(in srgb, var(--theme-a) 55%, white), transparent 58%),
+    radial-gradient(70% 55% at 88% 82%, color-mix(in srgb, var(--theme-b) 50%, white), transparent 52%),
+    linear-gradient(155deg, color-mix(in srgb, var(--theme-page) 88%, white), var(--theme-page) 42%, color-mix(in srgb, var(--theme-b) 35%, var(--theme-page)));
+  transition: background 0.55s var(--ease);
 }
 
 .page-top,
@@ -136,9 +137,14 @@ a { color: inherit; text-decoration: none; }
   box-shadow: var(--shadow);
   background:
     radial-gradient(90% 80% at 70% 30%, rgba(255,255,255,0.28), transparent 55%),
-    linear-gradient(135deg, var(--card-a), var(--card-b) 55%, #d9789a);
-  color: var(--white);
+    linear-gradient(135deg, var(--theme-a), var(--theme-b) 62%);
+  color: var(--theme-ink);
   transform: translateZ(0);
+  transition: background 0.55s var(--ease), color 0.35s ease;
+}
+
+.stage-card.is-theme-flash {
+  filter: saturate(1.08) brightness(1.03);
 }
 
 .card-chrome {
@@ -181,8 +187,15 @@ a { color: inherit; text-decoration: none; }
   transition: background 0.25s ease, color 0.25s ease;
 }
 .seg-btn.is-active {
-  background: rgba(255,255,255,0.92);
-  color: var(--ink);
+  background: rgba(255,255,255,0.94);
+  color: #16181c;
+}
+
+body[data-theme-ink="dark"] .seg-btn {
+  color: rgba(22, 24, 28, 0.7);
+}
+body[data-theme-ink="dark"] .seg {
+  background: rgba(22, 24, 28, 0.08);
 }
 
 .chrome-actions {
@@ -253,12 +266,22 @@ a { color: inherit; text-decoration: none; }
   box-shadow: 0 24px 50px rgba(60, 20, 40, 0.22);
 }
 
-.product-card img {
+.product-media {
   width: min(100%, 280px);
+  height: 220px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 70%, color-mix(in srgb, var(--glow, #fff) 35%, transparent), transparent 65%);
+}
+
+.product-card img {
+  width: 100%;
   height: 220px;
   object-fit: contain;
   filter: drop-shadow(0 22px 28px rgba(40, 10, 30, 0.35));
-  transform: rotate(-18deg) translateY(-8px);
+  transform: rotate(-12deg) translateY(-6px);
   transition: transform 0.55s var(--ease);
   animation: floatY 4.5s ease-in-out infinite;
 }
@@ -268,7 +291,7 @@ a { color: inherit; text-decoration: none; }
 
 .product-card:hover img,
 .product-card.is-hot img {
-  transform: rotate(-8deg) translateY(-16px) scale(1.05);
+  transform: rotate(-4deg) translateY(-14px) scale(1.04);
 }
 
 @keyframes floatY {
@@ -295,10 +318,34 @@ a { color: inherit; text-decoration: none; }
   min-height: 36px;
   padding: 0 1rem;
   border-radius: 999px;
-  background: rgba(255,255,255,0.92);
-  color: var(--ink);
+  background: rgba(255,255,255,0.94);
+  color: #16181c;
   font-weight: 700;
   font-size: 0.78rem;
+}
+
+body[data-theme-ink="dark"] .product-card h2,
+body[data-theme-ink="dark"] .detail-info h1,
+body[data-theme-ink="dark"] .ghost-name {
+  color: #16181c;
+}
+body[data-theme-ink="dark"] .product-card p,
+body[data-theme-ink="dark"] .micro,
+body[data-theme-ink="dark"] .mark,
+body[data-theme-ink="dark"] .icon-btn {
+  color: rgba(22, 24, 28, 0.72);
+}
+body[data-theme-ink="dark"] .size-chip {
+  border-color: rgba(22, 24, 28, 0.25);
+  color: #16181c;
+}
+body[data-theme-ink="dark"] .size-chip.is-active {
+  background: #16181c;
+  color: #fff;
+  border-color: #16181c;
+}
+body[data-theme-ink="dark"] .ghost-name {
+  color: rgba(22, 24, 28, 0.1);
 }
 
 .carousel-dots {
