@@ -249,31 +249,36 @@ body[data-theme-ink="dark"] .seg {
 .carousel {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.85rem;
+  gap: 1rem;
   height: calc(100% - 36px);
-  align-items: end;
+  align-items: stretch;
   padding-bottom: 0.5rem;
 }
 
 .product-card {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  min-height: 480px;
-  padding: 1.1rem 0.9rem 1.25rem;
+  min-height: 0;
+  height: 100%;
+  padding: 1.1rem 0.9rem 1.15rem;
   border-radius: 24px;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.12);
   text-align: center;
-  transition: transform 0.45s var(--ease), background 0.35s ease, box-shadow 0.45s ease;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.45s var(--ease), background 0.35s ease, box-shadow 0.45s ease, z-index 0s;
   cursor: pointer;
 }
 
 .product-card:hover,
 .product-card.is-hot {
-  transform: translateY(-10px) scale(1.02);
+  z-index: 3;
+  transform: translateY(-6px);
   background: rgba(255,255,255,0.16);
   box-shadow: 0 24px 50px rgba(60, 20, 40, 0.22);
 }
@@ -285,14 +290,17 @@ body[data-theme-ink="dark"] .seg {
   place-items: center;
   border-radius: 18px;
   background: transparent;
+  overflow: hidden;
+  flex: 1 1 auto;
+  max-height: 280px;
 }
 
 .product-card img {
   width: 100%;
-  height: 250px;
+  height: 230px;
   object-fit: contain;
   filter: drop-shadow(0 26px 32px rgba(20, 10, 30, 0.42));
-  transform: rotate(-12deg) translateY(-6px);
+  transform: rotate(-10deg);
   transition: transform 0.55s var(--ease);
   animation: floatY 4.5s ease-in-out infinite;
   background: transparent;
@@ -303,16 +311,16 @@ body[data-theme-ink="dark"] .seg {
 
 .product-card:hover img,
 .product-card.is-hot img {
-  transform: rotate(-4deg) translateY(-14px) scale(1.04);
+  transform: rotate(-4deg) translateY(-8px) scale(1.03);
 }
 
 @keyframes floatY {
   0%, 100% { translate: 0 0; }
-  50% { translate: 0 -10px; }
+  50% { translate: 0 -6px; }
 }
 
 .product-card h2 {
-  margin: 1.1rem 0 0.25rem;
+  margin: 0.85rem 0 0.25rem;
   font-family: var(--font-d);
   font-size: 1.05rem;
   font-weight: 800;
@@ -320,20 +328,25 @@ body[data-theme-ink="dark"] .seg {
 }
 
 .product-card p {
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.75rem;
   font-size: 0.78rem;
   color: rgba(255,255,255,0.78);
   max-width: 18ch;
 }
 
 .know-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 36px;
-  padding: 0 1rem;
+  padding: 0 1.1rem;
   border-radius: 999px;
   background: rgba(255,255,255,0.94);
   color: #16181c;
   font-weight: 700;
   font-size: 0.78rem;
+  line-height: 1;
+  margin-top: 0.15rem;
 }
 
 body[data-theme-ink="dark"] .product-card h2,
@@ -694,6 +707,22 @@ body[data-theme-ink="dark"] .ghost-name {
 }
 
 /* mobile */
+@media (max-width: 1100px) and (min-width: 901px) {
+  .carousel {
+    gap: 0.75rem;
+  }
+
+  .product-media {
+    height: 210px;
+    max-height: 220px;
+  }
+
+  .product-card img {
+    height: 200px;
+    transform: rotate(-8deg);
+  }
+}
+
 @media (max-width: 900px) {
   .disclaimer { display: none; }
 
@@ -733,11 +762,47 @@ body[data-theme-ink="dark"] .ghost-name {
 
   .carousel {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    gap: 1rem;
+    height: auto;
+    align-items: stretch;
   }
 
-  .product-card { min-height: 320px; }
-  .product-media, .product-card img { height: 220px; }
+  .product-card {
+    min-height: 300px;
+    height: auto;
+    transform: none !important;
+  }
+
+  .product-card:hover,
+  .product-card.is-hot {
+    transform: none !important;
+  }
+
+  .product-media {
+    height: 200px;
+    max-height: 200px;
+    flex: 0 0 auto;
+  }
+
+  .product-media,
+  .product-card img {
+    height: 190px;
+  }
+
+  .product-card img {
+    transform: rotate(-6deg);
+    animation: none;
+  }
+
+  .product-card:hover img,
+  .product-card.is-hot img {
+    transform: rotate(-4deg);
+  }
+
+  .know-more {
+    width: auto;
+    align-self: center;
+  }
 
   .detail-grid,
   .sizes-layout {
