@@ -25,6 +25,7 @@
 
 html, body {
   margin: 0;
+  height: 100%;
   min-height: 100%;
   font-family: var(--font-b);
   color: var(--ink);
@@ -33,7 +34,7 @@ html, body {
 }
 
 body {
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 img { display: block; max-width: 100%; }
@@ -78,11 +79,24 @@ a { color: inherit; text-decoration: none; }
 }
 
 .page-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.75rem clamp(0.85rem, 2vw, 1.5rem) 0.35rem;
+  padding: 0.85rem clamp(1rem, 2vw, 1.75rem);
+  pointer-events: none;
+  mix-blend-mode: difference;
+  color: #fff;
+}
+.page-top a,
+.page-top .top-link {
+  pointer-events: auto;
+  color: inherit;
 }
 
 .brand {
@@ -98,10 +112,10 @@ a { color: inherit; text-decoration: none; }
 
 .disclaimer {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--muted);
+  opacity: 0.7;
   text-align: center;
 }
 
@@ -111,19 +125,24 @@ a { color: inherit; text-decoration: none; }
 }
 
 .shell {
-  min-height: calc(100vh - 78px);
+  position: fixed;
+  inset: 0;
+  z-index: 1;
   display: grid;
-  place-items: center;
-  padding: 0.25rem clamp(0.5rem, 1.5vw, 1rem) 1rem;
+  padding: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* —— STAGE —— */
 .stage {
-  width: min(1520px, 98vw);
-  perspective: 1600px;
+  width: 100%;
+  height: 100%;
+  perspective: 1800px;
 }
 
 .stage-tilt {
+  height: 100%;
   transform-style: preserve-3d;
   transition: transform 0.35s var(--ease);
   will-change: transform;
@@ -131,11 +150,12 @@ a { color: inherit; text-decoration: none; }
 
 .stage-card {
   position: relative;
-  min-height: min(860px, calc(100vh - 96px));
-  height: min(860px, calc(100vh - 96px));
-  border-radius: calc(var(--radius) + 4px);
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: var(--shadow);
+  box-shadow: none;
   background:
     radial-gradient(90% 80% at 70% 30%, rgba(255,255,255,0.28), transparent 55%),
     linear-gradient(135deg, var(--theme-a), var(--theme-b) 62%);
@@ -155,7 +175,7 @@ a { color: inherit; text-decoration: none; }
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 1rem;
-  padding: 1.1rem 1.35rem 0.5rem;
+  padding: 4.25rem clamp(1.25rem, 3vw, 2.5rem) 0.75rem;
 }
 
 .mark {
@@ -216,8 +236,8 @@ body[data-theme-ink="dark"] .seg {
 /* —— VIEWS —— */
 .view {
   position: absolute;
-  inset: 56px 0 0;
-  padding: 0.5rem 1.35rem 1.35rem;
+  inset: 88px 0 0;
+  padding: 0.5rem clamp(1.25rem, 3vw, 2.5rem) 1.5rem;
   opacity: 0;
   visibility: hidden;
   transform: translateY(18px) scale(0.985);
@@ -667,31 +687,56 @@ body[data-theme-ink="dark"] .ghost-name {
 }
 
 .page-foot {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0.55rem;
+  z-index: 20;
   text-align: center;
-  padding: 0 1rem 0.85rem;
-  font-size: 0.75rem;
-  color: var(--muted);
+  padding: 0 1rem;
+  font-size: 0.72rem;
+  color: rgba(22, 24, 28, 0.45);
+  pointer-events: none;
 }
-.page-foot a { font-weight: 700; color: var(--ink); }
+.page-foot a {
+  pointer-events: auto;
+  font-weight: 700;
+  color: rgba(22, 24, 28, 0.7);
+}
 
 /* mobile */
 @media (max-width: 900px) {
+  body { overflow: auto; }
+
   .disclaimer { display: none; }
 
-  .stage {
+  .page-top {
+    mix-blend-mode: normal;
+    color: var(--theme-ink);
+  }
+
+  .shell {
+    position: relative;
+    inset: auto;
+    min-height: 100dvh;
+  }
+
+  .stage,
+  .stage-tilt,
+  .stage-card {
     width: 100%;
+    height: auto;
+    min-height: 100dvh;
   }
 
   .stage-card {
-    min-height: calc(100vh - 88px);
-    height: auto;
-    border-radius: 22px;
+    border-radius: 0;
   }
 
   .view {
     position: relative;
     inset: auto;
-    min-height: 560px;
+    min-height: calc(100dvh - 100px);
   }
 
   .view:not(.is-active) {
@@ -703,8 +748,14 @@ body[data-theme-ink="dark"] .ghost-name {
     gap: 0.75rem;
   }
 
-  .product-card { min-height: 340px; }
-  .product-media, .product-card img { height: 240px; }
+  .product-card { min-height: 360px; }
+  .product-media, .product-card img { height: 260px; }
+
+  .page-foot {
+    position: relative;
+    bottom: auto;
+    padding: 1rem;
+  }
 
   .detail-grid,
   .sizes-layout {
