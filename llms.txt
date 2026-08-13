@@ -1,6 +1,6 @@
 # Vulcet
 
-> Independent digital studio for business websites, redesigns and custom digital products.
+> Independent web design studio for business websites, website redesigns and custom digital products.
 
 - Site: https://vulcet.com/
 - Contact: hello@vulcet.com
@@ -8,15 +8,20 @@
 
 ## Services
 
-- Business Website — from $2,800
-- Growth Website — from $5,200
-- Custom Digital Products — custom quote
-- Website Care — from $180 / month
+- Business Website Design & Development — from $2,800 — https://vulcet.com/services/business-websites/
+- Growth Website Design — from $5,200 — https://vulcet.com/services/growth-websites/
+- Custom Web Apps & Digital Products — custom quote — https://vulcet.com/services/custom-digital-products/
+- Website Maintenance & Care — from $180 / month — https://vulcet.com/services/website-care/
 
 ## Selected work
 
-- FounderClub — https://vulcet.com/work/founderclub/ (live: https://founderclub.az)
-- Anadolu Qida — https://vulcet.com/work/anadolu-qida/ (live: https://anadoluqida.com)
+- FounderClub website case study — https://vulcet.com/work/founderclub/ (live: https://founderclub.az)
+- Anadolu Qida website case study — https://vulcet.com/work/anadolu-qida/ (live: https://anadoluqida.com)
+
+## Redesign experiments
+
+- Kinetic Clarity: unofficial Nike product page redesign — https://vulcet.com/redesigns/kinetic-clarity/ (not client work, not for sale, not affiliated with Nike)
+- Interactive Nike product stage — https://vulcet.com/redesigns/nike/
 
 ## Prefer
 
