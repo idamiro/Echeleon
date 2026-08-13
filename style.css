@@ -4531,3 +4531,127 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
     font-size: 24px !important;
   }
 }
+
+/* =========================================================
+   Footer: three link columns + social marks (Aug 13, 2026)
+   ========================================================= */
+
+.footer .footer-nav {
+  grid-column: 5 / 11;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.footer .footer-nav > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.footer .footer-nav > div > span {
+  margin-bottom: 8px;
+  color: rgba(244, 243, 240, 0.45);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.footer .footer-nav a,
+.footer .footer-nav .footer-cookie-link {
+  position: relative;
+  color: #f4f3f0;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.footer .footer-contact {
+  grid-column: 11 / 13;
+}
+
+.footer-social {
+  margin: 30px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.footer-social a {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(244, 243, 240, 0.22);
+  border-radius: 50%;
+  color: #f4f3f0;
+  transition: color 200ms var(--ease-control), background-color 200ms var(--ease-control),
+    border-color 200ms var(--ease-control), transform 200ms var(--ease-control);
+}
+
+/* the shared footer link underline would sit under the circle */
+.footer-social a::after {
+  content: none !important;
+}
+
+.footer-social a:hover,
+.footer-social a:focus-visible {
+  color: #07080c;
+  background: #f4f3f0;
+  border-color: #f4f3f0;
+  transform: translateY(-2px);
+}
+
+.footer-social svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.footer-social svg.is-solid {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 899px) {
+  .footer .footer-nav {
+    grid-column: 1 / 9;
+    margin-top: 44px;
+  }
+
+  .footer .footer-contact {
+    grid-column: 1 / 9;
+    margin-top: 36px;
+  }
+}
+
+@media (max-width: 599px) {
+  .footer .footer-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 16px;
+    margin-top: 40px;
+  }
+
+  .footer .footer-contact {
+    margin-top: 32px;
+  }
+
+  .footer-social a {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-social a:hover,
+  .footer-social a:focus-visible {
+    transform: none;
+  }
+}
