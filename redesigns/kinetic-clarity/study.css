@@ -1,24 +1,5 @@
 /* Kinetic Clarity write-up — compact media (page-scoped) */
 
-.kc-lead {
-  max-width: 720px;
-  margin: 48px auto 0;
-  border-radius: 18px;
-}
-
-.kc-lead img {
-  width: 100%;
-  height: auto;
-  display: block;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-}
-
-.kc-lead figcaption {
-  padding: 12px 14px 14px;
-  font-size: 11px;
-}
-
 .kc-gallery {
   margin-top: 28px;
   margin-bottom: 8px;
@@ -49,12 +30,6 @@
 }
 
 @media (max-width: 900px) {
-  .kc-lead {
-    margin-top: 32px;
-    max-width: 100%;
-    border-radius: 14px;
-  }
-
   .kc-gallery {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
