@@ -801,3 +801,16 @@
     align-items: flex-start;
   }
 }
+
+/* Phone type scale (Aug 13, 2026) - sizes only */
+@media (max-width: 599px) {
+  .contact-hero h1 {
+    font-size: 30px !important;
+    line-height: 1.16 !important;
+  }
+
+  .contact-brief-heading h2 {
+    font-size: 26px !important;
+    line-height: 1.16 !important;
+  }
+}

@@ -860,3 +860,40 @@
     grid-template-columns: 1fr !important;
   }
 }
+
+/* =========================================================
+   Case-study photography and phone type scale (Aug 13, 2026)
+   Frames were running far taller than the content around them.
+   ========================================================= */
+
+.case-media img {
+  height: clamp(240px, 36vw, 500px);
+  object-fit: cover;
+  object-position: center;
+}
+
+.case-media-grid img {
+  max-height: 360px;
+}
+
+@media (max-width: 599px) {
+  .page-hero h1 {
+    font-size: 32px !important;
+    line-height: 1.14 !important;
+  }
+
+  .page-intro-grid h2,
+  .case-story h2 {
+    font-size: 26px !important;
+    line-height: 1.16 !important;
+  }
+
+  .page-cta h2 {
+    font-size: 28px !important;
+    line-height: 1.14 !important;
+  }
+
+  .work-index-card h2 {
+    font-size: 26px !important;
+  }
+}

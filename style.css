@@ -4480,3 +4480,54 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   color: #f4f3f0;
   overflow-wrap: anywhere;
 }
+
+/* =========================================================
+   Photo frames and phone type scale (Aug 13, 2026)
+   Only sizes. No layout, motion, or visibility changes.
+   ========================================================= */
+
+/* Phone: headings were sized for desktop and ran too large */
+@media (max-width: 599px) {
+  .hero h1,
+  .hero h1 span,
+  .hero h1 em {
+    font-size: 32px !important;
+    line-height: 1.14 !important;
+  }
+
+  .home-case__copy h2 {
+    font-size: 26px !important;
+  }
+
+  .project-heading h2 {
+    font-size: 30px !important;
+    line-height: 1.1 !important;
+  }
+
+  .growth-grid > h2,
+  .growth-transition p,
+  .growth-intro h3 {
+    font-size: 28px !important;
+    line-height: 1.14 !important;
+  }
+
+  .working-model h2,
+  .faq-grid > h2,
+  .studio-copy h2 {
+    font-size: 27px !important;
+    line-height: 1.16 !important;
+  }
+
+  .final-grid h2 {
+    font-size: 30px !important;
+    line-height: 1.12 !important;
+  }
+
+  .services-intro {
+    font-size: 22px !important;
+  }
+
+  .service-row h3 {
+    font-size: 24px !important;
+  }
+}
