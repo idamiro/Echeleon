@@ -1,0 +1,67 @@
+/* Kinetic Clarity write-up — compact media (page-scoped) */
+
+.kc-lead {
+  max-width: 720px;
+  margin: 48px auto 0;
+  border-radius: 18px;
+}
+
+.kc-lead img {
+  width: 100%;
+  height: auto;
+  display: block;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.kc-lead figcaption {
+  padding: 12px 14px 14px;
+  font-size: 11px;
+}
+
+.kc-gallery {
+  margin-top: 28px;
+  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.kc-gallery figure {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #101116;
+}
+
+.kc-gallery img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.kc-gallery figcaption {
+  padding: 10px 12px 12px;
+  color: var(--graphite);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  .kc-lead {
+    margin-top: 32px;
+    max-width: 100%;
+    border-radius: 14px;
+  }
+
+  .kc-gallery {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .kc-gallery figcaption {
+    font-size: 9px;
+    padding: 8px 10px 10px;
+  }
+}
