@@ -1140,8 +1140,11 @@ a { color: inherit; text-decoration: none; }
 
   .rail-wrap { margin-right: clamp(-20px, -3vw, -14px); }
 
+  /* the art is too short here for an overlay caption to stay readable */
   .game-stage figcaption {
-    padding-top: clamp(40px, 14vw, 70px);
+    position: static;
+    padding: clamp(18px, 5vw, 26px);
+    background: #16191f;
   }
 
   .game-row img {
@@ -1170,7 +1173,9 @@ a { color: inherit; text-decoration: none; }
 
   .buy { justify-content: space-between; }
 
-  .hero-pad { right: 52%; }
+  .hero-console { height: clamp(200px, 52vw, 250px); }
+
+  .hero-pad { width: clamp(96px, 26vw, 120px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
