@@ -251,6 +251,11 @@
   letter-spacing: -.055em;
 }
 
+.case-story h2 em {
+  font-family: var(--font-instrument), Georgia, serif;
+  font-weight: 400;
+}
+
 .case-story p {
   max-width: 680px;
   margin: 26px 0 0;
