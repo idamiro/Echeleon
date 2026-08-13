@@ -24,7 +24,7 @@
       sub: 'The PS5 console bundled with Aster Fall, a survey mission across a mapped red planet.',
       price: '559.99',
       cta: 'Buy bundle',
-      pad: true
+      pad: 'bundle'
     }
   ];
 
@@ -44,6 +44,7 @@
     heroPrice.textContent = p.price;
     buyLabel.textContent = p.cta;
     heroStage.classList.toggle('is-solo', p.pad === 'solo');
+    heroStage.classList.toggle('is-bundle', p.pad === 'bundle');
   }
 
   function step(delta) {

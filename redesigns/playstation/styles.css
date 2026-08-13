@@ -429,6 +429,56 @@ a { color: inherit; text-decoration: none; }
 
 .hero-stage.is-solo .hero-pad { opacity: 1; }
 
+/* bundle slide: the console group plus the included game */
+.hero-bundle {
+  position: absolute;
+  z-index: 4;
+  left: clamp(0px, 2vw, 26px);
+  bottom: clamp(30px, 6vw, 80px);
+  width: clamp(132px, 15vw, 196px);
+  margin: 0;
+  padding: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #14171c;
+  box-shadow: 0 24px 44px rgba(28, 36, 48, 0.26);
+  opacity: 0;
+  pointer-events: none;
+  transform: rotate(-5deg);
+  transition: opacity 380ms var(--ease);
+}
+
+.hero-bundle img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.hero-bundle figcaption {
+  padding: 9px 12px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: #fff;
+}
+
+.hero-bundle strong {
+  font-family: var(--font-d);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.hero-bundle span {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hero-stage.is-bundle .hero-bundle { opacity: 1; }
+
 @keyframes float-console {
   0%, 100% { transform: translate3d(0, 0, 0); }
   50% { transform: translate3d(0, -12px, 0); }
@@ -1173,6 +1223,11 @@ a { color: inherit; text-decoration: none; }
   .hero-group { height: clamp(210px, 54vw, 260px); }
 
   .hero-pad { width: clamp(160px, 46vw, 210px); }
+
+  .hero-bundle {
+    width: clamp(104px, 30vw, 124px);
+    bottom: clamp(16px, 5vw, 30px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
