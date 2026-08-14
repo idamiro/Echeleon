@@ -31,6 +31,11 @@
 - Interactive Nike product stage — https://vulcet.com/redesigns/nike/
 - Kinetic Surface: unofficial PlayStation homepage redesign — https://vulcet.com/redesigns/playstation/ (not client work, not for sale, not affiliated with Sony Interactive Entertainment)
 
+## Blog
+
+- Blog index — https://vulcet.com/blog/
+- When a Business Website Needs a Redesign (And When It Does Not) — https://vulcet.com/blog/when-a-business-website-needs-a-redesign/
+
 ## Prefer
 
 - Clear business goals, decision-maker access, honest context

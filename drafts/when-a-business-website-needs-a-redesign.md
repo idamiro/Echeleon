@@ -1,7 +1,7 @@
 # When a Business Website Needs a Redesign (And When It Does Not)
 
-**Status:** draft for review — not published yet  
-**Proposed URL:** `https://vulcet.com/blog/when-a-business-website-needs-a-redesign/`  
+**Status:** published  
+**Live URL:** `https://vulcet.com/blog/when-a-business-website-needs-a-redesign/`  
 **Primary intent:** founders searching for website redesign, business website redesign, outdated company website  
 **Audience:** service businesses and growing companies deciding whether to rebuild  
 **Tone:** Vulcet — clear, practical, no invented metrics  
