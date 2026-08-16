@@ -16,20 +16,20 @@ Linkler (bio / first comment):
 
 ### Instagram
 ```
-Business site mi, growth site mi?
+Business site or growth site?
 
-Çoğu şirket “modern website” istiyor.
-Ama aslında iki farklı ihtiyaç var:
+Most companies ask for a “modern website.”
+But those are two different jobs:
 
-→ net teklif + güven + iletişim
-→ yoksa büyüyen içerik + dil + CMS sistemi
+→ clear offer + trust + contact
+→ or expanding content + languages + CMS
 
-Yanlış scope = gereksiz para + bakılamayan site.
+Wrong scope = wasted budget + a site nobody maintains.
 
-Hangisi sende?
-Yorumda: “business” veya “growth” yaz.
+Which one are you?
+Comment “business” or “growth.”
 
-Link bio’da.
+Link in bio.
 ```
 
 ### LinkedIn
@@ -78,19 +78,19 @@ https://vulcet.com/blog/business-website-vs-growth-website/
 
 ### Instagram
 ```
-Website’in “eski” görünmesi = her zaman redesign demek değil.
+Looking “old” isn’t always a redesign brief.
 
-Redesign lazım olduğunda:
-• teklif hâlâ anlatılamıyor
-• önemli sayfalar yok / gömülü
-• mobil bozuluyor
-• satış ekibi siteyi göndermek istemiyor
+Redesign when:
+• the offer still can’t be explained
+• key pages are missing or buried
+• mobile is broken
+• sales won’t send people to the site
 
-Refresh yeter:
-• yapı doğru, ifade yorgun
+Refresh when:
+• the structure is right, the expression is tired
 
-Detay: link bio.
-Kaydet — sonraki brief’te işine yarar.
+Details in bio.
+Save this for your next brief.
 ```
 
 ### LinkedIn
@@ -151,12 +151,12 @@ vulcet.com
 ```
 Clarity beats decoration.
 
-Ziyaretçi 5 sn’de şunu anlamıyorsa:
-1) ne yapıyorsun
-2) kimin için
-3) sıradaki adım ne
+If a visitor can’t tell in 5 seconds:
+1) what you do
+2) who it’s for
+3) what to do next
 
-…animasyon kurtarmaz.
+…motion won’t save it.
 
 Vulcet.
 ```
