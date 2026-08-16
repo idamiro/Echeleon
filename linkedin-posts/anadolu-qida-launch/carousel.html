@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vulcet × Anadolu Qida — LinkedIn Carousel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f2eee6;
+      --paper-light: #faf8f3;
+      --coal: #171715;
+      --graphite: #595650;
+      --rule: #c9c2b7;
+      --signal: #07080b;
+      --dark-text: #ddd8cf;
+      --dark-muted: #c9c4bb;
+      --dark-rule: #4a4843;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #111; }
+    body {
+      font-family: Inter, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      color: var(--coal);
+    }
+
+    .deck {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+      padding: 48px;
+      width: max-content;
+    }
+
+    .slide {
+      width: 1080px;
+      height: 1350px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide--paper { background: var(--paper); color: var(--coal); }
+    .slide--coal { background: var(--signal); color: var(--paper-light); }
+
+    .pad {
+      padding: 72px 80px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 2;
+    }
+
+    .chrome {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 44px;
+    }
+
+    .wordmark {
+      height: 28px;
+      width: auto;
+      display: block;
+    }
+    .wordmark--light { filter: invert(1) brightness(1.15); }
+
+    .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 15px;
+      font-weight: 650;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .label i {
+      font-style: normal;
+      color: var(--graphite);
+    }
+    .slide--coal .label i { color: var(--dark-muted); }
+    .label b {
+      font-weight: 650;
+      letter-spacing: .12em;
+    }
+
+    .rule {
+      width: 56px;
+      height: 1px;
+      background: var(--signal);
+      margin: 36px 0;
+    }
+    .slide--coal .rule { background: var(--paper-light); }
+
+    h1, h2 {
+      font-weight: 560;
+      letter-spacing: -.04em;
+      line-height: .96;
+    }
+    h1 { font-size: 96px; max-width: 920px; }
+    h2 { font-size: 78px; max-width: 900px; }
+    h1 em, h2 em {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .support {
+      font-size: 28px;
+      line-height: 1.4;
+      font-weight: 450;
+      max-width: 720px;
+    }
+    .slide--paper .support { color: var(--graphite); }
+    .slide--coal .support { color: var(--dark-muted); }
+
+    .foot {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 28px;
+      border-top: 1px solid var(--rule);
+      font-size: 15px;
+      font-weight: 650;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--graphite);
+    }
+    .slide--coal .foot {
+      border-top-color: var(--dark-rule);
+      color: var(--dark-muted);
+    }
+    .foot strong {
+      color: inherit;
+      font-weight: 650;
+      letter-spacing: .08em;
+    }
+    .slide--paper .foot strong { color: var(--coal); }
+    .slide--coal .foot strong { color: var(--paper-light); }
+
+    .aq-mark {
+      height: 44px;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+    .aq-mark--on-dark {
+      filter: brightness(0) invert(1);
+      opacity: .95;
+    }
+    .aq-mark--lg { height: 52px; }
+
+    /* ========== SLIDE 1 ========== */
+    .s1-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-bottom: 48px;
+    }
+    .s1-kicker {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--dark-muted);
+      margin-bottom: 40px;
+    }
+    .s1-partners {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      margin-top: 48px;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: var(--paper-light);
+    }
+    .s1-partners span {
+      opacity: .4;
+      font-weight: 500;
+    }
+
+    /* ========== SLIDE 2 ========== */
+    .s2-media {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .s2-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 45%;
+      filter: saturate(.92) contrast(1.05);
+    }
+    .s2-media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(7,8,11,.72) 0%, rgba(7,8,11,.28) 38%, rgba(7,8,11,.55) 62%, rgba(7,8,11,.92) 100%);
+    }
+    .s2-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding-bottom: 8px;
+      max-width: 880px;
+    }
+    .s2-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .s2-badge span {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--dark-muted);
+    }
+
+    /* ========== SLIDE 3 ========== */
+    .s3-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding-top: 28px;
+    }
+    .s3-grid {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+    .s3-grid div {
+      padding: 28px 28px 28px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .s3-grid div:nth-child(even) {
+      padding-left: 28px;
+      border-left: 1px solid var(--rule);
+    }
+    .s3-grid div:nth-last-child(-n+2) { border-bottom: 0; }
+    .s3-grid dt {
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--graphite);
+      margin-bottom: 10px;
+    }
+    .s3-grid dd {
+      font-size: 26px;
+      font-weight: 560;
+      letter-spacing: -.02em;
+      line-height: 1.2;
+    }
+    .s3-frame {
+      margin-top: 36px;
+      flex: 1;
+      min-height: 0;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+      background: var(--paper-light);
+    }
+    .s3-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 40%;
+      display: block;
+    }
+    .s3-frame figcaption {
+      position: absolute;
+      left: 20px;
+      bottom: 18px;
+      padding: 10px 14px;
+      background: rgba(7,8,11,.78);
+      color: var(--paper-light);
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      border-radius: 2px;
+    }
+
+    /* ========== SLIDE 4 ========== */
+    .s4-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-bottom: 24px;
+    }
+    .s4-marks {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-bottom: 56px;
+    }
+    .s4-marks .wordmark { height: 32px; }
+    .s4-marks .divider {
+      width: 1px;
+      height: 36px;
+      background: var(--dark-rule);
+    }
+    .s4-links {
+      margin-top: 48px;
+      display: grid;
+      gap: 14px;
+    }
+    .s4-links span {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: var(--paper-light);
+      text-decoration: none;
+    }
+    .s4-links small {
+      display: block;
+      margin-top: 6px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--dark-muted);
+      letter-spacing: 0;
+    }
+    .s4-points {
+      margin-top: 36px;
+      border-top: 1px solid var(--dark-rule);
+      max-width: 760px;
+    }
+    .s4-points li {
+      list-style: none;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--dark-rule);
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    .s4-points span {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--paper-light);
+      letter-spacing: .06em;
+      padding-top: 3px;
+    }
+    .s4-points p {
+      font-size: 24px;
+      line-height: 1.35;
+      font-weight: 500;
+      letter-spacing: -.015em;
+      color: var(--dark-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+
+    <!-- SLIDE 1: Cover -->
+    <section class="slide slide--coal" id="slide-1">
+      <div class="pad">
+        <div class="chrome">
+          <img class="wordmark wordmark--light" src="./vulcet-wordmark.png" alt="Vulcet">
+          <div class="label"><b>01</b><i>Case study</i></div>
+        </div>
+        <div class="s1-main">
+          <p class="s1-kicker">Client project · 02</p>
+          <h1>A clearer home for a flour <em>producer.</em></h1>
+          <div class="rule"></div>
+          <p class="support">Strategy, UI/UX and development for Anadolu Qida — a brand-led business website, now live.</p>
+          <div class="s1-partners">
+            <img class="aq-mark aq-mark--on-dark" src="./anadolu-logo.webp" alt="Anadolu Qida">
+            <div>Vulcet <span>×</span> Anadolu Qida</div>
+          </div>
+        </div>
+        <div class="foot">
+          <strong>Vulcet</strong>
+          <span>01 / 04</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: The client -->
+    <section class="slide slide--coal" id="slide-2">
+      <div class="s2-media" aria-hidden="true">
+        <img src="./anadolu-hero-small.jpg" alt="">
+      </div>
+      <div class="pad">
+        <div class="chrome">
+          <img class="wordmark wordmark--light" src="./vulcet-wordmark.png" alt="Vulcet">
+          <div class="label"><b>02</b><i>The client</i></div>
+        </div>
+        <div class="s2-main">
+          <div class="s2-badge">
+            <img class="aq-mark aq-mark--on-dark aq-mark--lg" src="./anadolu-logo.webp" alt="">
+            <span>Anadolu Qida</span>
+          </div>
+          <h2>A real production business that needed a solid digital face.</h2>
+          <div class="rule"></div>
+          <p class="support">Flour for bakeries, dough kitchens and corporate supply — with packaging clarity, production story and a practical enquiry path.</p>
+        </div>
+        <div class="foot">
+          <strong>anadoluqida.com</strong>
+          <span>02 / 04</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: What we built -->
+    <section class="slide slide--paper" id="slide-3">
+      <div class="pad">
+        <div class="chrome">
+          <img class="wordmark" src="./vulcet-wordmark.png" alt="Vulcet">
+          <div class="label"><b>03</b><i>Behind the work</i></div>
+        </div>
+        <div class="s3-main">
+          <h2>What we <em>built.</em></h2>
+          <p class="support" style="margin-top:24px;">One editorial system for products, production values and corporate orders — without decoration for its own sake.</p>
+          <dl class="s3-grid">
+            <div><dt>Role</dt><dd>Strategy, UI/UX, development</dd></div>
+            <div><dt>Duration</dt><dd>Approx. four weeks</dd></div>
+            <div><dt>Focus</dt><dd>Products · Story · Enquiry</dd></div>
+            <div><dt>Status</dt><dd>Live client project</dd></div>
+          </dl>
+          <figure class="s3-frame">
+            <img src="./anadolu-hero.webp" alt="Wheat field hero from the Anadolu Qida website.">
+            <figcaption>Live · anadoluqida.com</figcaption>
+          </figure>
+        </div>
+        <div class="foot">
+          <strong>Case study</strong>
+          <span>03 / 04</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: Close -->
+    <section class="slide slide--coal" id="slide-4">
+      <div class="pad">
+        <div class="chrome">
+          <div class="label"><b>04</b><i>Outcome</i></div>
+          <div class="label"><i>Vulcet</i></div>
+        </div>
+        <div class="s4-main">
+          <div class="s4-marks">
+            <img class="wordmark wordmark--light" src="./vulcet-wordmark.png" alt="Vulcet">
+            <div class="divider" aria-hidden="true"></div>
+            <img class="aq-mark aq-mark--on-dark aq-mark--lg" src="./anadolu-logo.webp" alt="Anadolu Qida">
+          </div>
+          <h1>Live site.<br><em>Clearer story.</em></h1>
+          <div class="rule"></div>
+          <p class="support">Buyers and partners can understand the offer, trust the operation and start an order conversation — without friction.</p>
+          <div class="s4-links">
+            <span>anadoluqida.com<small>Visit the live website</small></span>
+            <span>vulcet.com/work/anadolu-qida<small>Read the case study</small></span>
+          </div>
+        </div>
+        <div class="foot">
+          <strong>hello@vulcet.com</strong>
+          <span>04 / 04</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
