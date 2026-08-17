@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 140" role="img" aria-label="Vulcet">
-  <!-- Prefer brand/wordmark/vulcet-wordmark.png (Syne Bold + three-bar E). This SVG is a geometric fallback. -->
-  <g fill="#07080b">
+  <g fill="#f7f5f1">
     <path d="M16 22h40l46 96 46-96h40L178 130h-48L16 22z"/>
     <path d="M214 22h36v70c0 22 12 36 34 36s34-14 34-36V22h36v72c0 42-26 62-70 62s-70-20-70-62V22z"/>
     <path d="M390 22h36v86h68v32H390V22z"/>
