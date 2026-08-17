@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Vulcet">
+  <path fill="#07080b" d="M79.360,79.360 H380.408 L432.640,131.592 V174.328 H79.360 Z"/>
+  <rect fill="#07080b" x="79.360" y="208.516" width="353.280" height="94.968"/>
+  <path fill="#07080b" d="M79.360,337.672 H432.640 V432.640 H131.592 L79.360,380.408 Z"/>
+</svg>
