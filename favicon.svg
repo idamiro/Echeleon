@@ -1,9 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Vulcet">
-  <rect width="64" height="64" rx="12" fill="#07080b"/>
-  <g fill="#f7f5f1">
-    <rect x="12" y="16" width="40" height="7" rx="0.8"/>
-    <rect x="12" y="28.5" width="32.5" height="7" rx="0.8"/>
-    <rect x="12" y="41" width="40" height="7" rx="0.8"/>
-  </g>
+  <rect width="64" height="64" rx="14" fill="#07080b"/>
+  <rect x="14" y="16" width="36" height="8" rx="1.5" fill="#f3f3f5"/>
+  <rect x="14" y="28" width="36" height="8" rx="1.5" fill="#f3f3f5"/>
+  <rect x="14" y="40" width="36" height="8" rx="1.5" fill="#f3f3f5"/>
 </svg>
