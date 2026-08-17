@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Vulcet">
-  <path fill="#07080b" d="M9.920,9.920 H47.551 L54.080,16.449 V21.791 H9.920 Z"/>
-  <rect fill="#07080b" x="9.920" y="26.065" width="44.160" height="11.871"/>
-  <path fill="#07080b" d="M9.920,42.209 H54.080 V54.080 H16.449 L9.920,47.551 Z"/>
+  <path fill="#07080b" d="M9.920,9.920 H50.738 L54.080,13.262 V21.855 H9.920 Z"/>
+  <rect fill="#07080b" x="9.920" y="26.032" width="44.160" height="11.935"/>
+  <path fill="#07080b" d="M9.920,42.145 H54.080 V54.080 H13.262 L9.920,50.738 Z"/>
 </svg>
