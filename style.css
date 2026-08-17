@@ -984,7 +984,7 @@ html[data-motion="ready"] .motion-reveal.is-visible { opacity: 1; transform: tra
 }
 
 /* Hero motion is a modular product system, not a sculptural orbit */
-.hero-lens { top: 7%; right: 2%; width: clamp(360px, 35vw, 520px); aspect-ratio: 1; overflow: hidden; border: 1px solid rgba(7,8,11,.1); border-radius: 34px; background-color: rgba(255,255,255,.48); background-image: linear-gradient(rgba(7,8,11,.065) 1px, transparent 1px), linear-gradient(90deg, rgba(7,8,11,.065) 1px, transparent 1px); background-size: 54px 54px; box-shadow: 0 35px 80px rgba(29,31,45,.11); transform: translate3d(var(--hero-x), var(--hero-y), 0) rotate(2deg); }
+.hero-lens { top: 7%; right: 2%; width: clamp(360px, 35vw, 520px); aspect-ratio: 1; overflow: hidden; border: 1px solid rgba(7,8,11,.1); border-radius: 34px; background-color: rgba(255,255,255,.48); background-image: none; box-shadow: 0 35px 80px rgba(29,31,45,.11); transform: translate3d(var(--hero-x), var(--hero-y), 0) rotate(2deg); }
 .hero-lens::before { inset: auto; z-index: 2; width: 78%; height: 21%; left: -8%; top: 18%; border: 0; border-radius: 22px; background: linear-gradient(100deg, #5b45dc, #8d6dff 54%, #b8a8ff); box-shadow: 0 20px 40px rgba(83,61,205,.19); transform: rotate(-23deg); animation: module-band-a 7.5s var(--ease-standard) infinite; }
 .hero-lens::after { z-index: 2; width: 46%; height: 58%; left: auto; right: 8%; top: auto; bottom: 7%; border: 1px solid rgba(7,8,11,.08); border-radius: 26px; background: rgba(255,255,255,.84); box-shadow: 0 24px 48px rgba(42,45,63,.1), inset 0 1px white; filter: none; transform: rotate(-5deg); animation: module-panel 9s var(--ease-standard) infinite; }
 .hero-lens i { border-radius: 18px; box-shadow: none; }
@@ -1003,7 +1003,7 @@ html[data-motion="ready"] .motion-reveal.is-visible { opacity: 1; transform: tra
 }
 
 @media (max-width: 599px) {
-  .hero-lens { right: -43%; width: 255px; border-radius: 24px; background-size: 36px 36px; }
+  .hero-lens { right: -43%; width: 255px; border-radius: 24px; }
   .hero-lens i:first-child { width: 16%; height: 48%; }
   .hero-lens i:nth-child(2) { width: 42%; height: 13%; }
   .hero-lens span { width: 19%; height: 19%; }
@@ -1446,7 +1446,7 @@ html, body { max-width: 100%; overflow-x: clip; }
   .hero h1 em { display: inline; }
   .hero-support { margin-top: 26px; }
   .hero-support > p { max-width: 205px; font-size: 15.5px; line-height: 1.48; }
-  .hero-lens { top: auto; right: -10px; bottom: 38px; width: 136px; opacity: .68; border-radius: 18px; background-size: 27px 27px; }
+  .hero-lens { top: auto; right: -10px; bottom: 38px; width: 136px; opacity: .68; border-radius: 18px; }
   .hero-lens::before { border-radius: 14px; }
   .hero-lens::after { border-radius: 15px; }
 
@@ -3660,6 +3660,11 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 
 .locale-button {
   display: none !important;
+}
+
+/* Kill leftover hero grid lines only — keep lens/orbit visuals */
+.hero-lens {
+  background-image: none !important;
 }
 
 /* Free orbital hero object: no containing square */
