@@ -104,13 +104,13 @@
 
     const loader = new GLTFLoader();
     loader.load(
-      new URL('./assets/iphone-15-pro-case-preview.glb?v=plain4', import.meta.url).href,
+      new URL('./assets/iphone-15-pro-case-preview.glb?v=plain5', import.meta.url).href,
       (gltf) => {
         while (root.children.length) root.remove(root.children[0]);
         const obj = gltf.scene;
         // Flat solid white — no gloss, no edge glow, same inside & outside
         const whiteMat = new THREE.MeshLambertMaterial({
-          color: 0xe4e5e8,
+          color: 0xf0ebe3,
           side: THREE.DoubleSide
         });
         obj.traverse((o) => {
@@ -127,7 +127,7 @@
         box = new THREE.Box3().setFromObject(obj);
         obj.position.sub(box.getCenter(new THREE.Vector3()));
         root.add(obj);
-        note.textContent = 'Soft off-white case · matte, less bright';
+        note.textContent = 'Soft cream case · matte';
         setView('front');
       },
       undefined,
