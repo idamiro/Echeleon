@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Phone + case preview — Vulcet</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #c5c8cf; font-family: Inter, system-ui, sans-serif; color: #141416; }
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 2;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
+      padding: 14px; background: rgba(255,255,255,.92); border-bottom: 1px solid #e6e8ec;
+    }
+    .bar strong { margin-right: 8px; font-size: 13px; }
+    .bar a { font-size: 12px; font-weight: 600; color: #555; margin-right: 10px; text-decoration: none; }
+    .bar button {
+      height: 34px; padding: 0 14px; border: 0; border-radius: 999px;
+      background: #e8eaee; font-weight: 700; font-size: 12px; cursor: pointer;
+    }
+    .bar button.is-on { background: #111; color: #fff; }
+    #host { position: fixed; inset: 0; }
+    .note {
+      position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+      z-index: 2; margin: 0; padding: 8px 12px; border-radius: 999px;
+      background: rgba(20,20,24,.82); color: #fff; font-size: 12px; font-weight: 600;
+    }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="bar">
+    <a href="./case-preview.html">Case only</a>
+    <strong>Phone + case fit preview · no editor</strong>
+    <button type="button" data-view="front" class="is-on">Front</button>
+    <button type="button" data-view="back">Back</button>
+    <button type="button" data-view="side">Side</button>
+  </div>
+  <div id="host"></div>
+  <p class="note" id="note">Loading phone + case…</p>
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    const host = document.getElementById('host');
+    const note = document.getElementById('note');
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setClearColor(0xc5c8cf, 1);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.NoToneMapping;
+    host.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xc5c8cf);
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 200);
+    camera.position.set(0, 0, 8);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa0a8, 0.7));
+    const key = new THREE.DirectionalLight(0xffffff, 0.55);
+    key.position.set(2.2, 3.2, 3.5);
+    scene.add(key);
+
+    const root = new THREE.Group();
+    scene.add(root);
+
+    let orbit = { x: 0.1, y: 0 };
+    let dist = 7.4;
+
+    function resize() {
+      const w = host.clientWidth || innerWidth;
+      const h = host.clientHeight || innerHeight;
+      renderer.setSize(w, h, false);
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    addEventListener('resize', resize);
+    resize();
+
+    function setView(name) {
+      document.querySelectorAll('.bar button').forEach((b) => b.classList.toggle('is-on', b.dataset.view === name));
+      if (name === 'front') { orbit = { x: 0.06, y: 0 }; dist = 7.4; }
+      if (name === 'back') { orbit = { x: 0.1, y: Math.PI }; dist = 7.4; }
+      if (name === 'side') { orbit = { x: 0.04, y: Math.PI / 2 }; dist = 7.8; }
+    }
+    document.querySelectorAll('.bar button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
+
+    function animate() {
+      requestAnimationFrame(animate);
+      root.rotation.x += (orbit.x - root.rotation.x) * 0.12;
+      root.rotation.y += (orbit.y - root.rotation.y) * 0.12;
+      camera.position.z += (dist - camera.position.z) * 0.12;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    function boxOf(obj) {
+      obj.updateMatrixWorld(true);
+      return new THREE.Box3().setFromObject(obj);
+    }
+    function sizeOf(obj) {
+      return boxOf(obj).getSize(new THREE.Vector3());
+    }
+    function centerObj(obj) {
+      const c = boxOf(obj).getCenter(new THREE.Vector3());
+      obj.position.sub(c);
+      obj.updateMatrixWorld(true);
+    }
+    function fitHeight(obj, targetH) {
+      const s = sizeOf(obj);
+      if (s.y > 1e-9) obj.scale.multiplyScalar(targetH / s.y);
+      centerObj(obj);
+      return sizeOf(obj);
+    }
+
+    function loadGltf(loader, rel) {
+      const url = new URL(rel, import.meta.url).href;
+      return new Promise((resolve, reject) => loader.load(url, resolve, undefined, reject));
+    }
+
+    const loader = new GLTFLoader();
+    try {
+      const [phoneGltf, caseGltf] = await Promise.all([
+        loadGltf(loader, './assets/iphone-15-pro-max.glb'),
+        loadGltf(loader, './assets/iphone-15-pro-case-preview.glb?v=fit2')
+      ]);
+
+      while (root.children.length) root.remove(root.children[0]);
+
+      const phone = phoneGltf.scene;
+      phone.name = 'phone';
+      phone.traverse((o) => {
+        if (!o.isMesh) return;
+        o.castShadow = true;
+        o.receiveShadow = true;
+        const mats = Array.isArray(o.material) ? o.material : [o.material];
+        mats.forEach((m) => {
+          if (!m) return;
+          if (m.map) m.map.colorSpace = THREE.SRGBColorSpace;
+          m.needsUpdate = true;
+        });
+      });
+
+      // Phone GLB: screen on -Z, cameras on +Z. Front camera looks from +Z,
+      // so flip phone so the screen faces Front.
+      fitHeight(phone, 4.08);
+      phone.rotation.y = Math.PI;
+      centerObj(phone);
+
+      const caseObj = caseGltf.scene;
+      caseObj.name = 'case';
+      const caseMat = new THREE.MeshLambertMaterial({
+        color: 0xe4e5e8,
+        side: THREE.DoubleSide
+      });
+      caseObj.traverse((o) => {
+        if (!o.isMesh) return;
+        if (o.geometry && !o.geometry.getAttribute('normal')) o.geometry.computeVertexNormals();
+        o.material = caseMat;
+        o.castShadow = true;
+        o.receiveShadow = true;
+      });
+
+      // CAD solid back / exterior is on minZ (-Z). After phone flip the rear
+      // also faces -Z, so keep case unflipped and hug the phone back.
+      fitHeight(caseObj, sizeOf(phone).y * 1.03);
+      centerObj(caseObj);
+
+      const pSize = sizeOf(phone);
+      const cSize = sizeOf(caseObj);
+      const sXY = Math.min((pSize.x * 1.03) / cSize.x, (pSize.y * 1.025) / cSize.y);
+      caseObj.scale.multiplyScalar(sXY);
+      // Depth: wrap sides without covering the screen face
+      const depthScale = (pSize.z * 1.65) / Math.max(sizeOf(caseObj).z, 1e-6);
+      caseObj.scale.z *= Math.min(1.25, Math.max(0.85, depthScale));
+      centerObj(caseObj);
+
+      // Align centers, then seat case on the phone rear (-Z)
+      const pBox = boxOf(phone);
+      const pCenter = pBox.getCenter(new THREE.Vector3());
+      const cCenter = boxOf(caseObj).getCenter(new THREE.Vector3());
+      caseObj.position.add(pCenter.clone().sub(cCenter));
+
+      const cBox2 = boxOf(caseObj);
+      const phoneBack = pBox.min.z;
+      const caseBack = cBox2.min.z;
+      // Outer case back should sit just behind phone back
+      caseObj.position.z += (phoneBack - cBox2.getSize(new THREE.Vector3()).z * 0.04) - caseBack;
+
+      // Re-lock XY to phone center
+      const c3 = boxOf(caseObj).getCenter(new THREE.Vector3());
+      caseObj.position.x += pCenter.x - c3.x;
+      caseObj.position.y += pCenter.y - c3.y;
+
+      root.add(phone);
+      root.add(caseObj);
+
+      // Frame
+      const all = boxOf(root).getSize(new THREE.Vector3());
+      dist = Math.max(all.x, all.y) * 1.85;
+      camera.position.set(0, all.y * 0.02, dist);
+
+      note.textContent = 'Phone + soft case fitted · Front = screen, Back = case';
+      setView('front');
+    } catch (err) {
+      console.error(err);
+      note.textContent = 'Could not load phone + case preview';
+    }
+  </script>
+</body>
+</html>
