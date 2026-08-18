@@ -924,11 +924,20 @@ function buildCase(size) {
 }
 
 function resize3D() {
-  if (!renderer) return;
+  if (!renderer || !camera) return;
   const host = $('#previewHost');
-  const w = host.clientWidth || 800;
-  const h = host.clientHeight || 600;
+  const stageEl = $('#stage');
+  const w = Math.max(
+    2,
+    host.clientWidth || stageEl?.clientWidth || host.parentElement?.clientWidth || 800
+  );
+  const h = Math.max(
+    2,
+    host.clientHeight || stageEl?.clientHeight || host.parentElement?.clientHeight || 600
+  );
   renderer.setSize(w, h, false);
+  renderer.domElement.style.width = '100%';
+  renderer.domElement.style.height = '100%';
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
 }
@@ -949,34 +958,49 @@ function setCam(name) {
   if (name === 'angle') { orbit = { x: 0.32, y: Math.PI - 0.7 }; dist = 7.8; }
 }
 
+function framePhone(size) {
+  const maxDim = Math.max(size.x, size.y, size.z || 0.2);
+  dist = clamp(maxDim * 1.9, 5.6, 10);
+  camera.position.set(0, size.y * 0.04, dist);
+  camera.near = 0.05;
+  camera.far = 80;
+  camera.updateProjectionMatrix();
+}
+
 async function init3D() {
   const host = $('#previewHost');
   if (!host || host.querySelector('canvas')) return;
   try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+    renderer.setClearColor(0xf0f2f5, 1);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.12;
+    renderer.toneMappingExposure = 1.2;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     host.append(renderer.domElement);
 
     scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf0f2f5);
     camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-    camera.position.set(0, 0.1, dist);
+    camera.position.set(0, 0.12, dist);
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x2a2a32, 1.5));
-    const key = new THREE.DirectionalLight(0xffffff, 3.6);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x3a3a44, 1.65));
+    const key = new THREE.DirectionalLight(0xffffff, 3.8);
     key.position.set(3.5, 5, 5.5);
     key.castShadow = true;
     scene.add(key);
-    scene.add(new THREE.DirectionalLight(0xd7e4ff, 2).translateX(-4).translateY(1).translateZ(-3));
-    scene.add(new THREE.DirectionalLight(0xfff0e4, 1.1).translateY(-3.2).translateZ(2.5));
+    const rim = new THREE.DirectionalLight(0xd7e4ff, 2.2);
+    rim.position.set(-4, 1, -3);
+    scene.add(rim);
+    const fill = new THREE.DirectionalLight(0xfff0e4, 1.25);
+    fill.position.set(0.5, -3.2, 2.5);
+    scene.add(fill);
 
     const ground = new THREE.Mesh(
       new THREE.CircleGeometry(2.6, 64),
-      new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.14 })
+      new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.12 })
     );
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -2.4;
@@ -986,6 +1010,9 @@ async function init3D() {
     scene.add(root);
 
     const el = renderer.domElement;
+    el.style.display = 'block';
+    el.style.width = '100%';
+    el.style.height = '100%';
     el.addEventListener('pointerdown', (e) => {
       el.setPointerCapture(e.pointerId);
       dragging3d = { x: e.clientX, y: e.clientY };
@@ -1006,7 +1033,8 @@ async function init3D() {
 
     say('Loading realistic iPhone model…');
     const loader = new GLTFLoader();
-    const url = new URL('./assets/iphone-15-pro.glb', import.meta.url).href;
+    // Prefer page-relative path so query-string on app.js cannot break asset resolution
+    const url = new URL('assets/iphone-15-pro.glb', window.location.href).href;
     loader.load(
       url,
       (gltf) => {
@@ -1016,6 +1044,13 @@ async function init3D() {
           if (o.isMesh) {
             o.castShadow = true;
             o.receiveShadow = true;
+            if (o.material) {
+              const mats = Array.isArray(o.material) ? o.material : [o.material];
+              mats.forEach((m) => {
+                if (m.map) m.map.colorSpace = THREE.SRGBColorSpace;
+                m.needsUpdate = true;
+              });
+            }
           }
         });
         phoneSize = fit(device, 4.08);
@@ -1023,17 +1058,32 @@ async function init3D() {
         root.add(device);
         root.add(buildCase(phoneSize));
         applyCaseTo3D();
+        framePhone(phoneSize);
         root.rotation.set(orbit.x, orbit.y, 0);
         resize3D();
         say('Ready · design in 2D, inspect in 3D');
       },
       undefined,
-      () => say('Could not load 3D model.')
+      (err) => {
+        console.error(err);
+        say('Could not load 3D model.');
+      }
     );
 
     resize3D();
     animate();
     window.addEventListener('resize', resize3D);
+    if (window.ResizeObserver) {
+      const ro = new ResizeObserver(() => resize3D());
+      ro.observe(host);
+      const stageEl = $('#stage');
+      if (stageEl) ro.observe(stageEl);
+    }
+    // Layout can settle a frame after paint
+    requestAnimationFrame(() => {
+      resize3D();
+      requestAnimationFrame(resize3D);
+    });
   } catch (err) {
     console.error(err);
     say('3D preview unavailable in this browser.');
