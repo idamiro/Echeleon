@@ -1,10 +1,13 @@
-iPhone 15 Pro Max (black)
-File: iphone-15-pro-max.glb
-Source asset provided for Vulcet Case Studio (unofficial concept).
-Not affiliated with Apple.
+Case model preview assets
 
-iPhone 15 Pro Case — DJO + Jack@Meow REMIX 2.0
-File: iphone-15-pro-case.glb (converted from STEP for web preview)
-Original STEP: iPhone 15 Pro Case - DJO + Jack@Meow REMIX 2.0
-Includes Camera Guard sub-part.
-Not affiliated with Apple.
+iphone-15-pro-case-preview.glb
+  Converted from user-supplied Iphone_15_pro.stl (watertight full-back case).
+  Source STEP also kept as iphone-15-pro-case.step.
+
+iphone-15-pro-max.glb
+  User-supplied Apple iPhone 15 Pro Max black GLB (not used in case-preview.html).
+
+Removed:
+  Previous DEFINITIVE / DJO+Jack@Meow remeshed case GLB and any fake printable back plane.
+
+Unofficial Vulcet experiment. Not affiliated with Apple.

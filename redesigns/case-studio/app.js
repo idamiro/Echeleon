@@ -1042,29 +1042,27 @@ async function init3D() {
       requestAnimationFrame(resize3D);
     });
 
-    say('Loading iPhone + case models…');
+    say('Loading iPhone model…');
     const loader = new GLTFLoader();
     const draco = new DRACOLoader();
     draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/libs/draco/');
     loader.setDRACOLoader(draco);
 
-    const [phoneGltf, caseGltf] = await Promise.all([
-      loadGltf(loader, 'assets/iphone-15-pro-max.glb'),
-      loadGltf(loader, 'assets/iphone-15-pro-case.glb')
-    ]);
+    // Case model is previewed separately until solid-back confirmation.
+    // See case-preview.html — do not attach case here yet.
+    const phoneGltf = await loadGltf(loader, 'assets/iphone-15-pro-max.glb');
     draco.dispose();
 
     while (root.children.length) root.remove(root.children[0]);
     const device = phoneGltf.scene;
     phoneSize = preparePhone(device);
-    const caseObj = prepareCase(caseGltf.scene, phoneSize);
     root.add(device);
-    root.add(caseObj);
-    applyCaseTo3D();
+    caseMats = [];
+    caseMat = null;
     framePhone(phoneSize);
     root.rotation.set(orbit.x, orbit.y, 0);
     resize3D();
-    say('Ready · design in 2D, inspect in 3D');
+    say('Phone only · confirm case in /case-preview.html first');
   } catch (err) {
     console.error(err);
     say('Could not load 3D models.');
