@@ -15,10 +15,10 @@
 
   const requestedService = new URLSearchParams(window.location.search).get('service');
   const serviceLabels = {
-    'business-website': 'Business Website',
-    'growth-website': 'Growth Website',
-    'custom-product': 'Custom Digital Product',
-    'website-care': 'Care & Support'
+    'business-website': 'Brand Strategy',
+    'growth-website': 'Visual Identity',
+    'custom-product': 'Product Design',
+    'website-care': 'Web Development'
   };
   if (requestedService && serviceLabels[requestedService]) {
     needSelect.value = serviceLabels[requestedService];
