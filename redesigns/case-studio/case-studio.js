@@ -1,5 +1,5 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 (() => {
   'use strict';
@@ -19,6 +19,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/
   }
 
   const canvas = $('#design-canvas');
+  if (!canvas) throw new Error('Case Studio canvas missing');
   const ctx = canvas.getContext('2d', { alpha: false });
   const artCanvas = document.createElement('canvas');
   const textureCanvas = document.createElement('canvas');
@@ -1472,7 +1473,7 @@ import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/
 
   function animate() {
     raf = requestAnimationFrame(animate);
-    if (!renderer) return;
+    if (!renderer || !phone || !camera) return;
     phone.rotation.x += (viewTarget.x - phone.rotation.x) * 0.09;
     phone.rotation.y += (viewTarget.y - phone.rotation.y) * 0.09;
     camera.position.z += (distance - camera.position.z) * 0.1;
