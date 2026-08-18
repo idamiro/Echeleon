@@ -123,16 +123,33 @@
       return sizeOf(obj);
     }
 
-    function loadGltf(loader, rel) {
-      const url = new URL(rel, import.meta.url).href;
-      return new Promise((resolve, reject) => loader.load(url, resolve, undefined, reject));
+    // Resolve assets from /case-studio/ even when CF serves pretty URLs
+    // like /phone-case-preview (no .html).
+    function studioRoot() {
+      const path = window.location.pathname;
+      const marker = '/case-studio';
+      const i = path.indexOf(marker);
+      if (i >= 0) return path.slice(0, i + marker.length) + '/';
+      return path.replace(/\/[^/]*$/, '/');
+    }
+    function assetUrl(file) {
+      return studioRoot() + 'assets/' + file;
+    }
+    function loadGltf(loader, file) {
+      const url = assetUrl(file);
+      return new Promise((resolve, reject) => {
+        loader.load(url, resolve, undefined, (err) => {
+          console.error('Failed to load', url, err);
+          reject(new Error('Missing asset: ' + url));
+        });
+      });
     }
 
     const loader = new GLTFLoader();
     try {
       const [phoneGltf, caseGltf] = await Promise.all([
-        loadGltf(loader, './assets/iphone-15-pro-max.glb'),
-        loadGltf(loader, './assets/iphone-15-pro-case-preview.glb?v=fit4')
+        loadGltf(loader, 'iphone-15-pro-max.glb'),
+        loadGltf(loader, 'iphone-15-pro-case-preview.glb?v=fit5')
       ]);
 
       while (root.children.length) root.remove(root.children[0]);
@@ -215,7 +232,7 @@
       setView('back');
     } catch (err) {
       console.error(err);
-      note.textContent = 'Could not load phone + case preview';
+      note.textContent = 'Could not load phone + case preview · ' + (err && err.message ? err.message : 'check console');
     }
   </script>
 </body>
