@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 const W = 1170;
 const H = 2532;
@@ -783,11 +782,25 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ——— 3D ———
+const ASSET_BASE = (() => {
+  const path = window.location.pathname;
+  const marker = '/case-studio/';
+  const i = path.indexOf(marker);
+  if (i !== -1) return path.slice(0, i + marker.length) + 'assets/';
+  return new URL('./assets/', window.location.href).href;
+})();
+const PRODUCT_GLB = new URL('iphone-14-pro-leather-case.glb?v=leather1', ASSET_BASE).href;
+
 let renderer, scene, camera, root, caseTex, caseMat, phoneSize;
 let caseMats = [];
 let orbit = { x: 0.28, y: Math.PI - 0.55 };
 let dist = 7.6;
 let dragging3d = null;
+
+function isLeatherCaseMesh(mesh) {
+  const name = `${mesh.name || ''} ${mesh.parent?.name || ''}`.toLowerCase();
+  return name.includes('leather') || (name.includes('case') && !/(iphone|ipohne|phone|glass|screen|body)/.test(name));
+}
 
 function applyCaseTo3D() {
   if (!caseMats.length && !caseMat) return;
@@ -799,13 +812,17 @@ function applyCaseTo3D() {
   for (const mat of caseMats) {
     mat.color.set(0xffffff);
     mat.roughness = roughness;
-    mat.clearcoat = clearcoat;
-    mat.clearcoatRoughness = clearcoatRoughness;
+    if ('clearcoat' in mat) {
+      mat.clearcoat = clearcoat;
+      mat.clearcoatRoughness = clearcoatRoughness;
+    }
     if (caseTex) {
       mat.map = caseTex;
-      mat.emissiveMap = caseTex;
-      mat.emissive.set(0xffffff);
-      mat.emissiveIntensity = 0.05;
+      if ('emissiveMap' in mat) {
+        mat.emissiveMap = caseTex;
+        mat.emissive.set(0xffffff);
+        mat.emissiveIntensity = 0.04;
+      }
     }
     mat.needsUpdate = true;
   }
@@ -831,15 +848,13 @@ function updateTexture(force = false) {
     caseTex.needsUpdate = true;
   }
   for (const mat of caseMats) {
-    if (mat.userData?.isArt) {
-      mat.map = caseTex;
-      mat.emissiveMap = caseTex;
-      mat.needsUpdate = true;
-    }
+    mat.map = caseTex;
+    if ('emissiveMap' in mat) mat.emissiveMap = caseTex;
+    mat.needsUpdate = true;
   }
   if (caseMat) {
     caseMat.map = caseTex;
-    caseMat.emissiveMap = caseTex;
+    if ('emissiveMap' in caseMat) caseMat.emissiveMap = caseTex;
     caseMat.needsUpdate = true;
   }
   dirtyTex = false;
@@ -859,17 +874,45 @@ function fit(obj, targetH = 4.1) {
   return box2.getSize(new THREE.Vector3());
 }
 
-function loadGltf(loader, path) {
-  const url = new URL(path, window.location.href).href;
+function loadGltf(loader, url) {
   return new Promise((resolve, reject) => loader.load(url, resolve, undefined, reject));
 }
 
-function preparePhone(device) {
-  device.name = 'phone';
-  device.traverse((o) => {
+function prepareProduct(sceneRoot) {
+  caseMats = [];
+  caseMat = null;
+  updateTexture(true);
+
+  const artMat = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    map: caseTex || null,
+    emissive: 0xffffff,
+    emissiveMap: caseTex || null,
+    emissiveIntensity: 0.04,
+    roughness: 0.55,
+    metalness: 0.05,
+    clearcoat: 0.2,
+    clearcoatRoughness: 0.45,
+    side: THREE.DoubleSide
+  });
+  artMat.userData.isArt = true;
+  caseMats.push(artMat);
+  caseMat = artMat;
+
+  let caseCount = 0;
+  sceneRoot.traverse((o) => {
     if (!o.isMesh) return;
     o.castShadow = true;
     o.receiveShadow = true;
+    if (isLeatherCaseMesh(o)) {
+      caseCount += 1;
+      if (o.geometry && !o.geometry.getAttribute('normal')) {
+        o.geometry.computeVertexNormals();
+      }
+      // Artwork / design maps ONLY onto the leather case — never the phone.
+      o.material = artMat;
+      return;
+    }
     const mats = Array.isArray(o.material) ? o.material : [o.material];
     mats.forEach((m) => {
       if (!m) return;
@@ -877,47 +920,13 @@ function preparePhone(device) {
       m.needsUpdate = true;
     });
   });
-  return fit(device, 4.08);
-}
 
-function prepareCase(caseObj, phoneBoxSize) {
-  caseObj.name = 'case';
-  // Scale case to hug the phone (CAD was Pro-sized; phone GLB is Pro Max)
-  fit(caseObj, phoneBoxSize.y * 1.02);
-  caseMats = [];
-  updateTexture(true);
+  if (!caseCount) {
+    throw new Error('Leather case mesh not found in product GLB');
+  }
 
-  // Artwork canvas already paints caseColor as the base fill
-  const artMat = new THREE.MeshPhysicalMaterial({
-    color: 0xffffff,
-    map: caseTex || null,
-    emissive: 0xffffff,
-    emissiveMap: caseTex || null,
-    emissiveIntensity: 0.05,
-    roughness: 0.45,
-    metalness: 0,
-    clearcoat: 0.25,
-    clearcoatRoughness: 0.4,
-    side: THREE.DoubleSide
-  });
-  artMat.userData.isArt = true;
-  caseMats.push(artMat);
-  caseMat = artMat;
-  caseMat.userData.back = artMat;
-
-  caseObj.traverse((o) => {
-    if (!o.isMesh) return;
-    o.castShadow = true;
-    o.receiveShadow = true;
-    if (o.geometry && !o.geometry.getAttribute('normal')) {
-      o.geometry.computeVertexNormals();
-    }
-    o.material = artMat;
-  });
-
-  // Sit slightly around the phone
-  caseObj.position.z -= phoneBoxSize.z * 0.02;
-  return caseObj;
+  phoneSize = fit(sceneRoot, 4.1);
+  return caseCount;
 }
 
 function framePhone(size) {
@@ -1042,30 +1051,23 @@ async function init3D() {
       requestAnimationFrame(resize3D);
     });
 
-    say('Loading iPhone model…');
+    say('Loading iPhone 14 Pro + leather case…');
     const loader = new GLTFLoader();
-    const draco = new DRACOLoader();
-    draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/libs/draco/');
-    loader.setDRACOLoader(draco);
-
-    // Case model is previewed separately until solid-back confirmation.
-    // See case-preview.html — do not attach case here yet.
-    const phoneGltf = await loadGltf(loader, 'assets/iphone-15-pro-max.glb');
-    draco.dispose();
+    const productGltf = await loadGltf(loader, PRODUCT_GLB);
 
     while (root.children.length) root.remove(root.children[0]);
-    const device = phoneGltf.scene;
-    phoneSize = preparePhone(device);
-    root.add(device);
-    caseMats = [];
-    caseMat = null;
+    const product = productGltf.scene;
+    product.name = 'iphone-14-pro-leather-case';
+    const caseCount = prepareProduct(product);
+    root.add(product);
     framePhone(phoneSize);
     root.rotation.set(orbit.x, orbit.y, 0);
+    applyCaseTo3D();
     resize3D();
-    say('Phone only · confirm case in /case-preview.html first');
+    say(`Leather case ready · artwork on case only (${caseCount}) · Front = screen · Back = case`);
   } catch (err) {
     console.error(err);
-    say('Could not load 3D models.');
+    say('Could not load 3D model.');
   }
 }
 
