@@ -60,11 +60,13 @@
     const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 200);
     camera.position.set(0, 0, 8);
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x445566, 1.4));
-    const key = new THREE.DirectionalLight(0xffffff, 2.4);
-    key.position.set(3, 4, 5);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xb0b4bc, 0.95));
+    const key = new THREE.DirectionalLight(0xffffff, 0.85);
+    key.position.set(2.5, 3.5, 4);
     scene.add(key);
-    scene.add(new THREE.DirectionalLight(0xdde7ff, 1.2).translateX(-4).translateY(1).translateZ(-2));
+    const fill = new THREE.DirectionalLight(0xffffff, 0.35);
+    fill.position.set(-2.5, 1, -1.5);
+    scene.add(fill);
 
     const root = new THREE.Group();
     scene.add(root);
@@ -103,25 +105,23 @@
 
     const loader = new GLTFLoader();
     loader.load(
-      new URL('./assets/iphone-15-pro-case-preview.glb?v=plain1', import.meta.url).href,
+      new URL('./assets/iphone-15-pro-case-preview.glb?v=plain2', import.meta.url).href,
       (gltf) => {
         while (root.children.length) root.remove(root.children[0]);
         const obj = gltf.scene;
+        const whiteMat = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          roughness: 0.92,
+          metalness: 0,
+          side: THREE.DoubleSide
+        });
         obj.traverse((o) => {
           if (!o.isMesh) return;
           if (o.geometry && !o.geometry.getAttribute('normal')) o.geometry.computeVertexNormals();
-          o.material = new THREE.MeshPhysicalMaterial({
-            color: 0xf2f2f4,
-            roughness: 0.55,
-            metalness: 0.05,
-            clearcoat: 0.35,
-            clearcoatRoughness: 0.4,
-            side: THREE.DoubleSide
-          });
+          o.material = whiteMat;
           o.castShadow = true;
           o.receiveShadow = true;
         });
-        // Fit to ~4 units tall, centered
         obj.updateMatrixWorld(true);
         let box = new THREE.Box3().setFromObject(obj);
         const size = box.getSize(new THREE.Vector3());
@@ -131,7 +131,7 @@
         box = new THREE.Box3().setFromObject(obj);
         obj.position.sub(box.getCenter(new THREE.Vector3()));
         root.add(obj);
-        note.textContent = 'Plain case shell only · dragon relief removed · confirm solid back';
+        note.textContent = 'Matte white case · no gloss · confirm solid back';
         setView('front');
       },
       undefined,
