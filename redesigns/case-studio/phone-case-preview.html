@@ -123,6 +123,113 @@
       return sizeOf(obj);
     }
 
+    /** Largest near-square mesh on the phone rear = camera island plate. */
+    function findCameraIsland(phone) {
+      let best = null;
+      phone.updateMatrixWorld(true);
+      phone.traverse((o) => {
+        if (!o.isMesh || !o.geometry) return;
+        if (!o.geometry.boundingBox) o.geometry.computeBoundingBox();
+        const bb = o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld);
+        const size = bb.getSize(new THREE.Vector3());
+        const c = bb.getCenter(new THREE.Vector3());
+        // After our orientation: rear is -Z, island near top
+        if (c.z > 0) return;
+        if (size.x < 0.45 || size.x > 1.5 || size.y < 0.45 || size.y > 1.5) return;
+        if (size.z > 0.35) return;
+        if (c.y < 0.2) return;
+        const score = size.x * size.y;
+        if (!best || score > best.score) best = { bb, c, size, score };
+      });
+      return best;
+    }
+
+    /**
+     * Find the case camera window on the exterior back.
+     * Supports both through-holes (no hit) and recessed pockets (deeper first hit).
+     */
+    function findCutoutCenter(caseObj, nearPoint) {
+      caseObj.updateMatrixWorld(true);
+      const bb = boxOf(caseObj);
+      const size = bb.getSize(new THREE.Vector3());
+      const meshes = [];
+      caseObj.traverse((o) => { if (o.isMesh) meshes.push(o); });
+      if (!meshes.length) return null;
+
+      const ray = new THREE.Raycaster();
+      ray.far = size.z * 6;
+      const zOrigin = bb.min.z - 0.6;
+      const dir = new THREE.Vector3(0, 0, 1);
+      const skinZ = bb.min.z + size.z * 0.1;
+      const pocketZ = bb.min.z + size.z * 0.55;
+
+      const x0 = bb.min.x + size.x * 0.02;
+      const x1 = bb.min.x + size.x * 0.65;
+      const y0 = bb.min.y + size.y * 0.50;
+      const y1 = bb.max.y - size.y * 0.005;
+      const nx = 52;
+      const ny = 52;
+      const cells = [];
+
+      for (let iy = 0; iy < ny; iy++) {
+        for (let ix = 0; ix < nx; ix++) {
+          const x = x0 + ((ix + 0.5) / nx) * (x1 - x0);
+          const y = y0 + ((iy + 0.5) / ny) * (y1 - y0);
+          ray.set(new THREE.Vector3(x, y, zOrigin), dir);
+          const hits = ray.intersectObjects(meshes, true);
+          let kind = 'skin';
+          if (!hits.length) kind = 'hole';
+          else if (hits[0].point.z > skinZ && hits[0].point.z < pocketZ) kind = 'pocket';
+          if (kind !== 'skin') cells.push({ x, y, kind });
+        }
+      }
+      if (cells.length < 8) return null;
+
+      cells.sort((a, b) => (
+        Math.hypot(a.x - nearPoint.x, a.y - nearPoint.y) -
+        Math.hypot(b.x - nearPoint.x, b.y - nearPoint.y)
+      ));
+      const seed = cells[0];
+      const dists = cells.slice(0, 100).map((p) => Math.hypot(p.x - seed.x, p.y - seed.y)).sort((a, b) => a - b);
+      const radius = Math.max(0.28, Math.min(dists[Math.min(dists.length - 1, Math.floor(dists.length * 0.7))] * 1.7, 1.5));
+      const cluster = cells.filter((p) => Math.hypot(p.x - seed.x, p.y - seed.y) <= radius);
+      const use = cluster.length >= 10 ? cluster : cells.slice(0, 50);
+
+      let cx = 0; let cy = 0;
+      let minX = Infinity; let maxX = -Infinity;
+      let minY = Infinity; let maxY = -Infinity;
+      use.forEach((p) => {
+        cx += p.x; cy += p.y;
+        minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
+        minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y);
+      });
+      cx /= use.length; cy /= use.length;
+      return { x: cx, y: cy, w: maxX - minX, h: maxY - minY, n: use.length, kind: seed.kind };
+    }
+
+    function alignCutoutToCamera(phone, caseObj) {
+      const island = findCameraIsland(phone);
+      if (!island) {
+        console.warn('Camera island not found; using manual nudge');
+        // Annotated misalignment: cutout too high + open on the right of the island
+        caseObj.position.x -= 0.14; // slide cutout left
+        caseObj.position.y -= 0.20; // slide cutout down
+        return;
+      }
+      const hole = findCutoutCenter(caseObj, island.c);
+      if (!hole) {
+        console.warn('Case cutout not found; using manual nudge');
+        caseObj.position.x -= 0.14;
+        caseObj.position.y -= 0.20;
+        return;
+      }
+      const dx = island.c.x - hole.x;
+      const dy = island.c.y - hole.y;
+      caseObj.position.x += dx;
+      caseObj.position.y += dy;
+      console.log('Cutout align', { dx, dy, island: island.c, hole, islandSize: island.size });
+    }
+
     // Resolve assets from /case-studio/ even when CF serves pretty URLs
     // like /phone-case-preview (no .html).
     function studioRoot() {
@@ -149,7 +256,7 @@
     try {
       const [phoneGltf, caseGltf] = await Promise.all([
         loadGltf(loader, 'iphone-15-pro-max.glb'),
-        loadGltf(loader, 'iphone-15-pro-case-preview.glb?v=fit5')
+        loadGltf(loader, 'iphone-15-pro-case-preview.glb?v=fit8')
       ]);
 
       while (root.children.length) root.remove(root.children[0]);
@@ -221,6 +328,10 @@
       caseObj.position.x += pCenter.x - c3.x;
       caseObj.position.y += pCenter.y - c3.y;
 
+      // XY-only: slide the case so the rear camera WINDOW frames the
+      // camera island. Do not change Z seating (front bezel stays put).
+      alignCutoutToCamera(phone, caseObj);
+
       root.add(phone);
       root.add(caseObj);
 
@@ -228,7 +339,7 @@
       dist = Math.max(all.x, all.y) * 1.85;
       camera.position.set(0, all.y * 0.02, dist);
 
-      note.textContent = 'Cream case upright · camera top-left · like reference';
+      note.textContent = 'Cream case · camera window aligned · Front/Back';
       setView('back');
     } catch (err) {
       console.error(err);
