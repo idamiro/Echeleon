@@ -1,13 +1,11 @@
 Case model preview assets
 
 iphone-15-pro-case-preview.glb
-  Converted from user-supplied Iphone_15_pro.stl (watertight full-back case).
-  Source STEP also kept as iphone-15-pro-case.step.
+  Plain case shell only — extracted as STEP solid #4 (“Cover”).
+  Dragon / emboss solids (Component3 / Part1) removed.
+  Source: user Iphone_15_pro.step / .stl
 
 iphone-15-pro-max.glb
   User-supplied Apple iPhone 15 Pro Max black GLB (not used in case-preview.html).
-
-Removed:
-  Previous DEFINITIVE / DJO+Jack@Meow remeshed case GLB and any fake printable back plane.
 
 Unofficial Vulcet experiment. Not affiliated with Apple.
