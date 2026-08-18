@@ -103,7 +103,7 @@
 
     const loader = new GLTFLoader();
     loader.load(
-      new URL('./assets/iphone-15-pro-case-preview.glb', import.meta.url).href,
+      new URL('./assets/iphone-15-pro-case-preview.glb?v=plain1', import.meta.url).href,
       (gltf) => {
         while (root.children.length) root.remove(root.children[0]);
         const obj = gltf.scene;
@@ -131,7 +131,7 @@
         box = new THREE.Box3().setFromObject(obj);
         obj.position.sub(box.getCenter(new THREE.Vector3()));
         root.add(obj);
-        note.textContent = 'New case model only · confirm solid back before editor wiring';
+        note.textContent = 'Plain case shell only · dragon relief removed · confirm solid back';
         setView('front');
       },
       undefined,
