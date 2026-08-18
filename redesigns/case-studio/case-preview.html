@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex">
-  <title>Case model preview — Vulcet</title>
+  <title>Leather case preview — Vulcet</title>
   <style>
     html, body { height: 100%; margin: 0; background: #c5c8cf; font-family: Inter, system-ui, sans-serif; color: #141416; }
     .bar {
@@ -13,6 +13,7 @@
       padding: 14px; background: rgba(255,255,255,.92); border-bottom: 1px solid #e6e8ec;
     }
     .bar strong { margin-right: 12px; font-size: 13px; }
+    .bar a { font-size: 12px; font-weight: 600; color: #555; margin-right: 10px; text-decoration: none; }
     .bar button {
       height: 34px; padding: 0 14px; border: 0; border-radius: 999px;
       background: #e8eaee; font-weight: 700; font-size: 12px; cursor: pointer;
@@ -36,14 +37,14 @@
 </head>
 <body>
   <div class="bar">
-    <a href="./phone-case-preview.html" style="font-size:12px;font-weight:600;color:#555;margin-right:10px;text-decoration:none">Phone + case</a>
-    <strong>Case only · no phone · no editor</strong>
+    <a href="./phone-case-preview.html">Phone + case</a>
+    <strong>Leather case only · phone hidden</strong>
     <button type="button" data-view="front" class="is-on">Front</button>
     <button type="button" data-view="back">Back</button>
     <button type="button" data-view="side">Side</button>
   </div>
   <div id="host"></div>
-  <p class="note" id="note">Loading case model…</p>
+  <p class="note" id="note">Loading leather case…</p>
   <script type="module">
     import * as THREE from 'three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -54,7 +55,6 @@
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.setClearColor(0xc5c8cf, 1);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
-    // No tone mapping bloom / glow
     renderer.toneMapping = THREE.NoToneMapping;
     host.appendChild(renderer.domElement);
 
@@ -63,9 +63,11 @@
     const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 200);
     camera.position.set(0, 0, 8);
 
-    // Soft diffuse only — no specular, muted off-white
     scene.add(new THREE.AmbientLight(0xffffff, 0.55));
     scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa0a8, 0.55));
+    const key = new THREE.DirectionalLight(0xffffff, 0.45);
+    key.position.set(2, 3, 2.5);
+    scene.add(key);
 
     const root = new THREE.Group();
     scene.add(root);
@@ -102,21 +104,36 @@
     }
     animate();
 
+    function studioRoot() {
+      const path = window.location.pathname;
+      const marker = '/case-studio';
+      const i = path.indexOf(marker);
+      if (i >= 0) return path.slice(0, i + marker.length) + '/';
+      return path.replace(/\/[^/]*$/, '/');
+    }
+
     const loader = new GLTFLoader();
+    const url = studioRoot() + 'assets/iphone-14-pro-leather-case.glb?v=leather1';
     loader.load(
-      new URL('./assets/iphone-15-pro-case-preview.glb?v=plain5', import.meta.url).href,
+      url,
       (gltf) => {
         while (root.children.length) root.remove(root.children[0]);
         const obj = gltf.scene;
-        // Flat solid white — no gloss, no edge glow, same inside & outside
-        const whiteMat = new THREE.MeshLambertMaterial({
-          color: 0xf0ebe3,
-          side: THREE.DoubleSide
-        });
         obj.traverse((o) => {
           if (!o.isMesh) return;
+          const name = `${o.name || ''} ${o.parent?.name || ''}`.toLowerCase();
+          const isCase = name.includes('leather') || (name.includes('case') && !/(iphone|ipohne|phone)/.test(name));
+          if (!isCase) {
+            o.visible = false;
+            return;
+          }
           if (o.geometry && !o.geometry.getAttribute('normal')) o.geometry.computeVertexNormals();
-          o.material = whiteMat;
+          const mats = Array.isArray(o.material) ? o.material : [o.material];
+          mats.forEach((m) => {
+            if (!m) return;
+            if (m.map) m.map.colorSpace = THREE.SRGBColorSpace;
+            m.needsUpdate = true;
+          });
         });
         obj.updateMatrixWorld(true);
         let box = new THREE.Box3().setFromObject(obj);
@@ -127,13 +144,13 @@
         box = new THREE.Box3().setFromObject(obj);
         obj.position.sub(box.getCenter(new THREE.Vector3()));
         root.add(obj);
-        note.textContent = 'Soft cream case · matte';
-        setView('front');
+        note.textContent = 'Leather case only · phone hidden';
+        setView('back');
       },
       undefined,
       (err) => {
         console.error(err);
-        note.textContent = 'Failed to load case model';
+        note.textContent = 'Failed to load leather case';
       }
     );
   </script>
