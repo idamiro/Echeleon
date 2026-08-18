@@ -1,4 +1,5 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js';
 
 (() => {
   'use strict';
@@ -1280,99 +1281,53 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.m
   function clearPhone() {
     if (!phone) return;
     while (phone.children.length) {
-      const child = phone.children[0];
-      phone.remove(child);
-      child.traverse?.((obj) => {
-        if (obj.geometry) obj.geometry.dispose();
-        if (obj.material) {
-          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-          mats.forEach((m) => {
-            if (m.map && m.map !== caseTexture) m.map.dispose?.();
-            m.dispose?.();
-          });
-        }
-      });
+      phone.remove(phone.children[0]);
     }
   }
 
-  function buildPhone() {
-    clearPhone();
+  let phoneGltf = null;
+  const GLASS_MATS = new Set([
+    'zFdeDaGNRwzccye',
+    'ujsvqBWRMnqdwPx',
+    'hUlRcbieVuIiOXG',
+    'jlzuBkUzuJqgiAK',
+    'xNrofRCqOXXHVZt'
+  ]);
 
-    // Nested sizes: device fits inside case cavity — no mesh interpenetration
-    const CASE_W = 2.18;
-    const CASE_H = 4.28;
-    const CASE_R = 0.3;
-    const CAVITY_W = 2.0;
-    const CAVITY_H = 4.08;
-    const CAVITY_R = 0.25;
-    const DEVICE_W = 1.94;
-    const DEVICE_H = 4.0;
-    const DEVICE_R = 0.24;
-    const CASE_DEPTH = 0.26;
-    const DEVICE_DEPTH = 0.16;
-    const BACK_Z = -(CASE_DEPTH / 2) - 0.01;
-    const CAM_X = -0.5;
-    const CAM_Y = 1.38;
-    const CAM_W = 0.82;
-    const CAM_H = 0.78;
-    const CAM_R = 0.19;
+  function fitModel(root, targetHeight = 4.05) {
+    root.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(root);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    root.position.sub(center);
+    if (size.y > 0.0001) root.scale.multiplyScalar(targetHeight / size.y);
+    root.updateMatrixWorld(true);
+    const box2 = new THREE.Box3().setFromObject(root);
+    const center2 = box2.getCenter(new THREE.Vector3());
+    root.position.sub(center2);
+    root.updateMatrixWorld(true);
+    return box2.getSize(new THREE.Vector3());
+  }
 
-    const titanium = new THREE.MeshPhysicalMaterial({
-      color: 0x7a7670,
-      roughness: 0.26,
-      metalness: 0.92,
-      clearcoat: 0.35
-    });
-    const darkGlass = new THREE.MeshPhysicalMaterial({
-      color: 0x05060a,
-      roughness: 0.06,
-      metalness: 0.2,
-      clearcoat: 1,
-      clearcoatRoughness: 0.04
-    });
+  function buildCaseShell(phoneSize) {
+    const CASE_W = phoneSize.x * 1.045;
+    const CASE_H = phoneSize.y * 1.03;
+    const CASE_R = Math.min(CASE_W, CASE_H) * 0.12;
+    const CAVITY_W = phoneSize.x * 1.01;
+    const CAVITY_H = phoneSize.y * 1.005;
+    const CAVITY_R = CASE_R * 0.9;
+    const CASE_DEPTH = Math.max(0.28, phoneSize.z * 1.35);
+    const BACK_Z = -(phoneSize.z / 2) - 0.018;
 
-    const device = new THREE.Group();
-    device.name = 'device';
+    // iPhone 15 Pro camera island (viewed from the back): upper-left
+    const CAM_W = CASE_W * 0.38;
+    const CAM_H = CASE_H * 0.195;
+    const CAM_R = CAM_W * 0.22;
+    const CAM_X = -CASE_W * 0.22; // shape-space; flips to +X after back rotation
+    const CAM_Y = CASE_H * 0.32;
 
-    const bodyGeo = new THREE.ExtrudeGeometry(rrShape(DEVICE_W, DEVICE_H, DEVICE_R), {
-      depth: DEVICE_DEPTH,
-      bevelEnabled: true,
-      bevelSegments: 4,
-      steps: 1,
-      bevelSize: 0.028,
-      bevelThickness: 0.024
-    });
-    bodyGeo.center();
-    const body = new THREE.Mesh(bodyGeo, titanium);
-    body.castShadow = true;
-    device.add(body);
-
-    const screen = new THREE.Mesh(new THREE.ShapeGeometry(rrShape(DEVICE_W - 0.1, DEVICE_H - 0.12, DEVICE_R - 0.04)), darkGlass);
-    screen.position.z = DEVICE_DEPTH / 2 + 0.012;
-    device.add(screen);
-
-    const islandFront = new THREE.Mesh(
-      new THREE.ShapeGeometry(rrShape(0.5, 0.12, 0.06, 0, DEVICE_H / 2 - 0.42)),
-      new THREE.MeshBasicMaterial({ color: 0x000000 })
-    );
-    islandFront.position.z = DEVICE_DEPTH / 2 + 0.018;
-    device.add(islandFront);
-
-    // Side buttons sit on the case outer edge (not inside the cavity)
-    const buttonMat = new THREE.MeshStandardMaterial({ color: 0x6b6762, roughness: 0.22, metalness: 0.95 });
     const caseGroup = new THREE.Group();
     caseGroup.name = 'case';
-
-    [
-      [-CASE_W / 2 - 0.015, 0.88, 0.04, 0.3],
-      [-CASE_W / 2 - 0.015, 0.3, 0.04, 0.55],
-      [CASE_W / 2 + 0.015, 0.48, 0.04, 0.7],
-      [-CASE_W / 2 - 0.015, 1.34, 0.04, 0.18]
-    ].forEach(([x, y, w, h]) => {
-      const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.08), buttonMat);
-      b.position.set(x, y, 0);
-      caseGroup.add(b);
-    });
 
     const rimShape = rrShape(CASE_W, CASE_H, CASE_R);
     rimShape.holes.push(rrShape(CAVITY_W, CAVITY_H, CAVITY_R));
@@ -1381,8 +1336,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.m
       bevelEnabled: true,
       bevelSegments: 3,
       steps: 1,
-      bevelSize: 0.028,
-      bevelThickness: 0.022
+      bevelSize: 0.02,
+      bevelThickness: 0.016
     });
     rimGeo.center();
     caseRimMat = new THREE.MeshPhysicalMaterial({
@@ -1399,14 +1354,12 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.m
     rimMesh.castShadow = true;
     caseGroup.add(rimMesh);
 
-    // Back plate: single-sided, faces outward (-Z). Camera cutout as hole.
     const caseShape = rrShape(CASE_W, CASE_H, CASE_R);
     caseShape.holes.push(rrShape(CAM_W, CAM_H, CAM_R, CAM_X, CAM_Y));
-    const geo = new THREE.ShapeGeometry(caseShape, 48);
+    const geo = new THREE.ShapeGeometry(caseShape, 56);
     const pos = geo.attributes.position;
     const uv = geo.attributes.uv;
     for (let i = 0; i < pos.count; i++) {
-      // Mirror U so artwork reads correctly when the plate faces -Z
       uv.setXY(i, 1 - (pos.getX(i) + CASE_W / 2) / CASE_W, (pos.getY(i) + CASE_H / 2) / CASE_H);
     }
 
@@ -1430,66 +1383,73 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.m
     });
     const back = new THREE.Mesh(geo, backMat);
     back.position.z = BACK_Z;
-    back.rotation.y = Math.PI; // face outward toward -Z
+    back.rotation.y = Math.PI;
     back.castShadow = true;
     caseGroup.add(back);
 
-    // Camera island sits in the cutout, outside the back plate
-    const islandGeo = new THREE.ExtrudeGeometry(rrShape(CAM_W, CAM_H, CAM_R), {
-      depth: 0.07,
-      bevelEnabled: true,
-      bevelSize: 0.02,
-      bevelThickness: 0.018,
-      bevelSegments: 4
-    });
-    islandGeo.center();
-    const cameraIsland = new THREE.Mesh(
-      islandGeo,
-      new THREE.MeshPhysicalMaterial({ color: 0x2c2c30, roughness: 0.22, metalness: 0.8, clearcoat: 0.5 })
-    );
-    // After back is rotated 180° around Y, +X maps to -X — place island in world/local unmirrored case space
-    cameraIsland.position.set(-CAM_X, CAM_Y, BACK_Z - 0.045);
-    caseGroup.add(cameraIsland);
+    return caseGroup;
+  }
 
-    const lensMat = new THREE.MeshPhysicalMaterial({
-      color: 0x030711,
-      roughness: 0.03,
-      metalness: 0.55,
-      clearcoat: 1,
-      iridescence: 0.55,
-      iridescenceIOR: 1.4
+  function prepareDevice(root) {
+    root.name = 'device';
+    root.traverse((obj) => {
+      if (!obj.isMesh) return;
+      obj.castShadow = true;
+      obj.receiveShadow = true;
+      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+      mats.forEach((m) => {
+        if (!m) return;
+        // Keep glass/lenses crisp; gently unify titanium body response
+        if (m.name && GLASS_MATS.has(m.name)) {
+          m.envMapIntensity = 1.2;
+          return;
+        }
+        if (m.metalness !== undefined) m.metalness = Math.max(m.metalness ?? 0, 0.35);
+        if (m.roughness !== undefined) m.roughness = Math.min(m.roughness ?? 0.4, 0.45);
+      });
     });
-    const lensPositions = [
-      [-CAM_X + 0.18, CAM_Y + 0.18],
-      [-CAM_X - 0.18, CAM_Y + 0.1],
-      [-CAM_X + 0.08, CAM_Y - 0.18]
-    ];
-    lensPositions.forEach(([x, y]) => {
-      const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.155, 0.162, 0.06, 40), titanium);
-      ring.rotation.x = Math.PI / 2;
-      ring.position.set(x, y, BACK_Z - 0.09);
-      caseGroup.add(ring);
-      const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.118, 0.125, 0.07, 40), lensMat);
-      lens.rotation.x = Math.PI / 2;
-      lens.position.set(x, y, BACK_Z - 0.125);
-      caseGroup.add(lens);
-    });
+    return root;
+  }
 
-    const flash = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.055, 0.055, 0.02, 28),
-      new THREE.MeshPhysicalMaterial({ color: 0xfff4d1, emissive: 0xffe7a5, emissiveIntensity: 0.3, roughness: 0.18 })
-    );
-    flash.rotation.x = Math.PI / 2;
-    flash.position.set(-CAM_X - 0.18, CAM_Y - 0.18, BACK_Z - 0.085);
-    caseGroup.add(flash);
-
-    // Device sits inside the cavity, slightly forward of the back plate
-    device.position.z = 0.02;
+  function assembleRealisticPhone(sceneRoot) {
+    clearPhone();
+    const device = prepareDevice(sceneRoot);
+    const phoneSize = fitModel(device, 4.05);
+    // Nudge slightly forward so the case back sits cleanly behind titanium
+    device.position.z += 0.01;
     phone.add(device);
-    phone.add(caseGroup);
-
+    phone.add(buildCaseShell(phoneSize));
     applyFinishTo3D();
     phone.rotation.set(viewTarget.x, viewTarget.y, 0);
+    updateTexture(true);
+    say('Realistic iPhone 15 Pro Max loaded · design shows on the case.');
+  }
+
+  function buildPhone() {
+    clearPhone();
+    const modelUrl = new URL('./assets/iphone-15-pro.glb', import.meta.url).href;
+
+    const onLoad = (gltf) => {
+      phoneGltf = gltf;
+      assembleRealisticPhone(gltf.scene.clone(true));
+    };
+
+    if (phoneGltf) {
+      assembleRealisticPhone(phoneGltf.scene.clone(true));
+      return;
+    }
+
+    say('Loading realistic iPhone model…');
+    const loader = new GLTFLoader();
+    loader.load(
+      modelUrl,
+      onLoad,
+      undefined,
+      (err) => {
+        console.error(err);
+        say('Could not load the iPhone model. Check your connection and retry.');
+      }
+    );
   }
 
   function updateTexture(force = false) {
