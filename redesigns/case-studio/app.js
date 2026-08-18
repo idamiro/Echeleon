@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 const W = 1170;
 const H = 2532;
@@ -1033,11 +1034,15 @@ async function init3D() {
 
     say('Loading realistic iPhone model…');
     const loader = new GLTFLoader();
+    const draco = new DRACOLoader();
+    draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/libs/draco/');
+    loader.setDRACOLoader(draco);
     // Prefer page-relative path so query-string on app.js cannot break asset resolution
     const url = new URL('assets/iphone-15-pro.glb', window.location.href).href;
     loader.load(
       url,
       (gltf) => {
+        draco.dispose();
         while (root.children.length) root.remove(root.children[0]);
         const device = gltf.scene;
         device.traverse((o) => {
