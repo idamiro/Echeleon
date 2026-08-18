@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Case model preview — Vulcet</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #eceef2; font-family: Inter, system-ui, sans-serif; color: #141416; }
+    .bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 2;
+      display: flex; gap: 8px; align-items: center; justify-content: center;
+      padding: 14px; background: rgba(255,255,255,.92); border-bottom: 1px solid #e6e8ec;
+    }
+    .bar strong { margin-right: 12px; font-size: 13px; }
+    .bar button {
+      height: 34px; padding: 0 14px; border: 0; border-radius: 999px;
+      background: #e8eaee; font-weight: 700; font-size: 12px; cursor: pointer;
+    }
+    .bar button.is-on { background: #111; color: #fff; }
+    #host { position: fixed; inset: 0; }
+    .note {
+      position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+      z-index: 2; margin: 0; padding: 8px 12px; border-radius: 999px;
+      background: rgba(20,20,24,.82); color: #fff; font-size: 12px; font-weight: 600;
+    }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="bar">
+    <strong>Case only · no phone · no editor</strong>
+    <button type="button" data-view="front" class="is-on">Front</button>
+    <button type="button" data-view="back">Back</button>
+    <button type="button" data-view="side">Side</button>
+  </div>
+  <div id="host"></div>
+  <p class="note" id="note">Loading case model…</p>
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    const host = document.getElementById('host');
+    const note = document.getElementById('note');
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setClearColor(0xeceef2, 1);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    host.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xeceef2);
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 200);
+    camera.position.set(0, 0, 8);
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x445566, 1.4));
+    const key = new THREE.DirectionalLight(0xffffff, 2.4);
+    key.position.set(3, 4, 5);
+    scene.add(key);
+    scene.add(new THREE.DirectionalLight(0xdde7ff, 1.2).translateX(-4).translateY(1).translateZ(-2));
+
+    const root = new THREE.Group();
+    scene.add(root);
+
+    let orbit = { x: 0.12, y: 0 };
+    let dist = 7.2;
+
+    function resize() {
+      const w = host.clientWidth || innerWidth;
+      const h = host.clientHeight || innerHeight;
+      renderer.setSize(w, h, false);
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    addEventListener('resize', resize);
+    resize();
+
+    function setView(name) {
+      document.querySelectorAll('.bar button').forEach((b) => b.classList.toggle('is-on', b.dataset.view === name));
+      if (name === 'front') { orbit = { x: 0.08, y: 0 }; dist = 7.2; }
+      if (name === 'back') { orbit = { x: 0.12, y: Math.PI }; dist = 7.2; }
+      if (name === 'side') { orbit = { x: 0.05, y: Math.PI / 2 }; dist = 7.6; }
+    }
+    document.querySelectorAll('.bar button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
+
+    function animate() {
+      requestAnimationFrame(animate);
+      root.rotation.x += (orbit.x - root.rotation.x) * 0.12;
+      root.rotation.y += (orbit.y - root.rotation.y) * 0.12;
+      camera.position.z += (dist - camera.position.z) * 0.12;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    const loader = new GLTFLoader();
+    loader.load(
+      new URL('./assets/iphone-15-pro-case-preview.glb', import.meta.url).href,
+      (gltf) => {
+        while (root.children.length) root.remove(root.children[0]);
+        const obj = gltf.scene;
+        obj.traverse((o) => {
+          if (!o.isMesh) return;
+          if (o.geometry && !o.geometry.getAttribute('normal')) o.geometry.computeVertexNormals();
+          o.material = new THREE.MeshPhysicalMaterial({
+            color: 0xf2f2f4,
+            roughness: 0.55,
+            metalness: 0.05,
+            clearcoat: 0.35,
+            clearcoatRoughness: 0.4,
+            side: THREE.DoubleSide
+          });
+          o.castShadow = true;
+          o.receiveShadow = true;
+        });
+        // Fit to ~4 units tall, centered
+        obj.updateMatrixWorld(true);
+        let box = new THREE.Box3().setFromObject(obj);
+        const size = box.getSize(new THREE.Vector3());
+        const scale = 4.2 / Math.max(size.y, 1e-6);
+        obj.scale.multiplyScalar(scale);
+        obj.updateMatrixWorld(true);
+        box = new THREE.Box3().setFromObject(obj);
+        obj.position.sub(box.getCenter(new THREE.Vector3()));
+        root.add(obj);
+        note.textContent = 'New case model only · confirm solid back before editor wiring';
+        setView('front');
+      },
+      undefined,
+      (err) => {
+        console.error(err);
+        note.textContent = 'Failed to load case model';
+      }
+    );
+  </script>
+</body>
+</html>

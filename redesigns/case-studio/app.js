@@ -784,24 +784,35 @@ document.addEventListener('keydown', (e) => {
 
 // ——— 3D ———
 let renderer, scene, camera, root, caseTex, caseMat, phoneSize;
+let caseMats = [];
 let orbit = { x: 0.28, y: Math.PI - 0.55 };
 let dist = 7.6;
 let dragging3d = null;
 
 function applyCaseTo3D() {
-  if (!caseMat) return;
-  caseMat.color.set(caseColor);
+  if (!caseMats.length && !caseMat) return;
   const g = material === 'gloss' ? Math.max(gloss, 0.7) : gloss;
-  caseMat.roughness = clamp(1 - g, 0.08, 0.85);
-  caseMat.clearcoat = material === 'gloss' ? 1 : material === 'soft' ? 0.35 : 0.15;
-  caseMat.clearcoatRoughness = material === 'gloss' ? 0.08 : 0.4;
-  if (caseTex) caseTex.needsUpdate = true;
-  const back = caseMat.userData?.back;
-  if (back) {
-    back.roughness = clamp(1 - g, 0.08, 0.85);
-    back.clearcoat = material === 'gloss' ? 1 : 0.25;
-    back.clearcoatRoughness = material === 'gloss' ? 0.08 : 0.4;
+  const roughness = clamp(1 - g, 0.08, 0.85);
+  const clearcoat = material === 'gloss' ? 1 : material === 'soft' ? 0.35 : 0.15;
+  const clearcoatRoughness = material === 'gloss' ? 0.08 : 0.4;
+
+  for (const mat of caseMats) {
+    mat.color.set(0xffffff);
+    mat.roughness = roughness;
+    mat.clearcoat = clearcoat;
+    mat.clearcoatRoughness = clearcoatRoughness;
+    if (caseTex) {
+      mat.map = caseTex;
+      mat.emissiveMap = caseTex;
+      mat.emissive.set(0xffffff);
+      mat.emissiveIntensity = 0.05;
+    }
+    mat.needsUpdate = true;
   }
+  if (caseTex) caseTex.needsUpdate = true;
+  // Re-bake canvas so caseColor changes show on the textured case
+  dirtyTex = true;
+  updateTexture(true);
 }
 
 function updateTexture(force = false) {
@@ -814,9 +825,17 @@ function updateTexture(force = false) {
   if (!caseTex) {
     caseTex = new THREE.CanvasTexture(texOff);
     caseTex.colorSpace = THREE.SRGBColorSpace;
+    caseTex.flipY = false;
     caseTex.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
   } else {
     caseTex.needsUpdate = true;
+  }
+  for (const mat of caseMats) {
+    if (mat.userData?.isArt) {
+      mat.map = caseTex;
+      mat.emissiveMap = caseTex;
+      mat.needsUpdate = true;
+    }
   }
   if (caseMat) {
     caseMat.map = caseTex;
@@ -840,88 +859,74 @@ function fit(obj, targetH = 4.1) {
   return box2.getSize(new THREE.Vector3());
 }
 
-function rr(w, h, r, cx = 0, cy = 0) {
-  const s = new THREE.Shape();
-  const x = cx - w / 2;
-  const y = cy - h / 2;
-  s.moveTo(x + r, y);
-  s.lineTo(x + w - r, y);
-  s.quadraticCurveTo(x + w, y, x + w, y + r);
-  s.lineTo(x + w, y + h - r);
-  s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  s.lineTo(x + r, y + h);
-  s.quadraticCurveTo(x, y + h, x, y + h - r);
-  s.lineTo(x, y + r);
-  s.quadraticCurveTo(x, y, x + r, y);
-  return s;
+function loadGltf(loader, path) {
+  const url = new URL(path, window.location.href).href;
+  return new Promise((resolve, reject) => loader.load(url, resolve, undefined, reject));
 }
 
-function buildCase(size) {
-  const group = new THREE.Group();
-  group.name = 'case';
-  const CASE_W = size.x * 1.05;
-  const CASE_H = size.y * 1.035;
-  const CASE_R = Math.min(CASE_W, CASE_H) * 0.12;
-  const CAV_W = size.x * 1.012;
-  const CAV_H = size.y * 1.008;
-  const DEPTH = Math.max(0.3, size.z * 1.4);
-  const BACK_Z = -(size.z / 2) - 0.02;
-  const CAM_W = CASE_W * 0.38;
-  const CAM_H = CASE_H * 0.195;
-  const CAM_R = CAM_W * 0.22;
-  const CAM_X = -CASE_W * 0.22;
-  const CAM_Y = CASE_H * 0.32;
-
-  const rimShape = rr(CASE_W, CASE_H, CASE_R);
-  rimShape.holes.push(rr(CAV_W, CAV_H, CASE_R * 0.9));
-  const rimGeo = new THREE.ExtrudeGeometry(rimShape, {
-    depth: DEPTH,
-    bevelEnabled: true,
-    bevelSegments: 3,
-    bevelSize: 0.018,
-    bevelThickness: 0.014
+function preparePhone(device) {
+  device.name = 'phone';
+  device.traverse((o) => {
+    if (!o.isMesh) return;
+    o.castShadow = true;
+    o.receiveShadow = true;
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    mats.forEach((m) => {
+      if (!m) return;
+      if (m.map) m.map.colorSpace = THREE.SRGBColorSpace;
+      m.needsUpdate = true;
+    });
   });
-  rimGeo.center();
-  caseMat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color(caseColor),
-    roughness: 0.55,
-    clearcoat: 0.3,
-    clearcoatRoughness: 0.35
-  });
-  const rim = new THREE.Mesh(rimGeo, caseMat);
-  rim.castShadow = true;
-  group.add(rim);
+  return fit(device, 4.08);
+}
 
-  const backShape = rr(CASE_W, CASE_H, CASE_R);
-  backShape.holes.push(rr(CAM_W, CAM_H, CAM_R, CAM_X, CAM_Y));
-  const backGeo = new THREE.ShapeGeometry(backShape, 64);
-  const pos = backGeo.attributes.position;
-  const uv = backGeo.attributes.uv;
-  for (let i = 0; i < pos.count; i++) {
-    uv.setXY(i, 1 - (pos.getX(i) + CASE_W / 2) / CASE_W, (pos.getY(i) + CASE_H / 2) / CASE_H);
-  }
+function prepareCase(caseObj, phoneBoxSize) {
+  caseObj.name = 'case';
+  // Scale case to hug the phone (CAD was Pro-sized; phone GLB is Pro Max)
+  fit(caseObj, phoneBoxSize.y * 1.02);
+  caseMats = [];
   updateTexture(true);
-  const backMat = new THREE.MeshPhysicalMaterial({
-    map: caseTex,
+
+  // Artwork canvas already paints caseColor as the base fill
+  const artMat = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    map: caseTex || null,
     emissive: 0xffffff,
-    emissiveMap: caseTex,
-    emissiveIntensity: 0.08,
+    emissiveMap: caseTex || null,
+    emissiveIntensity: 0.05,
     roughness: 0.45,
     metalness: 0,
     clearcoat: 0.25,
     clearcoatRoughness: 0.4,
-    side: THREE.FrontSide
+    side: THREE.DoubleSide
   });
-  // keep shared caseMat for rim color; back uses its own textured mat
-  const back = new THREE.Mesh(backGeo, backMat);
-  back.position.z = BACK_Z;
-  back.rotation.y = Math.PI;
-  back.castShadow = true;
-  group.add(back);
+  artMat.userData.isArt = true;
+  caseMats.push(artMat);
+  caseMat = artMat;
+  caseMat.userData.back = artMat;
 
-  // expose textured mat for gloss updates too
-  caseMat.userData.back = backMat;
-  return group;
+  caseObj.traverse((o) => {
+    if (!o.isMesh) return;
+    o.castShadow = true;
+    o.receiveShadow = true;
+    if (o.geometry && !o.geometry.getAttribute('normal')) {
+      o.geometry.computeVertexNormals();
+    }
+    o.material = artMat;
+  });
+
+  // Sit slightly around the phone
+  caseObj.position.z -= phoneBoxSize.z * 0.02;
+  return caseObj;
+}
+
+function framePhone(size) {
+  const maxDim = Math.max(size.x, size.y, size.z || 0.2);
+  dist = clamp(maxDim * 1.9, 5.6, 10);
+  camera.position.set(0, size.y * 0.04, dist);
+  camera.near = 0.05;
+  camera.far = 80;
+  camera.updateProjectionMatrix();
 }
 
 function resize3D() {
@@ -957,15 +962,6 @@ function setCam(name) {
   if (name === 'front') { orbit = { x: 0.05, y: 0 }; dist = 7.3; }
   if (name === 'back') { orbit = { x: 0.18, y: Math.PI }; dist = 7.3; }
   if (name === 'angle') { orbit = { x: 0.32, y: Math.PI - 0.7 }; dist = 7.8; }
-}
-
-function framePhone(size) {
-  const maxDim = Math.max(size.x, size.y, size.z || 0.2);
-  dist = clamp(maxDim * 1.9, 5.6, 10);
-  camera.position.set(0, size.y * 0.04, dist);
-  camera.near = 0.05;
-  camera.far = 80;
-  camera.updateProjectionMatrix();
 }
 
 async function init3D() {
@@ -1032,49 +1028,6 @@ async function init3D() {
 
     $$('.view-angles button').forEach((b) => b.addEventListener('click', () => setCam(b.dataset.cam)));
 
-    say('Loading realistic iPhone model…');
-    const loader = new GLTFLoader();
-    const draco = new DRACOLoader();
-    draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/libs/draco/');
-    loader.setDRACOLoader(draco);
-    // Prefer page-relative path so query-string on app.js cannot break asset resolution
-    const url = new URL('assets/iphone-15-pro.glb', window.location.href).href;
-    loader.load(
-      url,
-      (gltf) => {
-        draco.dispose();
-        while (root.children.length) root.remove(root.children[0]);
-        const device = gltf.scene;
-        device.traverse((o) => {
-          if (o.isMesh) {
-            o.castShadow = true;
-            o.receiveShadow = true;
-            if (o.material) {
-              const mats = Array.isArray(o.material) ? o.material : [o.material];
-              mats.forEach((m) => {
-                if (m.map) m.map.colorSpace = THREE.SRGBColorSpace;
-                m.needsUpdate = true;
-              });
-            }
-          }
-        });
-        phoneSize = fit(device, 4.08);
-        device.position.z += 0.01;
-        root.add(device);
-        root.add(buildCase(phoneSize));
-        applyCaseTo3D();
-        framePhone(phoneSize);
-        root.rotation.set(orbit.x, orbit.y, 0);
-        resize3D();
-        say('Ready · design in 2D, inspect in 3D');
-      },
-      undefined,
-      (err) => {
-        console.error(err);
-        say('Could not load 3D model.');
-      }
-    );
-
     resize3D();
     animate();
     window.addEventListener('resize', resize3D);
@@ -1084,14 +1037,35 @@ async function init3D() {
       const stageEl = $('#stage');
       if (stageEl) ro.observe(stageEl);
     }
-    // Layout can settle a frame after paint
     requestAnimationFrame(() => {
       resize3D();
       requestAnimationFrame(resize3D);
     });
+
+    say('Loading iPhone model…');
+    const loader = new GLTFLoader();
+    const draco = new DRACOLoader();
+    draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/libs/draco/');
+    loader.setDRACOLoader(draco);
+
+    // Case model is previewed separately until solid-back confirmation.
+    // See case-preview.html — do not attach case here yet.
+    const phoneGltf = await loadGltf(loader, 'assets/iphone-15-pro-max.glb');
+    draco.dispose();
+
+    while (root.children.length) root.remove(root.children[0]);
+    const device = phoneGltf.scene;
+    phoneSize = preparePhone(device);
+    root.add(device);
+    caseMats = [];
+    caseMat = null;
+    framePhone(phoneSize);
+    root.rotation.set(orbit.x, orbit.y, 0);
+    resize3D();
+    say('Phone only · confirm case in /case-preview.html first');
   } catch (err) {
     console.error(err);
-    say('3D preview unavailable in this browser.');
+    say('Could not load 3D models.');
   }
 }
 
