@@ -1,0 +1,27 @@
+# Repository and tool metadata must never become public assets.
+.*
+**/.*
+
+# Build and development files are not website content.
+wrangler.jsonc
+**/wrangler.jsonc
+**/package.json
+**/package-lock.json
+**/yarn.lock
+**/pnpm-lock.yaml
+**/bun.lockb
+**/README*
+**/LICENSE*
+**/*.md
+**/*.map
+**/*.mjs
+**/*.cjs
+**/*.ts
+**/*.tsx
+**/*.jsx
+**/*.py
+**/*.ps1
+**/*.sh
+**/*.toml
+**/*.yaml
+**/*.yml
