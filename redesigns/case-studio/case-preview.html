@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex">
   <title>Case model preview — Vulcet</title>
   <style>
-    html, body { height: 100%; margin: 0; background: #d8dbe1; font-family: Inter, system-ui, sans-serif; color: #141416; }
+    html, body { height: 100%; margin: 0; background: #c5c8cf; font-family: Inter, system-ui, sans-serif; color: #141416; }
     .bar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 2;
       display: flex; gap: 8px; align-items: center; justify-content: center;
@@ -51,19 +51,20 @@
     const note = document.getElementById('note');
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    renderer.setClearColor(0xd8dbe1, 1);
+    renderer.setClearColor(0xc5c8cf, 1);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     // No tone mapping bloom / glow
     renderer.toneMapping = THREE.NoToneMapping;
     host.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xd8dbe1);
+    scene.background = new THREE.Color(0xc5c8cf);
     const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 200);
     camera.position.set(0, 0, 8);
 
-    // Very soft fill only — no hard specular highlights on edges
-    scene.add(new THREE.AmbientLight(0xffffff, 1));
+    // Soft diffuse only — no specular, muted off-white
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa0a8, 0.55));
 
     const root = new THREE.Group();
     scene.add(root);
@@ -102,13 +103,13 @@
 
     const loader = new GLTFLoader();
     loader.load(
-      new URL('./assets/iphone-15-pro-case-preview.glb?v=plain3', import.meta.url).href,
+      new URL('./assets/iphone-15-pro-case-preview.glb?v=plain4', import.meta.url).href,
       (gltf) => {
         while (root.children.length) root.remove(root.children[0]);
         const obj = gltf.scene;
         // Flat solid white — no gloss, no edge glow, same inside & outside
-        const whiteMat = new THREE.MeshBasicMaterial({
-          color: 0xffffff,
+        const whiteMat = new THREE.MeshLambertMaterial({
+          color: 0xe4e5e8,
           side: THREE.DoubleSide
         });
         obj.traverse((o) => {
@@ -125,7 +126,7 @@
         box = new THREE.Box3().setFromObject(obj);
         obj.position.sub(box.getCenter(new THREE.Vector3()));
         root.add(obj);
-        note.textContent = 'Flat white case · no glow inside or outside';
+        note.textContent = 'Soft off-white case · matte, less bright';
         setView('front');
       },
       undefined,
