@@ -1182,6 +1182,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.m
 
   function init3D() {
     const host = $('#preview-stage');
+    if (!host || host.querySelector('canvas')) return;
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
       renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
@@ -1276,7 +1277,46 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.m
     return s;
   }
 
+  function clearPhone() {
+    if (!phone) return;
+    while (phone.children.length) {
+      const child = phone.children[0];
+      phone.remove(child);
+      child.traverse?.((obj) => {
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+          mats.forEach((m) => {
+            if (m.map && m.map !== caseTexture) m.map.dispose?.();
+            m.dispose?.();
+          });
+        }
+      });
+    }
+  }
+
   function buildPhone() {
+    clearPhone();
+
+    // Nested sizes: device fits inside case cavity — no mesh interpenetration
+    const CASE_W = 2.18;
+    const CASE_H = 4.28;
+    const CASE_R = 0.3;
+    const CAVITY_W = 2.0;
+    const CAVITY_H = 4.08;
+    const CAVITY_R = 0.25;
+    const DEVICE_W = 1.94;
+    const DEVICE_H = 4.0;
+    const DEVICE_R = 0.24;
+    const CASE_DEPTH = 0.26;
+    const DEVICE_DEPTH = 0.16;
+    const BACK_Z = -(CASE_DEPTH / 2) - 0.01;
+    const CAM_X = -0.5;
+    const CAM_Y = 1.38;
+    const CAM_W = 0.82;
+    const CAM_H = 0.78;
+    const CAM_R = 0.19;
+
     const titanium = new THREE.MeshPhysicalMaterial({
       color: 0x7a7670,
       roughness: 0.26,
@@ -1291,52 +1331,91 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.m
       clearcoatRoughness: 0.04
     });
 
-    const bodyGeo = new THREE.ExtrudeGeometry(rrShape(2.02, 4.16, 0.268), {
-      depth: 0.22,
+    const device = new THREE.Group();
+    device.name = 'device';
+
+    const bodyGeo = new THREE.ExtrudeGeometry(rrShape(DEVICE_W, DEVICE_H, DEVICE_R), {
+      depth: DEVICE_DEPTH,
       bevelEnabled: true,
-      bevelSegments: 6,
+      bevelSegments: 4,
       steps: 1,
-      bevelSize: 0.048,
-      bevelThickness: 0.046
+      bevelSize: 0.028,
+      bevelThickness: 0.024
     });
     bodyGeo.center();
     const body = new THREE.Mesh(bodyGeo, titanium);
     body.castShadow = true;
-    phone.add(body);
+    device.add(body);
 
-    const screen = new THREE.Mesh(new THREE.ShapeGeometry(rrShape(1.9, 4.02, 0.23)), darkGlass);
-    screen.position.z = 0.215;
-    phone.add(screen);
+    const screen = new THREE.Mesh(new THREE.ShapeGeometry(rrShape(DEVICE_W - 0.1, DEVICE_H - 0.12, DEVICE_R - 0.04)), darkGlass);
+    screen.position.z = DEVICE_DEPTH / 2 + 0.012;
+    device.add(screen);
 
     const islandFront = new THREE.Mesh(
-      new THREE.ShapeGeometry(rrShape(0.52, 0.13, 0.065, 0, 1.62)),
+      new THREE.ShapeGeometry(rrShape(0.5, 0.12, 0.06, 0, DEVICE_H / 2 - 0.42)),
       new THREE.MeshBasicMaterial({ color: 0x000000 })
     );
-    islandFront.position.z = 0.222;
-    phone.add(islandFront);
+    islandFront.position.z = DEVICE_DEPTH / 2 + 0.018;
+    device.add(islandFront);
 
+    // Side buttons sit on the case outer edge (not inside the cavity)
     const buttonMat = new THREE.MeshStandardMaterial({ color: 0x6b6762, roughness: 0.22, metalness: 0.95 });
-    [[-1.07, 0.9, 0.055, 0.34], [-1.07, 0.3, 0.055, 0.6], [1.07, 0.5, 0.055, 0.78], [-1.07, 1.38, 0.055, 0.2]].forEach(([x, y, w, h]) => {
-      const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.1), buttonMat);
-      b.position.set(x, y, 0.01);
-      b.castShadow = true;
-      phone.add(b);
+    const caseGroup = new THREE.Group();
+    caseGroup.name = 'case';
+
+    [
+      [-CASE_W / 2 - 0.015, 0.88, 0.04, 0.3],
+      [-CASE_W / 2 - 0.015, 0.3, 0.04, 0.55],
+      [CASE_W / 2 + 0.015, 0.48, 0.04, 0.7],
+      [-CASE_W / 2 - 0.015, 1.34, 0.04, 0.18]
+    ].forEach(([x, y, w, h]) => {
+      const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.08), buttonMat);
+      b.position.set(x, y, 0);
+      caseGroup.add(b);
     });
 
-    const caseShape = rrShape(2.2, 4.32, 0.3);
-    const hole = rrShape(0.86, 0.82, 0.2, -0.52, 1.42);
-    caseShape.holes.push(hole);
-    const geo = new THREE.ShapeGeometry(caseShape, 36);
+    const rimShape = rrShape(CASE_W, CASE_H, CASE_R);
+    rimShape.holes.push(rrShape(CAVITY_W, CAVITY_H, CAVITY_R));
+    const rimGeo = new THREE.ExtrudeGeometry(rimShape, {
+      depth: CASE_DEPTH,
+      bevelEnabled: true,
+      bevelSegments: 3,
+      steps: 1,
+      bevelSize: 0.028,
+      bevelThickness: 0.022
+    });
+    rimGeo.center();
+    caseRimMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(baseColor),
+      roughness: 0.42,
+      clearcoat: 0.35,
+      clearcoatRoughness: 0.4,
+      polygonOffset: true,
+      polygonOffsetFactor: 1,
+      polygonOffsetUnits: 1
+    });
+    const rimMesh = new THREE.Mesh(rimGeo, caseRimMat);
+    rimMesh.name = 'case-rim';
+    rimMesh.castShadow = true;
+    caseGroup.add(rimMesh);
+
+    // Back plate: single-sided, faces outward (-Z). Camera cutout as hole.
+    const caseShape = rrShape(CASE_W, CASE_H, CASE_R);
+    caseShape.holes.push(rrShape(CAM_W, CAM_H, CAM_R, CAM_X, CAM_Y));
+    const geo = new THREE.ShapeGeometry(caseShape, 48);
     const pos = geo.attributes.position;
     const uv = geo.attributes.uv;
     for (let i = 0; i < pos.count; i++) {
-      uv.setXY(i, (pos.getX(i) + 1.1) / 2.2, (pos.getY(i) + 2.16) / 4.32);
+      // Mirror U so artwork reads correctly when the plate faces -Z
+      uv.setXY(i, 1 - (pos.getX(i) + CASE_W / 2) / CASE_W, (pos.getY(i) + CASE_H / 2) / CASE_H);
     }
 
     renderTexture();
+    if (caseTexture) caseTexture.dispose();
     caseTexture = new THREE.CanvasTexture(textureCanvas);
     caseTexture.colorSpace = THREE.SRGBColorSpace;
     caseTexture.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
+    caseTexture.needsUpdate = true;
 
     backMat = new THREE.MeshPhysicalMaterial({
       map: caseTexture,
@@ -1347,82 +1426,67 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.m
       metalness: 0,
       clearcoat: 0.25,
       clearcoatRoughness: 0.45,
-      side: THREE.DoubleSide
+      side: THREE.FrontSide
     });
     const back = new THREE.Mesh(geo, backMat);
-    back.position.z = -0.2;
-    back.rotation.y = Math.PI;
+    back.position.z = BACK_Z;
+    back.rotation.y = Math.PI; // face outward toward -Z
     back.castShadow = true;
-    phone.add(back);
+    caseGroup.add(back);
 
-    const rimShape = rrShape(2.2, 4.32, 0.3);
-    rimShape.holes.push(rrShape(2.0, 4.12, 0.24));
-    const rimGeo = new THREE.ExtrudeGeometry(rimShape, {
-      depth: 0.3,
+    // Camera island sits in the cutout, outside the back plate
+    const islandGeo = new THREE.ExtrudeGeometry(rrShape(CAM_W, CAM_H, CAM_R), {
+      depth: 0.07,
       bevelEnabled: true,
-      bevelSegments: 5,
-      steps: 1,
-      bevelSize: 0.05,
-      bevelThickness: 0.042
-    });
-    rimGeo.center();
-    caseRimMat = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color(baseColor),
-      roughness: 0.42,
-      clearcoat: 0.35,
-      clearcoatRoughness: 0.4
-    });
-    const rimMesh = new THREE.Mesh(rimGeo, caseRimMat);
-    rimMesh.name = 'case-rim';
-    rimMesh.position.z = -0.07;
-    rimMesh.castShadow = true;
-    phone.add(rimMesh);
-
-    const islandGeo = new THREE.ExtrudeGeometry(rrShape(0.86, 0.82, 0.2), {
-      depth: 0.08,
-      bevelEnabled: true,
-      bevelSize: 0.028,
-      bevelThickness: 0.026,
-      bevelSegments: 5
+      bevelSize: 0.02,
+      bevelThickness: 0.018,
+      bevelSegments: 4
     });
     islandGeo.center();
     const cameraIsland = new THREE.Mesh(
       islandGeo,
       new THREE.MeshPhysicalMaterial({ color: 0x2c2c30, roughness: 0.22, metalness: 0.8, clearcoat: 0.5 })
     );
-    cameraIsland.position.set(0.52, 1.42, -0.3);
-    cameraIsland.rotation.y = Math.PI;
-    phone.add(cameraIsland);
+    // After back is rotated 180° around Y, +X maps to -X — place island in world/local unmirrored case space
+    cameraIsland.position.set(-CAM_X, CAM_Y, BACK_Z - 0.045);
+    caseGroup.add(cameraIsland);
 
-    const lensPositions = [[0.7, 1.61], [0.33, 1.5], [0.61, 1.22]];
+    const lensMat = new THREE.MeshPhysicalMaterial({
+      color: 0x030711,
+      roughness: 0.03,
+      metalness: 0.55,
+      clearcoat: 1,
+      iridescence: 0.55,
+      iridescenceIOR: 1.4
+    });
+    const lensPositions = [
+      [-CAM_X + 0.18, CAM_Y + 0.18],
+      [-CAM_X - 0.18, CAM_Y + 0.1],
+      [-CAM_X + 0.08, CAM_Y - 0.18]
+    ];
     lensPositions.forEach(([x, y]) => {
-      const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.178, 0.08, 48), titanium);
+      const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.155, 0.162, 0.06, 40), titanium);
       ring.rotation.x = Math.PI / 2;
-      ring.position.set(x, y, -0.365);
-      phone.add(ring);
-      const lens = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.13, 0.138, 0.09, 48),
-        new THREE.MeshPhysicalMaterial({
-          color: 0x030711,
-          roughness: 0.03,
-          metalness: 0.55,
-          clearcoat: 1,
-          iridescence: 0.55,
-          iridescenceIOR: 1.4
-        })
-      );
+      ring.position.set(x, y, BACK_Z - 0.09);
+      caseGroup.add(ring);
+      const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.118, 0.125, 0.07, 40), lensMat);
       lens.rotation.x = Math.PI / 2;
-      lens.position.set(x, y, -0.41);
-      phone.add(lens);
+      lens.position.set(x, y, BACK_Z - 0.125);
+      caseGroup.add(lens);
     });
 
     const flash = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.06, 0.06, 0.025, 32),
+      new THREE.CylinderGeometry(0.055, 0.055, 0.02, 28),
       new THREE.MeshPhysicalMaterial({ color: 0xfff4d1, emissive: 0xffe7a5, emissiveIntensity: 0.3, roughness: 0.18 })
     );
     flash.rotation.x = Math.PI / 2;
-    flash.position.set(0.33, 1.22, -0.36);
-    phone.add(flash);
+    flash.position.set(-CAM_X - 0.18, CAM_Y - 0.18, BACK_Z - 0.085);
+    caseGroup.add(flash);
+
+    // Device sits inside the cavity, slightly forward of the back plate
+    device.position.z = 0.02;
+    phone.add(device);
+    phone.add(caseGroup);
 
     applyFinishTo3D();
     phone.rotation.set(viewTarget.x, viewTarget.y, 0);
