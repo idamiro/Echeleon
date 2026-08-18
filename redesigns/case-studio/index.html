@@ -15,9 +15,9 @@
   <title>Case Studio — Interactive Phone Case Designer | Vulcet</title>
   <link rel="icon" href="../../favicon.ico?v=20260817-mark3" sizes="any"><link rel="icon" href="../../favicon-48.png?v=20260817-mark3" type="image/png" sizes="48x48"><link rel="icon" href="../../favicon.svg?v=20260817-mark3" type="image/svg+xml"><link rel="apple-touch-icon" href="../../apple-touch-icon.png?v=20260817-mark3"><link rel="manifest" href="../../site.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../style.css?v=20260817-nocol"><link rel="stylesheet" href="../../consent.css?v=20260807-1"><link rel="stylesheet" href="./case-studio.css?v=20260818-1">
+  <link rel="stylesheet" href="../../style.css?v=20260817-nocol"><link rel="stylesheet" href="../../consent.css?v=20260807-1"><link rel="stylesheet" href="./case-studio.css?v=20260818-2">
   <script src="../../script.js?v=20260807-1" defer></script><script src="../../consent.js?v=20260724-18" defer></script>
-  <script type="module" src="./case-studio.js?v=20260818-1"></script>
+  <script type="module" src="./case-studio.js?v=20260818-2"></script>
 </head>
 <body class="case-page">
   <a class="skip-link" href="#main">Skip to studio</a>
@@ -30,14 +30,15 @@
 
     <section class="studio" aria-label="Case design studio">
       <div class="studio-topbar">
+        <div class="studio-brand"><span>V / CS</span><strong>Design workspace</strong></div>
         <div class="mode-switch" role="group" aria-label="Workspace view">
           <button class="mode-button is-active" type="button" data-mode="design" aria-pressed="true">Design View</button>
           <button class="mode-button" type="button" data-mode="preview" aria-pressed="false">3D Preview</button>
         </div>
         <div class="history-actions" role="group" aria-label="Edit actions">
-          <button type="button" data-action="undo" aria-label="Undo" title="Undo (Ctrl or Command Z)">Undo</button>
-          <button type="button" data-action="redo" aria-label="Redo" title="Redo (Ctrl or Command Shift Z)">Redo</button>
-          <button type="button" data-action="reset" aria-label="Reset design">Reset</button>
+	          <button type="button" data-action="undo" aria-label="Undo" title="Undo (Ctrl or Command Z)"><span aria-hidden="true">↶</span> Undo</button>
+	          <button type="button" data-action="redo" aria-label="Redo" title="Redo (Ctrl or Command Shift Z)"><span aria-hidden="true">↷</span> Redo</button>
+	          <button type="button" data-action="reset" aria-label="Reset design"><span aria-hidden="true">○</span> Reset</button>
           <button class="download-button" type="button" data-action="download">Download PNG</button>
         </div>
       </div>
@@ -54,7 +55,8 @@
             <label class="range-row"><span>Size <output id="size-value">18</output></span><input id="brush-size" type="range" min="2" max="100" value="18"></label>
             <label class="range-row"><span>Opacity <output id="opacity-value">100%</output></span><input id="brush-opacity" type="range" min="5" max="100" value="100"></label>
           </section>
-          <section class="tool-section"><h3>Image</h3><label class="upload-button" for="image-upload">Upload PNG, JPG or WebP<input id="image-upload" type="file" accept="image/png,image/jpeg,image/webp"></label><p class="tool-note">Images stay on this device.</p></section>
+          <section class="tool-section text-tool"><h3>Typography</h3><label class="text-entry"><span>Text</span><textarea id="text-input" rows="2" maxlength="120" placeholder="Type something bold">VULCET</textarea></label><div class="font-presets" role="group" aria-label="Text style"><button class="font-preset is-active" type="button" data-font="Inter" data-weight="700">Sans</button><button class="font-preset" type="button" data-font="Instrument Serif" data-weight="400">Serif</button><button class="font-preset" type="button" data-font="Arial Black" data-weight="900">Display</button><button class="font-preset" type="button" data-font="monospace" data-weight="700">Mono</button></div><div class="text-inline"><label><span>Size</span><input id="text-size" type="number" min="24" max="280" value="96"></label><label><span>Colour</span><input id="text-color" type="color" value="#111111"></label></div><button class="add-text-button" id="add-text" type="button"><span aria-hidden="true">T+</span> Add text layer</button></section>
+          <section class="tool-section image-tool"><h3>Image</h3><label class="upload-button" for="image-upload"><span aria-hidden="true">＋</span> Upload image<input id="image-upload" type="file" accept="image/png,image/jpeg,image/webp"></label><p class="tool-note">PNG, JPG or WebP · fitted for strong 3D visibility · stays on this device.</p></section>
           <section class="tool-section"><h3>Guides</h3><label class="check-row"><input id="show-safe" type="checkbox" checked><span>Safe area</span></label><label class="check-row"><input id="show-bleed" type="checkbox" checked><span>Bleed</span></label></section>
           <button class="clear-button" type="button" data-action="clear">Clear artwork</button>
         </aside>
@@ -68,7 +70,7 @@
             </div>
             <div class="preview-stage" id="preview-stage" aria-label="Interactive 3D phone case preview"><div class="webgl-message" hidden>Your browser cannot display the 3D preview. You can continue designing and download your artwork.</div></div>
           </div>
-          <p class="stage-hint" data-design-hint>Draw directly on the case. Select an image to move it.</p>
+	          <p class="stage-hint" data-design-hint>Draw freely · select text or imagery to move and transform</p>
           <p class="stage-hint" data-preview-hint hidden>Drag to rotate · Pinch or scroll to zoom</p>
           <div class="view-buttons" data-view-controls hidden role="group" aria-label="3D view controls"><button type="button" data-view="front">Front</button><button type="button" data-view="back">Back</button><button type="button" data-view="angle">Angle</button><button type="button" data-view="home">Reset view</button></div>
         </div>
@@ -76,7 +78,7 @@
         <aside class="layers-panel" id="layers-panel" aria-label="Selection and layers">
           <div class="panel-heading"><span>02</span><h2>Layers</h2><button class="panel-close" type="button" data-close-panel aria-label="Close layers">Close</button></div>
           <section class="selection-controls" id="selection-controls" aria-live="polite"><p>Select an image or drawing layer to edit it.</p></section>
-          <div class="layer-actions" role="group" aria-label="Layer actions"><button type="button" data-action="forward" aria-label="Move selected layer forward">Forward</button><button type="button" data-action="backward" aria-label="Move selected layer backward">Backward</button><button type="button" data-action="duplicate" aria-label="Duplicate selected layer">Duplicate</button><button type="button" data-action="delete" aria-label="Delete selected layer">Delete</button></div>
+	          <div class="layer-actions" role="group" aria-label="Layer actions"><button type="button" data-action="forward" aria-label="Move selected layer forward">↑ Forward</button><button type="button" data-action="backward" aria-label="Move selected layer backward">↓ Backward</button><button type="button" data-action="duplicate" aria-label="Duplicate selected layer">＋ Duplicate</button><button class="danger-action" type="button" data-action="delete" aria-label="Delete selected layer">× Delete</button></div>
           <ol class="layers-list" id="layers-list" aria-label="Artwork layers"></ol>
         </aside>
       </div>
