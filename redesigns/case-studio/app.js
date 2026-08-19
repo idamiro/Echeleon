@@ -436,21 +436,49 @@ function redo() {
 }
 
 function exportPNG() {
-  const out = document.createElement('canvas');
-  const gap = 80;
-  out.width = W * 2 + gap;
-  out.height = H;
-  const c = out.getContext('2d');
-  c.fillStyle = '#c5c8cf';
-  c.fillRect(0, 0, out.width, out.height);
+  if (!renderer || !scene || !camera || !root) {
+    say('3D view not ready yet');
+    return;
+  }
   flushPaint();
-  c.drawImage(exteriorTexOff, 0, 0);
-  c.drawImage(interiorTexOff, W + gap, 0);
+  // Snap orbit/camera instantly so the export matches what you see.
+  root.rotation.x = orbit.x;
+  root.rotation.y = orbit.y;
+  camera.position.z = dist;
+  camera.updateProjectionMatrix();
+
+  const host = previewHost;
+  const cssW = Math.max(2, host?.clientWidth || 800);
+  const cssH = Math.max(2, host?.clientHeight || 600);
+  const exportScale = Math.min(2.5, 1800 / Math.max(cssW, cssH));
+  const prevSize = new THREE.Vector2();
+  renderer.getSize(prevSize);
+  const prevPR = renderer.getPixelRatio();
+
+  renderer.setPixelRatio(1);
+  renderer.setSize(Math.round(cssW * exportScale), Math.round(cssH * exportScale), false);
+  camera.aspect = cssW / cssH;
+  camera.updateProjectionMatrix();
+  renderer.render(scene, camera);
+
+  const url = renderer.domElement.toDataURL('image/png');
+
+  renderer.setPixelRatio(prevPR);
+  renderer.setSize(prevSize.x, prevSize.y, false);
+  resize3D();
+  renderer.render(scene, camera);
+
+  const side =
+    Math.abs(((orbit.y % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) - Math.PI) < 0.55
+      ? 'back'
+      : Math.abs(((orbit.y % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)) < 0.55
+        ? 'front'
+        : 'view';
   const a = document.createElement('a');
-  a.download = `${($('#caseTitle').value || 'case').replace(/\s+/g, '-').toLowerCase()}-exterior-interior.png`;
-  a.href = out.toDataURL('image/png');
+  a.download = `${($('#caseTitle').value || 'case').replace(/\s+/g, '-').toLowerCase()}-${side}.png`;
+  a.href = url;
   a.click();
-  say('Exported exterior + interior PNG.');
+  say(`Exported ${side} photo from current 3D view`);
 }
 
 // ——— UI ———
@@ -640,7 +668,7 @@ function isLeatherCaseMesh(mesh) {
 }
 
 function makeCaseMat(map) {
-  return new THREE.MeshPhysicalMaterial({
+  const mat = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
     map: map || null,
     roughness: 0.55,
@@ -649,6 +677,13 @@ function makeCaseMat(map) {
     clearcoatRoughness: 0.45,
     side: THREE.FrontSide
   });
+  // Never keep Sketchfab leather photo maps on the case.
+  mat.normalMap = null;
+  mat.roughnessMap = null;
+  mat.metalnessMap = null;
+  mat.aoMap = null;
+  mat.emissiveMap = null;
+  return mat;
 }
 
 function ensureFaceTexture(face) {
@@ -1122,7 +1157,12 @@ function bindViewportPointer(el) {
 async function init3D() {
   if (!previewHost || previewHost.querySelector('canvas')) return;
   try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+    renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: false,
+      powerPreference: 'high-performance',
+      preserveDrawingBuffer: true
+    });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
     renderer.setClearColor(0xf0f2f5, 1);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
