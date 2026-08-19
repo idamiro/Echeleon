@@ -391,7 +391,7 @@ function initImageProjection(layer) {
   layer.x = W / 2;
   layer.y = H / 2;
   layer.face = 'exterior';
-  // Bake immediately onto the leather texture — no floating plane.
+  // Bake straight onto leather UVs (no floating screen plane).
   dirtyFaces.exterior = true;
   flushPaint();
 }
