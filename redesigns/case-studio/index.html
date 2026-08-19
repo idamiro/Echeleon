@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./app.css?v=20260819-fix8">
+  <link rel="stylesheet" href="./app.css?v=20260819-fix9">
   <script type="importmap">
   {
     "imports": {
@@ -30,7 +30,7 @@
     }
   }
   </script>
-  <script type="module" src="./app.js?v=20260819-fix8"></script>
+  <script type="module" src="./app.js?v=20260819-fix4"></script>
 </head>
 <body>
   <div class="app" id="app">
@@ -141,20 +141,56 @@
               <option>iPhone 14 Pro · leather case</option>
             </select>
           </label>
-          <p class="section-label">Exterior colour <small>(back + outer sides)</small></p>
+          <p class="section-label">Exterior colour</p>
           <div class="swatches" id="exteriorSwatches" data-target="exterior">
             <button type="button" class="swatch is-on" data-color="#1a1a1c" style="--c:#1a1a1c" aria-label="Black"></button>
             <button type="button" class="swatch" data-color="#f4f1ea" style="--c:#f4f1ea" aria-label="White"></button>
             <button type="button" class="swatch" data-color="#d8c3a8" style="--c:#d8c3a8" aria-label="Beige"></button>
             <button type="button" class="swatch" data-color="#2f4a3a" style="--c:#2f4a3a" aria-label="Dark green"></button>
           </div>
-          <p class="section-label">Interior colour <small>(inner walls + cavity)</small></p>
+          <p class="section-label">Interior colour</p>
           <div class="swatches" id="interiorSwatches" data-target="interior">
             <button type="button" class="swatch is-on" data-color="#1a1a1c" style="--c:#1a1a1c" aria-label="Black"></button>
             <button type="button" class="swatch" data-color="#2a2420" style="--c:#2a2420" aria-label="Dark brown"></button>
             <button type="button" class="swatch" data-color="#f4f1ea" style="--c:#f4f1ea" aria-label="White"></button>
             <button type="button" class="swatch" data-color="#d8c3a8" style="--c:#d8c3a8" aria-label="Beige"></button>
           </div>
+        </div>
+
+        <div class="props-block">
+          <h3>Material</h3>
+          <div class="material-grid" id="materialGrid">
+            <button type="button" class="mat is-on" data-mat="soft" aria-label="Soft touch">
+              <i style="background:linear-gradient(145deg,#3a3a3c,#111)"></i>
+              <span>Soft</span>
+            </button>
+            <button type="button" class="mat" data-mat="matte" aria-label="Matte">
+              <i style="background:linear-gradient(145deg,#cfcfcf,#9a9a9a)"></i>
+              <span>Matte</span>
+            </button>
+            <button type="button" class="mat" data-mat="gloss" aria-label="Glossy">
+              <i style="background:linear-gradient(145deg,#fff,#777)"></i>
+              <span>Gloss</span>
+            </button>
+            <button type="button" class="mat" data-mat="grain" aria-label="Grain">
+              <i style="background:repeating-linear-gradient(135deg,#555 0 2px,#333 2px 4px)"></i>
+              <span>Grain</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="props-block">
+          <h3>Finish</h3>
+          <label class="field">Type
+            <select id="finishSelect">
+              <option value="soft">Soft touch</option>
+              <option value="matte">Matte</option>
+              <option value="gloss">Glossy</option>
+            </select>
+          </label>
+          <label class="field">Gloss level <output id="glossOut">20%</output>
+            <input id="gloss" type="range" min="0" max="100" value="20">
+          </label>
         </div>
 
         <div class="props-block" id="transformBlock">
