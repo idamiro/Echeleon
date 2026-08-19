@@ -138,7 +138,6 @@ function measureText(c, l) {
 function drawLayer(c, l, s = 1) {
   if (l.visible === false) return;
   if (l.type === 'image' && l.useProjection) {
-    if (l.livePreview) return; // 3D preview plane handles live placement
     stampProjectedImage(c, l);
     return;
   }
@@ -201,22 +200,20 @@ function drawLayer(c, l, s = 1) {
   c.restore();
 }
 
-/** Planar-project a photo onto the case mesh and bake into the UV canvas. */
+/** Project photo in mesh-local space onto UV canvas so it sticks to the leather. */
 function stampProjectedImage(ctx, layer) {
   const img = layer.image;
   const mesh = faceMeshes[layer.face || 'exterior'];
   const p = layer.proj;
   if (!img || !mesh?.geometry || !p) return;
 
-  mesh.updateMatrixWorld(true);
   const geo = mesh.geometry;
   const posAttr = geo.attributes.position;
   const uvAttr = geo.attributes.uv;
   if (!posAttr || !uvAttr) return;
 
-  const origin = new THREE.Vector3(p.ox, p.oy, p.oz);
-  let right = new THREE.Vector3(p.rx, p.ry, p.rz);
-  let up = new THREE.Vector3(p.ux, p.uy, p.uz);
+  let right = new THREE.Vector3(p.rx, p.ry, p.rz).normalize();
+  let up = new THREE.Vector3(p.ux, p.uy, p.uz).normalize();
   const rot = layer.rotation || 0;
   if (rot) {
     const c = Math.cos(rot);
@@ -226,27 +223,27 @@ function stampProjectedImage(ctx, layer) {
     right = r2.normalize();
     up = u2.normalize();
   }
-  const halfW = Math.max(1e-4, (p.worldW || 1) * 0.5 * (layer.scale || 1));
-  const halfH = Math.max(1e-4, (p.worldH || 1) * 0.5 * (layer.scale || 1));
+  const origin = new THREE.Vector3(p.ox, p.oy, p.oz);
+  refreshProjectionOrigin(layer, origin, right, up);
+  const halfW = Math.max(1e-4, (p.localW || 1) * 0.5 * (layer.scale || 1));
+  const halfH = Math.max(1e-4, (p.localH || 1) * 0.5 * (layer.scale || 1));
 
-  // Sample from an offscreen copy for getImageData speed
   const iw = img.naturalWidth || img.width;
   const ih = img.naturalHeight || img.height;
   if (!iw || !ih) return;
-  if (!layer._sampleCanvas) {
-    layer._sampleCanvas = document.createElement('canvas');
-    layer._sampleCanvas.width = iw;
-    layer._sampleCanvas.height = ih;
-    layer._sampleCtx = layer._sampleCanvas.getContext('2d', { willReadFrequently: true });
-    layer._sampleCtx.drawImage(img, 0, 0);
-    layer._sampleData = layer._sampleCtx.getImageData(0, 0, iw, ih).data;
+  if (!layer._sampleData) {
+    const sc = document.createElement('canvas');
+    sc.width = iw;
+    sc.height = ih;
+    const sctx = sc.getContext('2d', { willReadFrequently: true });
+    sctx.drawImage(img, 0, 0);
+    layer._sampleData = sctx.getImageData(0, 0, iw, ih).data;
   }
   const src = layer._sampleData;
   const out = ctx.getImageData(0, 0, W, H);
   const dd = out.data;
   const opacity = layer.opacity ?? 1;
 
-  const mw = mesh.matrixWorld;
   const v0 = new THREE.Vector3();
   const v1 = new THREE.Vector3();
   const v2 = new THREE.Vector3();
@@ -255,19 +252,16 @@ function stampProjectedImage(ctx, layer) {
 
   for (let t = 0; t < triCount; t++) {
     const i = t * 3;
-    v0.fromBufferAttribute(posAttr, i).applyMatrix4(mw);
-    v1.fromBufferAttribute(posAttr, i + 1).applyMatrix4(mw);
-    v2.fromBufferAttribute(posAttr, i + 2).applyMatrix4(mw);
+    v0.fromBufferAttribute(posAttr, i);
+    v1.fromBufferAttribute(posAttr, i + 1);
+    v2.fromBufferAttribute(posAttr, i + 2);
 
-    const s0 = (v0.x - origin.x) * right.x + (v0.y - origin.y) * right.y + (v0.z - origin.z) * right.z;
-    const t0c = (v0.x - origin.x) * up.x + (v0.y - origin.y) * up.y + (v0.z - origin.z) * up.z;
-    const s1 = (v1.x - origin.x) * right.x + (v1.y - origin.y) * right.y + (v1.z - origin.z) * right.z;
-    const t1c = (v1.x - origin.x) * up.x + (v1.y - origin.y) * up.y + (v1.z - origin.z) * up.z;
-    const s2 = (v2.x - origin.x) * right.x + (v2.y - origin.y) * right.y + (v2.z - origin.z) * right.z;
-    const t2c = (v2.x - origin.x) * up.x + (v2.y - origin.y) * up.y + (v2.z - origin.z) * up.z;
-    const S0 = s0 / halfW; const T0 = t0c / halfH;
-    const S1 = s1 / halfW; const T1 = t1c / halfH;
-    const S2 = s2 / halfW; const T2 = t2c / halfH;
+    const S0 = ((v0.x - origin.x) * right.x + (v0.y - origin.y) * right.y + (v0.z - origin.z) * right.z) / halfW;
+    const T0 = ((v0.x - origin.x) * up.x + (v0.y - origin.y) * up.y + (v0.z - origin.z) * up.z) / halfH;
+    const S1 = ((v1.x - origin.x) * right.x + (v1.y - origin.y) * right.y + (v1.z - origin.z) * right.z) / halfW;
+    const T1 = ((v1.x - origin.x) * up.x + (v1.y - origin.y) * up.y + (v1.z - origin.z) * up.z) / halfH;
+    const S2 = ((v2.x - origin.x) * right.x + (v2.y - origin.y) * right.y + (v2.z - origin.z) * right.z) / halfW;
+    const T2 = ((v2.x - origin.x) * up.x + (v2.y - origin.y) * up.y + (v2.z - origin.z) * up.z) / halfH;
 
     if (
       (S0 < -margin && S1 < -margin && S2 < -margin) ||
@@ -276,19 +270,12 @@ function stampProjectedImage(ctx, layer) {
       (T0 > margin && T1 > margin && T2 > margin)
     ) continue;
 
-    const u0 = uvAttr.getX(i);
-    const vv0 = uvAttr.getY(i);
-    const u1 = uvAttr.getX(i + 1);
-    const vv1 = uvAttr.getY(i + 1);
-    const u2 = uvAttr.getX(i + 2);
-    const vv2 = uvAttr.getY(i + 2);
-
-    const x0 = u0 * W;
-    const y0 = (1 - vv0) * H;
-    const x1 = u1 * W;
-    const y1 = (1 - vv1) * H;
-    const x2 = u2 * W;
-    const y2 = (1 - vv2) * H;
+    const x0 = uvAttr.getX(i) * W;
+    const y0 = (1 - uvAttr.getY(i)) * H;
+    const x1 = uvAttr.getX(i + 1) * W;
+    const y1 = (1 - uvAttr.getY(i + 1)) * H;
+    const x2 = uvAttr.getX(i + 2) * W;
+    const y2 = (1 - uvAttr.getY(i + 2)) * H;
 
     const minX = Math.max(0, Math.floor(Math.min(x0, x1, x2)));
     const maxX = Math.min(W - 1, Math.ceil(Math.max(x0, x1, x2)));
@@ -331,118 +318,82 @@ function stampProjectedImage(ctx, layer) {
   ctx.putImageData(out, 0, 0);
 }
 
-function applyProjection(layer, point, normal) {
-  const n = normal.clone().normalize();
+function refreshProjectionOrigin(layer, originOut, right, up) {
+  if (!layer.projBase) {
+    if (originOut && layer.proj) originOut.set(layer.proj.ox, layer.proj.oy, layer.proj.oz);
+    return;
+  }
+  const mesh = faceMeshes[layer.face || 'exterior'];
+  let span = 40;
+  if (mesh?.geometry) {
+    if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
+    const sz = mesh.geometry.boundingBox.getSize(new THREE.Vector3());
+    span = Math.max(sz.x, sz.y, sz.z) * 0.85;
+  }
+  const ox = ((layer.x / W) - 0.5) * span;
+  const oy = ((layer.y / H) - 0.5) * span;
+  const b = layer.projBase;
+  const r = right || new THREE.Vector3(layer.proj.rx, layer.proj.ry, layer.proj.rz);
+  const u = up || new THREE.Vector3(layer.proj.ux, layer.proj.uy, layer.proj.uz);
+  const x = b.x + r.x * ox - u.x * oy;
+  const y = b.y + r.y * ox - u.y * oy;
+  const z = b.z + r.z * ox - u.z * oy;
+  layer.proj.ox = x;
+  layer.proj.oy = y;
+  layer.proj.oz = z;
+  if (originOut) originOut.set(x, y, z);
+}
+
+/** Store projection in the case mesh's local space so it stays glued when orbiting. */
+function applyProjection(layer, worldPoint, worldNormal, mesh) {
+  if (!mesh) return;
+  mesh.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(mesh.matrixWorld).invert();
+  const point = worldPoint.clone().applyMatrix4(inv);
+  const n = worldNormal.clone().transformDirection(inv).normalize();
   let up = new THREE.Vector3(0, 1, 0);
   if (Math.abs(n.dot(up)) > 0.92) up.set(1, 0, 0);
   up.addScaledVector(n, -up.dot(n)).normalize();
   const right = new THREE.Vector3().crossVectors(n, up).normalize();
   up.crossVectors(right, n).normalize();
 
-  const caseH = phoneSize?.y || 4.1;
-  const worldH = layer.proj?.worldH || caseH * 0.32;
+  if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
+  const sz = mesh.geometry.boundingBox.getSize(new THREE.Vector3());
+  const localH = layer.proj?.localH || Math.max(sz.y, sz.z) * 0.32;
   const aspect = (layer.w && layer.h) ? layer.w / layer.h : 1;
-  const worldW = layer.proj?.worldW || worldH * aspect;
+  const localW = layer.proj?.localW || localH * aspect;
 
   layer.proj = {
     ox: point.x, oy: point.y, oz: point.z,
     nx: n.x, ny: n.y, nz: n.z,
     rx: right.x, ry: right.y, rz: right.z,
     ux: up.x, uy: up.y, uz: up.z,
-    worldW,
-    worldH
+    localW,
+    localH
   };
   layer.projBase = { x: point.x, y: point.y, z: point.z };
   layer.useProjection = true;
 }
 
-function refreshProjectionFromSliders(layer) {
-  if (!layer?.proj || !layer.projBase) return;
-  const span = (phoneSize?.y || 4.1) * 0.85;
-  const ox = ((layer.x / W) - 0.5) * span;
-  const oy = ((layer.y / H) - 0.5) * span;
-  const b = layer.projBase;
-  const p = layer.proj;
-  p.ox = b.x + p.rx * ox - p.ux * oy;
-  p.oy = b.y + p.ry * ox - p.uy * oy;
-  p.oz = b.z + p.rz * ox - p.uz * oy;
-}
-
-function ensurePhotoPreview(layer) {
-  if (!scene) return;
-  if (!photoPreview) {
-    const mat = new THREE.MeshBasicMaterial({
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      polygonOffset: true,
-      polygonOffsetFactor: -2,
-      polygonOffsetUnits: -2
-    });
-    photoPreview = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
-    photoPreview.renderOrder = 20;
-    photoPreview.frustumCulled = false;
-    scene.add(photoPreview);
-  }
-  const map = photoPreview.material.map;
-  if (!map || map.image !== layer.image) {
-    if (map) map.dispose();
-    const tex = new THREE.Texture(layer.image);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.needsUpdate = true;
-    photoPreview.material.map = tex;
-    photoPreview.material.needsUpdate = true;
-  }
-  updatePhotoPreview(layer);
-  photoPreview.visible = true;
-}
-
-function updatePhotoPreview(layer) {
-  if (!photoPreview || !layer?.proj) return;
-  refreshProjectionFromSliders(layer);
-  const p = layer.proj;
-  const origin = new THREE.Vector3(p.ox, p.oy, p.oz);
-  const n = new THREE.Vector3(p.nx, p.ny, p.nz).normalize();
-  let right = new THREE.Vector3(p.rx, p.ry, p.rz).normalize();
-  let up = new THREE.Vector3(p.ux, p.uy, p.uz).normalize();
-  const rot = layer.rotation || 0;
-  if (rot) {
-    const c = Math.cos(rot);
-    const s = Math.sin(rot);
-    const r2 = right.clone().multiplyScalar(c).addScaledVector(up, s);
-    const u2 = up.clone().multiplyScalar(c).addScaledVector(right, -s);
-    right = r2.normalize();
-    up = u2.normalize();
-  }
-  const w = (p.worldW || 1) * (layer.scale || 1);
-  const h = (p.worldH || 1) * (layer.scale || 1);
-  origin.addScaledVector(n, 0.012);
-  photoPreview.position.copy(origin);
-  const m = new THREE.Matrix4().makeBasis(right, up, n);
-  photoPreview.quaternion.setFromRotationMatrix(m);
-  photoPreview.scale.set(w, h, 1);
-  photoPreview.visible = true;
-}
-
-function hidePhotoPreview() {
-  if (photoPreview) photoPreview.visible = false;
-}
-
 function initImageProjection(layer) {
   const mesh = faceMeshes.exterior || casePickMeshes.find((m) => m.userData.face === 'exterior');
-  const point = new THREE.Vector3();
-  const normal = new THREE.Vector3(0, 0, 1);
-  if (mesh) {
-    const box = new THREE.Box3().setFromObject(mesh);
-    box.getCenter(point);
-    if (camera) normal.copy(camera.position).sub(point).normalize();
+  if (!mesh) {
+    say('Case not ready — wait a moment and upload again');
+    return;
   }
-  applyProjection(layer, point, normal);
+  mesh.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(mesh);
+  const point = box.getCenter(new THREE.Vector3());
+  const normal = camera
+    ? camera.position.clone().sub(point).normalize()
+    : new THREE.Vector3(0, 0, 1);
+  applyProjection(layer, point, normal, mesh);
   layer.x = W / 2;
   layer.y = H / 2;
   layer.face = 'exterior';
-  layer.livePreview = true;
-  ensurePhotoPreview(layer);
+  // Bake immediately onto the leather texture — no floating plane.
+  dirtyFaces.exterior = true;
+  flushPaint();
 }
 
 function roundRect(c, x, y, w, h, r) {
@@ -556,11 +507,6 @@ function beginLiveMove(face, layerId) {
   liveMode = 'move';
   liveFace = face;
   liveExcludeId = layerId;
-  const layer = layers.find((x) => x.id === layerId);
-  if (layer?.type === 'image' && layer.useProjection) {
-    layer.livePreview = true;
-    ensurePhotoPreview(layer);
-  }
   paintFace(liveBaseCtx, face, 1, layerId);
   const ctx = faceTexCtx(face);
   ctx.drawImage(liveBase, 0, 0);
@@ -570,14 +516,7 @@ function beginLiveMove(face, layerId) {
 function liveMoveTick(layer) {
   const face = layer.face || 'exterior';
   if (face !== liveFace) beginLiveMove(face, layer.id);
-  if (layer.type === 'image' && layer.useProjection) {
-    layer.livePreview = true;
-    updatePhotoPreview(layer);
-    const ctx = faceTexCtx(face);
-    ctx.drawImage(liveBase, 0, 0);
-    markFaceTex(face);
-    return;
-  }
+  refreshProjectionOrigin(layer);
   const ctx = faceTexCtx(face);
   ctx.drawImage(liveBase, 0, 0);
   drawLayer(ctx, layer, 1);
@@ -586,11 +525,6 @@ function liveMoveTick(layer) {
 
 function endLive() {
   const face = liveFace;
-  const layer = layers.find((x) => x.id === liveExcludeId || x.id === selected);
-  if (layer?.type === 'image' && layer.useProjection) {
-    layer.livePreview = false;
-    hidePhotoPreview();
-  }
   liveMode = null;
   liveExcludeId = null;
   dirtyFaces[face] = true;
@@ -717,8 +651,7 @@ function addImageFromFile(file) {
         rotation: 0,
         opacity: 1,
         visible: true,
-        useProjection: true,
-        livePreview: true
+        useProjection: true
       };
       layers.push(layer);
       selected = layer.id;
@@ -727,10 +660,9 @@ function addImageFromFile(file) {
       setOrbitLocked(true);
       initImageProjection(layer);
       snapshot();
-      render();
       renderLayers();
       syncTransform(layer);
-      say('Photo on case · Lock, drag to place · scroll to scale');
+      say('Photo on case · Lock, drag on leather to place · scroll to scale');
     };
     im.src = reader.result;
   };
@@ -941,7 +873,7 @@ $('#posXRange')?.addEventListener('input', (e) => {
   l.x = (+e.target.value / 100) * W;
   $('#posXOut').textContent = `${e.target.value}%`;
   if (l.type === 'image' && l.useProjection) {
-    refreshProjectionFromSliders(l);
+    refreshProjectionOrigin(l);
     if (liveMode !== 'move') beginLiveMove(l.face || 'exterior', l.id);
     liveMoveTick(l);
   } else render(l.face || 'exterior');
@@ -952,7 +884,7 @@ $('#posYRange')?.addEventListener('input', (e) => {
   l.y = (+e.target.value / 100) * H;
   $('#posYOut').textContent = `${e.target.value}%`;
   if (l.type === 'image' && l.useProjection) {
-    refreshProjectionFromSliders(l);
+    refreshProjectionOrigin(l);
     if (liveMode !== 'move') beginLiveMove(l.face || 'exterior', l.id);
     liveMoveTick(l);
   } else render(l.face || 'exterior');
@@ -1025,7 +957,6 @@ let interiorMat = null;
 let caseMats = [];
 let casePickMeshes = [];
 let faceMeshes = { exterior: null, interior: null };
-let photoPreview = null;
 let orbit = { x: 0.18, y: Math.PI };
 let dist = 7.3;
 let dragging3d = null;
@@ -1406,9 +1337,10 @@ function moveSelectedToUv(hit) {
   if (!l || !['image', 'text', 'pattern'].includes(l.type) || !hit) return false;
   const face = hit.object?.userData?.face === 'interior' ? 'interior' : 'exterior';
   if (l.type === 'image') {
+    const mesh = hit.object;
     const n = hit.face?.normal
-      ? hit.face.normal.clone().transformDirection(hit.object.matrixWorld).normalize()
-      : hit.normal?.clone?.() || new THREE.Vector3(0, 0, 1);
+      ? hit.face.normal.clone().transformDirection(mesh.matrixWorld).normalize()
+      : (hit.normal?.clone?.() || new THREE.Vector3(0, 0, 1));
     if (camera) {
       const toCam = camera.position.clone().sub(hit.point).normalize();
       if (n.dot(toCam) < 0) n.negate();
@@ -1416,11 +1348,11 @@ function moveSelectedToUv(hit) {
     l.face = face;
     l.x = W / 2;
     l.y = H / 2;
-    const keepW = l.proj?.worldW;
-    const keepH = l.proj?.worldH;
-    applyProjection(l, hit.point.clone(), n);
-    if (keepW) l.proj.worldW = keepW;
-    if (keepH) l.proj.worldH = keepH;
+    const keepW = l.proj?.localW;
+    const keepH = l.proj?.localH;
+    applyProjection(l, hit.point.clone(), n, mesh);
+    if (keepW) l.proj.localW = keepW;
+    if (keepH) l.proj.localH = keepH;
     if (liveMode !== 'move') beginLiveMove(face, l.id);
     liveMoveTick(l);
     return true;
