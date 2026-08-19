@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const W = 1170;
 const H = 2532;
-const STORE = 'vulcet-case-studio-v6';
+const STORE = 'vulcet-case-studio-v7';
 
 const $ = (s, p = document) => p.querySelector(s);
 const $$ = (s, p = document) => [...p.querySelectorAll(s)];
@@ -27,7 +27,6 @@ let layers = [];
 let selected = null;
 let history = [];
 let future = [];
-let dirtyTex = true;
 let saveTimer = 0;
 let orbitLocked = false;
 
@@ -205,25 +204,46 @@ function paintFace(target, face, scale = 1) {
     artOff.width = aw;
     artOff.height = ah;
   }
-  // Artwork only on a transparent canvas. Base leather colour comes from material.color
-  // so interior/exterior colours never bleed through shared UVs.
   const a = artOff.getContext('2d', { alpha: true });
   a.clearRect(0, 0, aw, ah);
   layers.filter((l) => (l.face || 'exterior') === face).forEach((l) => drawLayer(a, l, scale));
 
-  // target canvases used for CanvasTexture must stay opaque for WebGL sampling stability:
-  // fill white, then draw artwork. material.color tints the white → case colour.
+  // Bake face colour into the texture (material.color stays white) so photos
+  // stay full-opacity and interior/exterior colours cannot tint each other.
   target.clearRect(0, 0, aw, ah);
-  target.fillStyle = '#ffffff';
+  target.fillStyle = faceColor(face);
   target.fillRect(0, 0, aw, ah);
   target.drawImage(artOff, 0, 0);
-  dirtyTex = true;
 }
 
-function render() {
-  paintFace(exteriorTexCtx, 'exterior', 1);
-  paintFace(interiorTexCtx, 'interior', 1);
-  updateTexture();
+let paintRaf = 0;
+let dirtyFaces = { exterior: false, interior: false };
+
+function schedulePaint(face) {
+  if (face === 'exterior' || face === 'both') dirtyFaces.exterior = true;
+  if (face === 'interior' || face === 'both') dirtyFaces.interior = true;
+  if (paintRaf) return;
+  paintRaf = requestAnimationFrame(() => {
+    paintRaf = 0;
+    flushPaint();
+  });
+}
+
+function flushPaint() {
+  // Always bake canvases (even before WebGL is ready).
+  if (dirtyFaces.exterior) {
+    paintFace(exteriorTexCtx, 'exterior', 1);
+    if (exteriorTex) exteriorTex.needsUpdate = true;
+  }
+  if (dirtyFaces.interior) {
+    paintFace(interiorTexCtx, 'interior', 1);
+    if (interiorTex) interiorTex.needsUpdate = true;
+  }
+  dirtyFaces.exterior = dirtyFaces.interior = false;
+}
+
+function render(face = 'both') {
+  schedulePaint(face);
 }
 
 function renderLayers() {
@@ -364,62 +384,11 @@ function addImageFromFile(file) {
 }
 
 function addPattern(index) {
-  const amps = [34, 22, 40, 18];
-  const base = exteriorColor;
-  const layer = {
-    id: uid(),
-    type: 'pattern',
-    face: 'exterior',
-    name: `Pattern ${index + 1}`,
-    color: '#f4f1ea',
-    amp: amps[index % 4],
-    step: 70 + index * 12,
-    x: W / 2,
-    y: H / 2,
-    w: W,
-    h: H,
-    scale: 1,
-    rotation: index % 2 ? 0.15 : -0.08,
-    opacity: 1,
-    visible: true
-  };
-  if (base === '#f4f1ea' || base === '#d8c3a8') layer.color = '#111111';
-  layers.push(layer);
-  selected = layer.id;
-  snapshot();
-  render();
-  renderLayers();
-  say('Pattern applied on exterior.');
+  // Patterns removed with Artwork panel — keep no-op for safety.
 }
 
 function buildPatterns() {
-  const grid = $('#patternGrid');
-  if (!grid) return;
-  for (let i = 0; i < 4; i++) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'pattern';
-    btn.title = `Pattern ${i + 1}`;
-    const c = document.createElement('canvas');
-    c.width = 180;
-    c.height = 180;
-    const g = c.getContext('2d');
-    g.fillStyle = i % 2 ? '#111' : '#f3f1ea';
-    g.fillRect(0, 0, 180, 180);
-    g.fillStyle = i % 2 ? '#f3f1ea' : '#111';
-    g.beginPath();
-    for (let y = -20; y < 220; y += 28) {
-      g.moveTo(0, y);
-      for (let x = 0; x <= 180; x += 20) g.quadraticCurveTo(x + 10, y + 12 * Math.sin((x + y) * 0.05), x + 20, y);
-      g.lineTo(180, y + 28);
-      g.lineTo(0, y + 28);
-      g.closePath();
-    }
-    g.fill();
-    btn.appendChild(c);
-    btn.onclick = () => addPattern(i);
-    grid.appendChild(btn);
-  }
+  // no-op
 }
 
 function mutate(act) {
@@ -474,29 +443,9 @@ function exportPNG() {
   const c = out.getContext('2d');
   c.fillStyle = '#c5c8cf';
   c.fillRect(0, 0, out.width, out.height);
-
-  function bake(face) {
-    const canvas = document.createElement('canvas');
-    canvas.width = W;
-    canvas.height = H;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = faceColor(face);
-    roundRect(ctx, 0, 0, W, H, 120);
-    ctx.fill();
-    ctx.save();
-    roundRect(ctx, 0, 0, W, H, 120);
-    ctx.clip();
-    // reuse current face texture bake
-    const src = face === 'interior' ? interiorTexOff : exteriorTexOff;
-    paintFace(face === 'interior' ? interiorTexCtx : exteriorTexCtx, face, 1);
-    ctx.globalCompositeOperation = 'multiply';
-    ctx.drawImage(src, 0, 0);
-    ctx.restore();
-    return canvas;
-  }
-
-  c.drawImage(bake('exterior'), 0, 0);
-  c.drawImage(bake('interior'), W + gap, 0);
+  flushPaint();
+  c.drawImage(exteriorTexOff, 0, 0);
+  c.drawImage(interiorTexOff, W + gap, 0);
   const a = document.createElement('a');
   a.download = `${($('#caseTitle').value || 'case').replace(/\s+/g, '-').toLowerCase()}-exterior-interior.png`;
   a.href = out.toDataURL('image/png');
@@ -593,35 +542,34 @@ $('#addTextBtn').onclick = () => {
 };
 
 $('#fileInput').onchange = (e) => { addImageFromFile(e.target.files[0]); e.target.value = ''; };
-$('#fileInput2').onchange = (e) => { addImageFromFile(e.target.files[0]); e.target.value = ''; };
 
+$('#scaleRange')?.addEventListener('input', (e) => {
+  const l = layers.find((x) => x.id === selected);
+  if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
+  l.scale = +e.target.value / 100;
+  $('#scaleOut').textContent = `${e.target.value}%`;
+  render(l.face || 'exterior');
+});
 $('#posXRange')?.addEventListener('input', (e) => {
   const l = layers.find((x) => x.id === selected);
   if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
   l.x = (+e.target.value / 100) * W;
   $('#posXOut').textContent = `${e.target.value}%`;
-  render();
+  render(l.face || 'exterior');
 });
 $('#posYRange')?.addEventListener('input', (e) => {
   const l = layers.find((x) => x.id === selected);
   if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
   l.y = (+e.target.value / 100) * H;
   $('#posYOut').textContent = `${e.target.value}%`;
-  render();
-});
-$('#scaleRange')?.addEventListener('input', (e) => {
-  const l = layers.find((x) => x.id === selected);
-  if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
-  l.scale = +e.target.value / 100;
-  $('#scaleOut').textContent = `${e.target.value}%`;
-  render();
+  render(l.face || 'exterior');
 });
 $('#rotRange')?.addEventListener('input', (e) => {
   const l = layers.find((x) => x.id === selected);
   if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
   l.rotation = (+e.target.value * Math.PI) / 180;
   $('#rotOut').textContent = `${e.target.value}°`;
-  render();
+  render(l.face || 'exterior');
 });
 ['posXRange', 'posYRange', 'scaleRange', 'rotRange'].forEach((id) => {
   $(`#${id}`)?.addEventListener('change', () => snapshot());
@@ -667,7 +615,7 @@ const ASSET_BASE = (() => {
   }
   return new URL('./assets/', window.location.href).href;
 })();
-const PRODUCT_GLB = new URL('iphone-14-pro-leather-case.glb?v=fix1', ASSET_BASE).href;
+const PRODUCT_GLB = new URL('iphone-14-pro-leather-case.glb?v=fix2', ASSET_BASE).href;
 
 let renderer, scene, camera, root, phoneSize;
 let exteriorTex = null;
@@ -691,31 +639,32 @@ function isLeatherCaseMesh(mesh) {
   return name.includes('leather') || (name.includes('case') && !/(iphone|ipohne|phone|glass|screen|body)/.test(name));
 }
 
-function makeCaseMat(map, hex) {
-  const mat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color(hex || '#ffffff'),
+function makeCaseMat(map) {
+  return new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
     map: map || null,
     roughness: 0.55,
-    metalness: 0.05,
+    metalness: 0.04,
     clearcoat: 0.2,
     clearcoatRoughness: 0.45,
     side: THREE.FrontSide
   });
-  return mat;
 }
 
 function ensureFaceTexture(face) {
   const isIn = face === 'interior';
   const off = isIn ? interiorTexOff : exteriorTexOff;
-  const ctx2 = isIn ? interiorTexCtx : exteriorTexCtx;
-  paintFace(ctx2, face, 1);
   let tex = isIn ? interiorTex : exteriorTex;
   if (!tex) {
+    // Ensure canvas has content before first upload
+    paintFace(isIn ? interiorTexCtx : exteriorTexCtx, face, 1);
     tex = new THREE.CanvasTexture(off);
     tex.colorSpace = THREE.SRGBColorSpace;
-    // CanvasTexture default flipY=true matches glTF UV (v=0 at bottom) with canvasY=(1-v)*H
     tex.flipY = true;
-    tex.anisotropy = Math.min(16, renderer?.capabilities.getMaxAnisotropy?.() || 1);
+    tex.anisotropy = Math.min(8, renderer?.capabilities.getMaxAnisotropy?.() || 1);
+    tex.generateMipmaps = true;
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    tex.magFilter = THREE.LinearFilter;
     if (isIn) interiorTex = tex;
     else exteriorTex = tex;
   } else {
@@ -731,36 +680,39 @@ function applyCaseTo3D() {
   const clearcoat = material === 'gloss' ? 1 : material === 'soft' ? 0.35 : 0.15;
   const clearcoatRoughness = material === 'gloss' ? 0.08 : 0.4;
   if (exteriorMat) {
-    exteriorMat.color.set(exteriorColor);
+    exteriorMat.color.set(0xffffff);
     exteriorMat.roughness = roughness;
     exteriorMat.clearcoat = clearcoat;
     exteriorMat.clearcoatRoughness = clearcoatRoughness;
     exteriorMat.needsUpdate = true;
   }
   if (interiorMat) {
-    interiorMat.color.set(interiorColor);
-    interiorMat.roughness = Math.min(0.92, roughness + 0.12);
-    interiorMat.clearcoat = clearcoat * 0.4;
-    interiorMat.clearcoatRoughness = Math.min(1, clearcoatRoughness + 0.2);
+    interiorMat.color.set(0xffffff);
+    interiorMat.roughness = Math.min(0.95, roughness + 0.15);
+    interiorMat.clearcoat = clearcoat * 0.35;
+    interiorMat.clearcoatRoughness = Math.min(1, clearcoatRoughness + 0.25);
     interiorMat.needsUpdate = true;
   }
-  dirtyTex = true;
-  updateTexture(true);
+  // Colour lives in the baked canvases — refresh both faces.
+  schedulePaint('both');
 }
 
 function updateTexture(force = false) {
-  if (!renderer || (!dirtyTex && !force)) return;
-  const ext = ensureFaceTexture('exterior');
-  const inn = ensureFaceTexture('interior');
+  if (!renderer) return;
+  if (force) {
+    dirtyFaces.exterior = dirtyFaces.interior = true;
+    flushPaint();
+  } else {
+    schedulePaint('both');
+  }
   if (exteriorMat) {
-    exteriorMat.map = ext;
+    exteriorMat.map = ensureFaceTexture('exterior');
     exteriorMat.needsUpdate = true;
   }
   if (interiorMat) {
-    interiorMat.map = inn;
+    interiorMat.map = ensureFaceTexture('interior');
     interiorMat.needsUpdate = true;
   }
-  dirtyTex = false;
 }
 
 function fit(obj, targetH = 4.1) {
@@ -781,33 +733,47 @@ function loadGltf(loader, url) {
   return new Promise((resolve, reject) => loader.load(url, resolve, undefined, reject));
 }
 
-function splitCaseByFacing(mesh) {
-  // Classify with geometric face normal · (centroid - volumeCenter).
-  // Prefer geometric normal over averaged vertex normals (more stable on leather shells).
+function splitCaseByFacing(mesh, phoneCenterWorld) {
+  // Interior = faces whose geometric normal points toward the phone.
+  // This keeps exterior/interior colours from bleeding across the shell.
   const src = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
-  src.computeBoundingBox();
-  const center = src.boundingBox.getCenter(new THREE.Vector3());
+  mesh.updateMatrixWorld(true);
+  const normalMatrix = new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld);
   const pos = src.attributes.position;
+  const uvAttr = src.attributes.uv || src.attributes.TEXCOORD_0;
   const triCount = pos.count / 3;
   const extTris = [];
   const intTris = [];
+  const cLocal = new THREE.Vector3();
+  const cWorld = new THREE.Vector3();
+  const nLocal = new THREE.Vector3();
+  const nWorld = new THREE.Vector3();
+  const toPhone = new THREE.Vector3();
 
   for (let t = 0; t < triCount; t++) {
     const i = t * 3;
-    const ax = (pos.getX(i) + pos.getX(i + 1) + pos.getX(i + 2)) / 3;
-    const ay = (pos.getY(i) + pos.getY(i + 1) + pos.getY(i + 2)) / 3;
-    const az = (pos.getZ(i) + pos.getZ(i + 1) + pos.getZ(i + 2)) / 3;
+    cLocal.set(
+      (pos.getX(i) + pos.getX(i + 1) + pos.getX(i + 2)) / 3,
+      (pos.getY(i) + pos.getY(i + 1) + pos.getY(i + 2)) / 3,
+      (pos.getZ(i) + pos.getZ(i + 1) + pos.getZ(i + 2)) / 3
+    );
+    cWorld.copy(cLocal).applyMatrix4(mesh.matrixWorld);
+
     const e1x = pos.getX(i + 1) - pos.getX(i);
     const e1y = pos.getY(i + 1) - pos.getY(i);
     const e1z = pos.getZ(i + 1) - pos.getZ(i);
     const e2x = pos.getX(i + 2) - pos.getX(i);
     const e2y = pos.getY(i + 2) - pos.getY(i);
     const e2z = pos.getZ(i + 2) - pos.getZ(i);
-    const nx = e1y * e2z - e1z * e2y;
-    const ny = e1z * e2x - e1x * e2z;
-    const nz = e1x * e2y - e1y * e2x;
-    const dot = nx * (ax - center.x) + ny * (ay - center.y) + nz * (az - center.z);
-    (dot >= 0 ? extTris : intTris).push(t);
+    nLocal.set(
+      e1y * e2z - e1z * e2y,
+      e1z * e2x - e1x * e2z,
+      e1x * e2y - e1y * e2x
+    ).normalize();
+    nWorld.copy(nLocal).applyMatrix3(normalMatrix).normalize();
+    toPhone.copy(phoneCenterWorld).sub(cWorld);
+    const towardPhone = nWorld.dot(toPhone);
+    (towardPhone > 0 ? intTris : extTris).push(t);
   }
 
   function buildFromTris(tris) {
@@ -827,18 +793,27 @@ function splitCaseByFacing(mesh) {
       }
       g.setAttribute(name, new THREE.BufferAttribute(array, itemSize));
     }
-    // Drop unused UV channels that can confuse raycast/material sampling.
-    if (g.getAttribute('uv1')) g.deleteAttribute('uv1');
-    if (g.getAttribute('uv2')) g.deleteAttribute('uv2');
+    // Keep only the primary UV set used for painting.
+    if (g.attributes.uv1) g.deleteAttribute('uv1');
+    if (g.attributes.uv2) g.deleteAttribute('uv2');
+    if (g.attributes.TEXCOORD_1) g.deleteAttribute('TEXCOORD_1');
     g.computeVertexNormals();
     g.computeBoundingBox();
     g.computeBoundingSphere();
     return g;
   }
 
+  if (!extTris.length && intTris.length) {
+    // Fallback: treat all as exterior if classification failed.
+    return {
+      exterior: buildFromTris(intTris),
+      interior: buildFromTris([])
+    };
+  }
+
   return {
     exterior: buildFromTris(extTris.length ? extTris : Array.from({ length: triCount }, (_, i) => i)),
-    interior: buildFromTris(intTris.length ? intTris : [])
+    interior: buildFromTris(intTris)
   };
 }
 
@@ -878,10 +853,25 @@ function prepareProduct(sceneRoot) {
   casePickMeshes = [];
   exteriorMat = null;
   interiorMat = null;
-  updateTexture(true);
 
-  exteriorMat = makeCaseMat(exteriorTex, exteriorColor);
-  interiorMat = makeCaseMat(interiorTex, interiorColor);
+  // Seat case onto phone BEFORE splitting so "toward phone" classification is correct.
+  seatCaseOnPhone(sceneRoot);
+  sceneRoot.updateMatrixWorld(true);
+
+  let phoneNode = null;
+  sceneRoot.traverse((o) => {
+    const n = (o.name || '').toLowerCase();
+    if (!phoneNode && (n.includes('ipohne') || n.includes('iphone')) && !n.includes('leather')) phoneNode = o;
+  });
+  const phoneCenterWorld = new THREE.Vector3();
+  if (phoneNode) {
+    new THREE.Box3().setFromObject(phoneNode).getCenter(phoneCenterWorld);
+  }
+
+  paintFace(exteriorTexCtx, 'exterior', 1);
+  paintFace(interiorTexCtx, 'interior', 1);
+  exteriorMat = makeCaseMat(ensureFaceTexture('exterior'));
+  interiorMat = makeCaseMat(ensureFaceTexture('interior'));
   exteriorMat.userData.face = 'exterior';
   interiorMat.userData.face = 'interior';
   caseMats = [exteriorMat, interiorMat];
@@ -892,7 +882,7 @@ function prepareProduct(sceneRoot) {
     if (!o.isMesh) return;
     o.castShadow = true;
     o.receiveShadow = true;
-    if (isLeatherCaseMesh(o)) {
+    if (isLeatherCaseMesh(o) && !o.name.includes('_Exterior') && !o.name.includes('_Interior')) {
       caseMeshes.push(o);
       return;
     }
@@ -907,7 +897,7 @@ function prepareProduct(sceneRoot) {
   for (const mesh of caseMeshes) {
     caseCount += 1;
     if (mesh.geometry && !mesh.geometry.getAttribute('normal')) mesh.geometry.computeVertexNormals();
-    const { exterior, interior } = splitCaseByFacing(mesh);
+    const { exterior, interior } = splitCaseByFacing(mesh, phoneCenterWorld);
     const parent = mesh.parent || sceneRoot;
 
     const exteriorMesh = new THREE.Mesh(exterior, exteriorMat);
@@ -929,19 +919,17 @@ function prepareProduct(sceneRoot) {
     interiorMesh.scale.copy(mesh.scale);
     interiorMesh.renderOrder = 1;
     interiorMat.polygonOffset = true;
-    interiorMat.polygonOffsetFactor = 1;
-    interiorMat.polygonOffsetUnits = 1;
+    interiorMat.polygonOffsetFactor = -1;
+    interiorMat.polygonOffsetUnits = -1;
 
     parent.add(exteriorMesh);
     parent.add(interiorMesh);
     casePickMeshes.push(exteriorMesh, interiorMesh);
     mesh.visible = false;
-    mesh.geometry.dispose?.();
   }
 
   if (!caseCount) throw new Error('Leather case mesh not found in product GLB');
 
-  seatCaseOnPhone(sceneRoot);
   phoneSize = fit(sceneRoot, 4.1);
   return caseCount;
 }
@@ -1006,10 +994,11 @@ function moveSelectedToUv(hit) {
   if (!l || !['image', 'text', 'pattern'].includes(l.type) || !hit?.uv) return false;
   const face = hit.object?.userData?.face === 'interior' ? 'interior' : 'exterior';
   const pt = uvToCanvas(hit.uv);
+  const prev = l.face || 'exterior';
   l.face = face;
   l.x = pt.x;
   l.y = pt.y;
-  render();
+  render(prev === face ? face : 'both');
   syncTransform(l);
   return true;
 }
@@ -1036,13 +1025,12 @@ function paintAtHit(hit) {
     selected = paintStroke.id;
   } else if (paintStroke.face === face) {
     const last = paintStroke.points[paintStroke.points.length - 1];
-    // Skip tiny gaps to keep strokes smooth without UV jumps
-    if (Math.hypot(pt.x - last.x, pt.y - last.y) < 0.5) return true;
+    if (Math.hypot(pt.x - last.x, pt.y - last.y) < 1.2) return true;
     paintStroke.points.push(pt);
   } else {
     return false;
   }
-  render();
+  render(face);
   return true;
 }
 
@@ -1115,6 +1103,16 @@ function bindViewportPointer(el) {
   el.addEventListener('pointercancel', end);
 
   el.addEventListener('wheel', (e) => {
+    const sel = layers.find((x) => x.id === selected);
+    if (orbitLocked && sel && ['image', 'text', 'pattern'].includes(sel.type)) {
+      e.preventDefault();
+      const factor = e.deltaY > 0 ? 0.92 : 1.09;
+      sel.scale = clamp((sel.scale || 1) * factor, 0.05, 6);
+      render(sel.face || 'exterior');
+      syncTransform(sel);
+      scheduleSave();
+      return;
+    }
     if (orbitLocked) return;
     e.preventDefault();
     dist = clamp(dist + e.deltaY * 0.004, 5.2, 9.5);
@@ -1205,7 +1203,6 @@ async function init3D() {
 }
 
 // boot
-buildPatterns();
 setPanel('draw');
 setCam('back');
 setOrbitLocked(false, false);
