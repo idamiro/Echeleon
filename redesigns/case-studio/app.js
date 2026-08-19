@@ -536,6 +536,7 @@ $$('.mat').forEach((b) => b.addEventListener('click', () => {
 
 $$('.seg-btn').forEach((b) => b.addEventListener('click', () => {
   tool = b.dataset.tool;
+  placingArtwork = false;
   syncUI();
   setPanel('draw');
   if (!orbitLocked) {
