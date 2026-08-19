@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./app.css?v=20260819-3donly1">
+  <link rel="stylesheet" href="./app.css?v=20260819-fix1">
   <script type="importmap">
   {
     "imports": {
@@ -30,7 +30,7 @@
     }
   }
   </script>
-  <script type="module" src="./app.js?v=20260819-3donly1"></script>
+  <script type="module" src="./app.js?v=20260819-fix1"></script>
 </head>
 <body>
   <div class="app" id="app">
@@ -208,8 +208,23 @@
         </div>
 
         <div class="props-block" id="transformBlock">
-          <h3>Paint target</h3>
-          <p class="help">Brush hits whichever face you click (exterior or interior). Lock the scene before drawing.</p>
+          <h3>Move artwork</h3>
+          <p class="help" id="transformHelp">Select a photo/text layer, Lock the scene, then drag on the case to place it. Or use the sliders.</p>
+          <div id="transformControls" hidden>
+            <label class="field">Pos X <output id="posXOut">50%</output>
+              <input id="posXRange" type="range" min="0" max="100" value="50">
+            </label>
+            <label class="field">Pos Y <output id="posYOut">55%</output>
+              <input id="posYRange" type="range" min="0" max="100" value="55">
+            </label>
+            <label class="field">Scale <output id="scaleOut">100%</output>
+              <input id="scaleRange" type="range" min="10" max="400" value="100">
+            </label>
+            <label class="field">Rotation <output id="rotOut">0°</output>
+              <input id="rotRange" type="range" min="-180" max="180" value="0">
+            </label>
+            <button type="button" class="full-btn" id="placeOnCaseBtn">Place by clicking case</button>
+          </div>
         </div>
 
         <div class="props-block">
