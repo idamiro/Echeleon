@@ -18,8 +18,6 @@ const lockBtn = $('#lockOrbit');
 
 let exteriorColor = '#1a1a1c';
 let interiorColor = '#1a1a1c';
-let material = 'soft';
-let gloss = 0.2;
 let tool = 'brush';
 let brushColor = '#f4f1ea';
 let brushSize = 28;
@@ -55,8 +53,6 @@ function serial() {
   return {
     exteriorColor,
     interiorColor,
-    material,
-    gloss,
     title: $('#caseTitle').value,
     layers: layers.map((l) => {
       const o = { ...l };
@@ -106,8 +102,6 @@ async function loadImages(list) {
 async function restore(data, announce = true) {
   exteriorColor = data.exteriorColor || data.caseColor || '#1a1a1c';
   interiorColor = data.interiorColor || data.caseColor || '#1a1a1c';
-  material = data.material || 'soft';
-  gloss = data.gloss ?? 0.2;
   if (data.title) $('#caseTitle').value = data.title;
   layers = (data.layers || []).map((l) => ({
     ...l,
@@ -385,16 +379,10 @@ function syncTransform(l) {
 function syncUI() {
   $$('#exteriorSwatches .swatch').forEach((b) => b.classList.toggle('is-on', b.dataset.color === exteriorColor));
   $$('#interiorSwatches .swatch').forEach((b) => b.classList.toggle('is-on', b.dataset.color === interiorColor));
-  $$('.mat').forEach((b) => b.classList.toggle('is-on', b.dataset.mat === material));
   $$('.seg-btn').forEach((b) => b.classList.toggle('is-on', b.dataset.tool === tool));
   if ($('#brushSize')) $('#brushSize').value = brushSize;
   if ($('#brushSizeOut')) $('#brushSizeOut').textContent = String(brushSize);
   if ($('#brushColor')) $('#brushColor').value = brushColor;
-  if ($('#gloss')) $('#gloss').value = Math.round(gloss * 100);
-  if ($('#glossOut')) $('#glossOut').textContent = `${Math.round(gloss * 100)}%`;
-  if ($('#finishSelect')) {
-    $('#finishSelect').value = material === 'gloss' ? 'gloss' : material === 'matte' ? 'matte' : 'soft';
-  }
   setOrbitLocked(orbitLocked, false);
 }
 
@@ -581,16 +569,6 @@ $$('#exteriorSwatches .swatch, #interiorSwatches .swatch').forEach((b) => b.addE
   applyCaseTo3D();
 }));
 
-$$('.mat').forEach((b) => b.addEventListener('click', () => {
-  material = b.dataset.mat;
-  if (material === 'gloss') gloss = 0.85;
-  if (material === 'matte') gloss = 0.12;
-  if (material === 'soft' || material === 'grain') gloss = 0.22;
-  syncUI();
-  snapshot();
-  applyCaseTo3D();
-}));
-
 $$('.seg-btn').forEach((b) => b.addEventListener('click', () => {
   tool = b.dataset.tool;
   placingArtwork = false;
@@ -606,17 +584,6 @@ $('#brushColor').oninput = (e) => { brushColor = e.target.value; };
 $('#brushSize').oninput = (e) => {
   brushSize = +e.target.value;
   $('#brushSizeOut').textContent = String(brushSize);
-};
-$('#gloss').oninput = (e) => {
-  gloss = +e.target.value / 100;
-  $('#glossOut').textContent = `${e.target.value}%`;
-  applyCaseTo3D();
-};
-$('#finishSelect').onchange = (e) => {
-  material = e.target.value === 'gloss' ? 'gloss' : e.target.value === 'matte' ? 'matte' : 'soft';
-  syncUI();
-  applyCaseTo3D();
-  snapshot();
 };
 $('#caseTitle').oninput = () => scheduleSave();
 
@@ -790,22 +757,19 @@ function ensureFaceTexture(face) {
 
 function applyCaseTo3D() {
   if (!exteriorMat && !interiorMat) return;
-  const g = material === 'gloss' ? Math.max(gloss, 0.7) : gloss;
-  const roughness = clamp(1 - g, 0.08, 0.85);
-  const clearcoat = material === 'gloss' ? 1 : material === 'soft' ? 0.35 : 0.15;
-  const clearcoatRoughness = material === 'gloss' ? 0.08 : 0.4;
+  // Fixed soft-case finish (Material / Finish UI removed).
   if (exteriorMat) {
     exteriorMat.color.set(0xffffff);
-    exteriorMat.roughness = roughness;
-    exteriorMat.clearcoat = clearcoat;
-    exteriorMat.clearcoatRoughness = clearcoatRoughness;
+    exteriorMat.roughness = 0.55;
+    exteriorMat.clearcoat = 0.28;
+    exteriorMat.clearcoatRoughness = 0.42;
     exteriorMat.needsUpdate = true;
   }
   if (interiorMat) {
     interiorMat.color.set(0xffffff);
-    interiorMat.roughness = Math.min(0.95, roughness + 0.15);
-    interiorMat.clearcoat = clearcoat * 0.35;
-    interiorMat.clearcoatRoughness = Math.min(1, clearcoatRoughness + 0.25);
+    interiorMat.roughness = 0.72;
+    interiorMat.clearcoat = 0.1;
+    interiorMat.clearcoatRoughness = 0.55;
     interiorMat.needsUpdate = true;
   }
   // Colour lives in the baked canvases — refresh both faces.
@@ -849,22 +813,44 @@ function loadGltf(loader, url) {
 }
 
 function splitCaseByFacing(mesh, phoneCenterWorld) {
-  // Interior = faces whose geometric normal points toward the phone.
-  // This keeps exterior/interior colours from bleeding across the shell.
+  // Exterior = outer back + outer side walls only.
+  // Interior = cavity floor + inner side walls only.
+  // Never assign the same shell face to both; no colour bleed across the wall.
   const src = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
   mesh.updateMatrixWorld(true);
   const normalMatrix = new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld);
   const pos = src.attributes.position;
-  const uvAttr = src.attributes.uv || src.attributes.TEXCOORD_0;
   const triCount = pos.count / 3;
-  const extTris = [];
-  const intTris = [];
+
+  // Reference point must sit inside the cavity (not outside / on the shell).
+  const caseBox = new THREE.Box3().setFromObject(mesh);
+  const caseCenter = caseBox.getCenter(new THREE.Vector3());
+  const inside = phoneCenterWorld.clone();
+  if (caseBox.isEmpty()) {
+    inside.copy(caseCenter);
+  } else {
+    const pad = caseBox.getSize(new THREE.Vector3()).multiplyScalar(0.08);
+    const lo = caseBox.min.clone().add(pad);
+    const hi = caseBox.max.clone().sub(pad);
+    inside.clamp(lo, hi);
+    // Bias toward case center so outer rims do not flip classification.
+    inside.lerp(caseCenter, 0.35);
+  }
+
   const cLocal = new THREE.Vector3();
   const cWorld = new THREE.Vector3();
   const nLocal = new THREE.Vector3();
   const nWorld = new THREE.Vector3();
-  const toPhone = new THREE.Vector3();
+  const toInside = new THREE.Vector3();
+  const fromCenterXY = new THREE.Vector3();
 
+  // Dominant thin axis of the phone/case (depth) — used to separate back vs sides.
+  const size = caseBox.getSize(new THREE.Vector3());
+  let depthAxis = 2; // z
+  if (size.x <= size.y && size.x <= size.z) depthAxis = 0;
+  else if (size.y <= size.x && size.y <= size.z) depthAxis = 1;
+
+  const metrics = [];
   for (let t = 0; t < triCount; t++) {
     const i = t * 3;
     cLocal.set(
@@ -884,12 +870,82 @@ function splitCaseByFacing(mesh, phoneCenterWorld) {
       e1y * e2z - e1z * e2y,
       e1z * e2x - e1x * e2z,
       e1x * e2y - e1y * e2x
-    ).normalize();
+    );
+    if (nLocal.lengthSq() < 1e-20) {
+      metrics.push({ t, toward: 0, dist: cWorld.distanceTo(inside), radialOut: 0 });
+      continue;
+    }
+    nLocal.normalize();
     nWorld.copy(nLocal).applyMatrix3(normalMatrix).normalize();
-    toPhone.copy(phoneCenterWorld).sub(cWorld);
-    const towardPhone = nWorld.dot(toPhone);
-    (towardPhone > 0 ? intTris : extTris).push(t);
+
+    toInside.copy(inside).sub(cWorld);
+    const dist = toInside.length();
+    if (dist > 1e-8) toInside.multiplyScalar(1 / dist);
+    const toward = nWorld.dot(toInside);
+
+    // Radial outward in the plane perpendicular to depth: outer walls > 0, inner walls < 0.
+    fromCenterXY.copy(cWorld).sub(inside);
+    if (depthAxis === 0) fromCenterXY.x = 0;
+    else if (depthAxis === 1) fromCenterXY.y = 0;
+    else fromCenterXY.z = 0;
+    const nRad = nWorld.clone();
+    if (depthAxis === 0) nRad.x = 0;
+    else if (depthAxis === 1) nRad.y = 0;
+    else nRad.z = 0;
+    const radialOut = fromCenterXY.lengthSq() > 1e-12 && nRad.lengthSq() > 1e-12
+      ? fromCenterXY.normalize().dot(nRad.normalize())
+      : 0;
+
+    metrics.push({ t, toward, dist, radialOut });
   }
+
+  // Clear labels: must face cavity (= interior) or face away (= exterior).
+  // Side walls use radial sign so outer/inner skins never share a colour.
+  const CLEAR = 0.15;
+  const clearInt = [];
+  const clearExt = [];
+  const amb = [];
+  for (const m of metrics) {
+    const wallLike = Math.abs(m.radialOut) > 0.35 && Math.abs(m.toward) < 0.55;
+    if (wallLike) {
+      if (m.radialOut < 0) clearInt.push(m);
+      else clearExt.push(m);
+      continue;
+    }
+    if (m.toward > CLEAR) clearInt.push(m);
+    else if (m.toward < -CLEAR) clearExt.push(m);
+    else amb.push(m);
+  }
+
+  const meanDist = (arr) => {
+    if (!arr.length) return 0;
+    return arr.reduce((s, x) => s + x.dist, 0) / arr.length;
+  };
+  let intMean = meanDist(clearInt);
+  let extMean = meanDist(clearExt);
+  if (!clearInt.length && clearExt.length) intMean = extMean * 0.85;
+  if (!clearExt.length && clearInt.length) extMean = intMean * 1.15;
+  const midDist = (intMean + extMean) * 0.5 || meanDist(metrics);
+
+  for (const m of amb) {
+    // Rim / bevel: closer to cavity centre → interior, farther → exterior.
+    if (m.dist < midDist) clearInt.push(m);
+    else clearExt.push(m);
+  }
+
+  // Sanity: interior shell must be closer to cavity than exterior on average.
+  // If inverted (winding / phone offset wrong), swap once.
+  intMean = meanDist(clearInt);
+  extMean = meanDist(clearExt);
+  let intList = clearInt;
+  let extList = clearExt;
+  if (intList.length && extList.length && intMean > extMean * 1.02) {
+    intList = clearExt;
+    extList = clearInt;
+  }
+
+  const extTris = extList.map((m) => m.t);
+  const intTris = intList.map((m) => m.t);
 
   function buildFromTris(tris) {
     const g = new THREE.BufferGeometry();
@@ -908,7 +964,6 @@ function splitCaseByFacing(mesh, phoneCenterWorld) {
       }
       g.setAttribute(name, new THREE.BufferAttribute(array, itemSize));
     }
-    // Keep only the primary UV set used for painting.
     if (g.attributes.uv1) g.deleteAttribute('uv1');
     if (g.attributes.uv2) g.deleteAttribute('uv2');
     if (g.attributes.TEXCOORD_1) g.deleteAttribute('TEXCOORD_1');
@@ -919,7 +974,6 @@ function splitCaseByFacing(mesh, phoneCenterWorld) {
   }
 
   if (!extTris.length && intTris.length) {
-    // Fallback: treat all as exterior if classification failed.
     return {
       exterior: buildFromTris(intTris),
       interior: buildFromTris([])
