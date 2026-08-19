@@ -197,7 +197,7 @@ function roundRect(c, x, y, w, h, r) {
   c.roundRect(x, y, w, h, r);
 }
 
-function paintFace(target, face, scale = 1) {
+function paintFace(target, face, scale = 1, excludeId = null) {
   const aw = W * scale;
   const ah = H * scale;
   if (artOff.width !== aw || artOff.height !== ah) {
@@ -206,10 +206,10 @@ function paintFace(target, face, scale = 1) {
   }
   const a = artOff.getContext('2d', { alpha: true });
   a.clearRect(0, 0, aw, ah);
-  layers.filter((l) => (l.face || 'exterior') === face).forEach((l) => drawLayer(a, l, scale));
+  layers
+    .filter((l) => (l.face || 'exterior') === face && l.id !== excludeId)
+    .forEach((l) => drawLayer(a, l, scale));
 
-  // Bake face colour into the texture (material.color stays white) so photos
-  // stay full-opacity and interior/exterior colours cannot tint each other.
   target.clearRect(0, 0, aw, ah);
   target.fillStyle = faceColor(face);
   target.fillRect(0, 0, aw, ah);
@@ -218,8 +218,19 @@ function paintFace(target, face, scale = 1) {
 
 let paintRaf = 0;
 let dirtyFaces = { exterior: false, interior: false };
+const liveBase = document.createElement('canvas');
+liveBase.width = W;
+liveBase.height = H;
+const liveBaseCtx = liveBase.getContext('2d', { alpha: false });
+let liveMode = null; // null | 'stroke' | 'move'
+let liveFace = 'exterior';
+let liveExcludeId = null;
+let pendingPtr = null;
+let interactRaf = 0;
+let wheelLiveTimer = 0;
 
 function schedulePaint(face) {
+  if (liveMode) return; // live path owns the canvas until gesture ends
   if (face === 'exterior' || face === 'both') dirtyFaces.exterior = true;
   if (face === 'interior' || face === 'both') dirtyFaces.interior = true;
   if (paintRaf) return;
@@ -230,7 +241,6 @@ function schedulePaint(face) {
 }
 
 function flushPaint() {
-  // Always bake canvases (even before WebGL is ready).
   if (dirtyFaces.exterior) {
     paintFace(exteriorTexCtx, 'exterior', 1);
     if (exteriorTex) exteriorTex.needsUpdate = true;
@@ -244,6 +254,76 @@ function flushPaint() {
 
 function render(face = 'both') {
   schedulePaint(face);
+}
+
+function faceTexCtx(face) {
+  return face === 'interior' ? interiorTexCtx : exteriorTexCtx;
+}
+function faceTex(face) {
+  return face === 'interior' ? interiorTex : exteriorTex;
+}
+function markFaceTex(face) {
+  const tex = faceTex(face);
+  if (tex) tex.needsUpdate = true;
+}
+
+function beginLiveStroke(face, strokeId) {
+  liveMode = 'stroke';
+  liveFace = face;
+  liveExcludeId = strokeId;
+  paintFace(liveBaseCtx, face, 1, strokeId);
+  const ctx = faceTexCtx(face);
+  ctx.drawImage(liveBase, 0, 0);
+  markFaceTex(face);
+}
+
+function drawStrokeDab(stroke, from, to) {
+  const ctx = faceTexCtx(stroke.face);
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = stroke.size;
+  if (stroke.erase) {
+    // Fast eraser: paint face colour over artwork (good enough while dragging)
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = faceColor(stroke.face);
+  } else {
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = stroke.color;
+  }
+  ctx.beginPath();
+  ctx.moveTo(from.x, from.y);
+  ctx.lineTo(to.x, to.y);
+  ctx.stroke();
+  ctx.restore();
+  markFaceTex(stroke.face);
+}
+
+function beginLiveMove(face, layerId) {
+  liveMode = 'move';
+  liveFace = face;
+  liveExcludeId = layerId;
+  paintFace(liveBaseCtx, face, 1, layerId);
+  const ctx = faceTexCtx(face);
+  ctx.drawImage(liveBase, 0, 0);
+  markFaceTex(face);
+}
+
+function liveMoveTick(layer) {
+  const face = layer.face || 'exterior';
+  if (face !== liveFace) beginLiveMove(face, layer.id);
+  const ctx = faceTexCtx(face);
+  ctx.drawImage(liveBase, 0, 0);
+  drawLayer(ctx, layer, 1);
+  markFaceTex(face);
+}
+
+function endLive() {
+  const face = liveFace;
+  liveMode = null;
+  liveExcludeId = null;
+  dirtyFaces[face] = true;
+  flushPaint();
 }
 
 function renderLayers() {
@@ -697,8 +777,8 @@ function ensureFaceTexture(face) {
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.flipY = true;
     tex.anisotropy = Math.min(8, renderer?.capabilities.getMaxAnisotropy?.() || 1);
-    tex.generateMipmaps = true;
-    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    tex.generateMipmaps = false;
+    tex.minFilter = THREE.LinearFilter;
     tex.magFilter = THREE.LinearFilter;
     if (isIn) interiorTex = tex;
     else exteriorTex = tex;
@@ -1029,12 +1109,11 @@ function moveSelectedToUv(hit) {
   if (!l || !['image', 'text', 'pattern'].includes(l.type) || !hit?.uv) return false;
   const face = hit.object?.userData?.face === 'interior' ? 'interior' : 'exterior';
   const pt = uvToCanvas(hit.uv);
-  const prev = l.face || 'exterior';
+  if (liveMode !== 'move') beginLiveMove(face, l.id);
   l.face = face;
   l.x = pt.x;
   l.y = pt.y;
-  render(prev === face ? face : 'both');
-  syncTransform(l);
+  liveMoveTick(l);
   return true;
 }
 
@@ -1058,15 +1137,34 @@ function paintAtHit(hit) {
     };
     layers.push(paintStroke);
     selected = paintStroke.id;
-  } else if (paintStroke.face === face) {
-    const last = paintStroke.points[paintStroke.points.length - 1];
-    if (Math.hypot(pt.x - last.x, pt.y - last.y) < 1.2) return true;
-    paintStroke.points.push(pt);
-  } else {
-    return false;
+    beginLiveStroke(face, paintStroke.id);
+    drawStrokeDab(paintStroke, pt, { x: pt.x + 0.01, y: pt.y });
+    return true;
   }
-  render(face);
+  if (paintStroke.face !== face) return false;
+  const last = paintStroke.points[paintStroke.points.length - 1];
+  if (Math.hypot(pt.x - last.x, pt.y - last.y) < 0.8) return true;
+  paintStroke.points.push(pt);
+  drawStrokeDab(paintStroke, last, pt);
   return true;
+}
+
+function queuePointer(e, kind) {
+  pendingPtr = { x: e.clientX, y: e.clientY, kind };
+  if (interactRaf) return;
+  interactRaf = requestAnimationFrame(() => {
+    interactRaf = 0;
+    const p = pendingPtr;
+    pendingPtr = null;
+    if (!p) return;
+    if (p.kind === 'paint' && painting) {
+      const hit = hitCase(p.x, p.y);
+      if (hit) paintAtHit(hit);
+    } else if (p.kind === 'move' && draggingArtwork) {
+      const hit = hitCase(p.x, p.y);
+      if (hit) moveSelectedToUv(hit);
+    }
+  });
 }
 
 function bindViewportPointer(el) {
@@ -1089,7 +1187,6 @@ function bindViewportPointer(el) {
       if (tool === 'brush' || tool === 'eraser') {
         if (hit) {
           paintAtHit(hit);
-          renderLayers();
           return;
         }
         say('Aim at the leather case to draw');
@@ -1102,13 +1199,11 @@ function bindViewportPointer(el) {
 
   el.addEventListener('pointermove', (e) => {
     if (orbitLocked && draggingArtwork) {
-      const hit = hitCase(e.clientX, e.clientY);
-      if (hit) moveSelectedToUv(hit);
+      queuePointer(e, 'move');
       return;
     }
     if (painting && orbitLocked) {
-      const hit = hitCase(e.clientX, e.clientY);
-      if (hit) paintAtHit(hit);
+      queuePointer(e, 'paint');
       return;
     }
     if (!dragging3d || orbitLocked) return;
@@ -1121,18 +1216,23 @@ function bindViewportPointer(el) {
     if (painting) {
       painting = false;
       paintStroke = null;
+      endLive();
       snapshot();
       renderLayers();
       say('Stroke saved on case');
     }
     if (draggingArtwork) {
+      const l = layers.find((x) => x.id === selected);
       draggingArtwork = false;
       placingArtwork = false;
+      endLive();
+      if (l) syncTransform(l);
       snapshot();
       renderLayers();
       say('Artwork moved on case');
     }
     dragging3d = null;
+    pendingPtr = null;
   };
   el.addEventListener('pointerup', end);
   el.addEventListener('pointercancel', end);
@@ -1143,9 +1243,16 @@ function bindViewportPointer(el) {
       e.preventDefault();
       const factor = e.deltaY > 0 ? 0.92 : 1.09;
       sel.scale = clamp((sel.scale || 1) * factor, 0.05, 6);
-      render(sel.face || 'exterior');
+      if (liveMode !== 'move') beginLiveMove(sel.face || 'exterior', sel.id);
+      liveMoveTick(sel);
       syncTransform(sel);
-      scheduleSave();
+      clearTimeout(wheelLiveTimer);
+      wheelLiveTimer = setTimeout(() => {
+        if (liveMode === 'move' && !draggingArtwork) {
+          endLive();
+          snapshot();
+        }
+      }, 200);
       return;
     }
     if (orbitLocked) return;
