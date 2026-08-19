@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const W = 1170;
 const H = 2532;
-const STORE = 'vulcet-case-studio-v4';
+const STORE = 'vulcet-case-studio-v5';
 
 const $ = (s, p = document) => p.querySelector(s);
 const $$ = (s, p = document) => [...p.querySelectorAll(s)];
@@ -11,34 +11,25 @@ const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 const uid = () => Math.random().toString(36).slice(2, 9);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-const board = $('#case2d');
-const exteriorCanvas = $('#artExterior');
-const interiorCanvas = $('#artInterior');
-const exteriorCtx = exteriorCanvas.getContext('2d', { alpha: false });
-const interiorCtx = interiorCanvas.getContext('2d', { alpha: false });
 const statusEl = $('#status');
-const stage = $('#stage');
 const savePill = $('#savePill');
+const previewHost = $('#previewHost');
+const lockBtn = $('#lockOrbit');
 
 let exteriorColor = '#1a1a1c';
 let interiorColor = '#1a1a1c';
-let activeFace = 'exterior'; // exterior | interior
 let material = 'soft';
 let gloss = 0.2;
 let tool = 'brush';
-let brushColor = '#111111';
-let brushSize = 16;
-let mode = 'preview'; // design | preview
+let brushColor = '#f4f1ea';
+let brushSize = 28;
 let layers = [];
 let selected = null;
-let drawing = false;
-let dragging = false;
-let xform = null; // { type: 'scale'|'rotate', ... }
-let last = null;
 let history = [];
 let future = [];
 let dirtyTex = true;
 let saveTimer = 0;
+let orbitLocked = false;
 
 const artOff = document.createElement('canvas');
 const exteriorTexOff = document.createElement('canvas');
@@ -48,27 +39,12 @@ artOff.height = exteriorTexOff.height = interiorTexOff.height = H;
 const exteriorTexCtx = exteriorTexOff.getContext('2d', { alpha: false });
 const interiorTexCtx = interiorTexOff.getContext('2d', { alpha: false });
 
-function faceCanvas(face = activeFace) {
-  return face === 'interior' ? interiorCanvas : exteriorCanvas;
-}
-function faceCtx(face = activeFace) {
-  return face === 'interior' ? interiorCtx : exteriorCtx;
-}
-function faceColor(face = activeFace) {
+function faceColor(face) {
   return face === 'interior' ? interiorColor : exteriorColor;
-}
-function setActiveFace(face) {
-  activeFace = face === 'interior' ? 'interior' : 'exterior';
-  board?.setAttribute('data-face', activeFace);
-  $$('.case-face').forEach((el) => {
-    const on = el.dataset.face === activeFace;
-    el.classList.toggle('is-active', on);
-    el.setAttribute('aria-pressed', on ? 'true' : 'false');
-  });
 }
 
 function say(msg) {
-  statusEl.textContent = msg;
+  if (statusEl) statusEl.textContent = msg;
 }
 function markSaved(ok = true) {
   savePill.textContent = ok ? 'Saved' : 'Saving…';
@@ -113,8 +89,10 @@ function scheduleSave() {
 }
 
 function updateUndo() {
-  $('[data-act=undo]').disabled = history.length < 2;
-  $('[data-act=redo]').disabled = !future.length;
+  const u = $('[data-act=undo]');
+  const r = $('[data-act=redo]');
+  if (u) u.disabled = history.length < 2;
+  if (r) r.disabled = !future.length;
 }
 
 async function loadImages(list) {
@@ -186,7 +164,7 @@ function drawLayer(c, l, s = 1) {
     c.translate(l.x * s, l.y * s);
     c.rotate(l.rotation || 0);
     c.scale(l.scale * s, l.scale * s);
-    c.fillStyle = l.color || '#111';
+    c.fillStyle = l.color || '#f4f1ea';
     c.font = `700 ${l.fontSize || 120}px Inter, sans-serif`;
     c.textAlign = 'center';
     c.textBaseline = 'middle';
@@ -195,8 +173,7 @@ function drawLayer(c, l, s = 1) {
       c.fillText(line, 0, (i - (arr.length - 1) / 2) * lh);
     });
   } else if (l.type === 'pattern') {
-    c.fillStyle = l.color || '#111';
-    // simple wave pattern fill clipped later by case
+    c.fillStyle = l.color || '#f4f1ea';
     const step = l.step || 90;
     c.translate(l.x * s, l.y * s);
     c.rotate(l.rotation || 0);
@@ -214,6 +191,11 @@ function drawLayer(c, l, s = 1) {
     c.fill();
   }
   c.restore();
+}
+
+function roundRect(c, x, y, w, h, r) {
+  c.beginPath();
+  c.roundRect(x, y, w, h, r);
 }
 
 function paintFace(target, face, scale = 1) {
@@ -237,265 +219,18 @@ function paintFace(target, face, scale = 1) {
   target.clip();
   target.drawImage(artOff, 0, 0);
   target.restore();
-  // Camera hole is CSS-only on the exterior 2D face.
-  // Do NOT punch alpha into the 3D texture — that caused black blotches on the leather UVs.
   dirtyTex = true;
 }
 
-function paintCase(target, scale = 1) {
-  // Back-compat helper: paint the active face (used by export of a single side).
-  paintFace(target, activeFace, scale);
-}
-
-function roundRect(c, x, y, w, h, r) {
-  c.beginPath();
-  c.roundRect(x, y, w, h, r);
-}
-
-function layerSize(l) {
-  if (l.type === 'text') measureText(faceCtx(l.face || activeFace), l);
-  if (l.type === 'pattern') return { w: (l.w || 900) * (l.scale || 1), h: (l.h || 900) * (l.scale || 1) };
-  return { w: (l.w || 100) * (l.scale || 1), h: (l.h || 100) * (l.scale || 1) };
-}
-
-function toLocal(p, l) {
-  const dx = p.x - l.x;
-  const dy = p.y - l.y;
-  const co = Math.cos(-(l.rotation || 0));
-  const si = Math.sin(-(l.rotation || 0));
-  return { x: dx * co - dy * si, y: dx * si + dy * co };
-}
-
-function hitRadius() {
-  const r = faceCanvas().getBoundingClientRect();
-  return Math.max(40, (16 * W) / Math.max(1, r.width));
-}
-
-function handles(l) {
-  const { w, h } = layerSize(l);
-  return {
-    w,
-    h,
-    corners: [
-      { id: 'nw', x: -w / 2, y: -h / 2, cursor: 'nwse-resize' },
-      { id: 'ne', x: w / 2, y: -h / 2, cursor: 'nesw-resize' },
-      { id: 'se', x: w / 2, y: h / 2, cursor: 'nwse-resize' },
-      { id: 'sw', x: -w / 2, y: h / 2, cursor: 'nesw-resize' }
-    ],
-    rotate: { id: 'rotate', x: 0, y: -h / 2 - 70, cursor: 'grab' }
-  };
-}
-
-function hitHandle(p, l) {
-  if (!['image', 'text', 'pattern'].includes(l.type) || l.visible === false) return null;
-  const local = toLocal(p, l);
-  const { corners, rotate } = handles(l);
-  const r = hitRadius();
-  for (const c of corners) if (Math.hypot(local.x - c.x, local.y - c.y) <= r) return c;
-  if (Math.hypot(local.x - rotate.x, local.y - rotate.y) <= r) return rotate;
-  return null;
-}
-
-function hitObject(p, l) {
-  if (!['image', 'text', 'pattern'].includes(l.type) || l.visible === false) return false;
-  const local = toLocal(p, l);
-  const { w, h } = layerSize(l);
-  return Math.abs(local.x) <= w / 2 && Math.abs(local.y) <= h / 2;
-}
-
-function drawSelection(face) {
-  const l = layers.find((x) => x.id === selected);
-  if (!l || (l.face || 'exterior') !== face) return;
-  if (!['image', 'text', 'pattern'].includes(l.type) || l.visible === false) return;
-  const c = faceCtx(face);
-  const { w, h, corners, rotate } = handles(l);
-  c.save();
-  c.translate(l.x, l.y);
-  c.rotate(l.rotation || 0);
-  c.strokeStyle = '#2f6bff';
-  c.lineWidth = 4;
-  c.beginPath();
-  c.moveTo(0, -h / 2);
-  c.lineTo(rotate.x, rotate.y);
-  c.stroke();
-  c.setLineDash([12, 8]);
-  c.strokeRect(-w / 2, -h / 2, w, h);
-  c.setLineDash([]);
-  corners.forEach((corner) => {
-    c.fillStyle = '#fff';
-    c.strokeStyle = '#2f6bff';
-    c.lineWidth = 3;
-    c.fillRect(corner.x - 12, corner.y - 12, 24, 24);
-    c.strokeRect(corner.x - 12, corner.y - 12, 24, 24);
-  });
-  c.beginPath();
-  c.arc(rotate.x, rotate.y, 12, 0, Math.PI * 2);
-  c.fillStyle = '#2f6bff';
-  c.fill();
-  c.strokeStyle = '#fff';
-  c.lineWidth = 3;
-  c.stroke();
-  c.restore();
-}
-
 function render() {
-  paintFace(exteriorCtx, 'exterior', 1);
-  paintFace(interiorCtx, 'interior', 1);
-  drawSelection('exterior');
-  drawSelection('interior');
+  paintFace(exteriorTexCtx, 'exterior', 1);
+  paintFace(interiorTexCtx, 'interior', 1);
   updateTexture();
 }
 
-function point(e, face = activeFace) {
-  const r = faceCanvas(face).getBoundingClientRect();
-  return {
-    x: ((e.clientX - r.left) * W) / r.width,
-    y: ((e.clientY - r.top) * H) / r.height
-  };
-}
-
-function onPointerDown(e, face) {
-  if (mode !== 'design') return;
-  setActiveFace(face);
-  const canvasEl = faceCanvas(face);
-  canvasEl.setPointerCapture(e.pointerId);
-  const p = point(e, face);
-  const cur = layers.find((x) => x.id === selected && (x.face || 'exterior') === face);
-
-  if (cur && ['image', 'text', 'pattern'].includes(cur.type)) {
-    const h = hitHandle(p, cur);
-    if (h) {
-      xform = {
-        type: h.id === 'rotate' ? 'rotate' : 'scale',
-        scale: cur.scale || 1,
-        rotation: cur.rotation || 0,
-        angle: Math.atan2(p.y - cur.y, p.x - cur.x),
-        local: toLocal(p, cur)
-      };
-      last = p;
-      render();
-      return;
-    }
-  }
-
-  const hit = [...layers].reverse().find((l) => (l.face || 'exterior') === face && hitObject(p, l));
-  if (hit) {
-    selected = hit.id;
-    dragging = true;
-    last = p;
-    tool = 'select';
-    syncUI();
-    render();
-    renderLayers();
-    say('Drag to move · corners to resize · top handle to rotate.');
-    return;
-  }
-
-  if (tool === 'brush' || tool === 'eraser') {
-    selected = null;
-    drawing = true;
-    const stroke = {
-      id: uid(),
-      type: 'stroke',
-      face,
-      name: tool === 'eraser' ? 'Eraser' : 'Brush',
-      color: brushColor,
-      size: brushSize,
-      erase: tool === 'eraser',
-      visible: true,
-      opacity: 1,
-      points: [p]
-    };
-    layers.push(stroke);
-    selected = stroke.id;
-    render();
-    renderLayers();
-    return;
-  }
-
-  selected = null;
-  render();
-  renderLayers();
-}
-
-function onPointerMove(e) {
-  if (mode !== 'design') return;
-  const p = point(e, activeFace);
-  if (drawing) {
-    layers[layers.length - 1].points.push(p);
-    render();
-    return;
-  }
-  const l = layers.find((x) => x.id === selected);
-  if (!l || (l.face || 'exterior') !== activeFace) return;
-
-  if (xform?.type === 'scale') {
-    const local = toLocal(p, l);
-    const start = Math.hypot(xform.local.x, xform.local.y) || 1;
-    const now = Math.hypot(local.x, local.y) || 1;
-    l.scale = clamp(xform.scale * (now / start), 0.08, 6);
-    render();
-    syncTransform(l);
-    return;
-  }
-  if (xform?.type === 'rotate') {
-    const ang = Math.atan2(p.y - l.y, p.x - l.x);
-    l.rotation = xform.rotation + (ang - xform.angle);
-    render();
-    syncTransform(l);
-    return;
-  }
-  if (dragging) {
-    l.x += p.x - last.x;
-    l.y += p.y - last.y;
-    last = p;
-    render();
-  }
-}
-
-const endPointer = () => {
-  if (drawing || dragging || xform) {
-    drawing = false;
-    dragging = false;
-    xform = null;
-    last = null;
-    snapshot();
-    renderLayers();
-  }
-};
-
-exteriorCanvas.addEventListener('pointerdown', (e) => onPointerDown(e, 'exterior'));
-interiorCanvas.addEventListener('pointerdown', (e) => onPointerDown(e, 'interior'));
-exteriorCanvas.addEventListener('pointermove', onPointerMove);
-interiorCanvas.addEventListener('pointermove', onPointerMove);
-exteriorCanvas.addEventListener('pointerup', endPointer);
-interiorCanvas.addEventListener('pointerup', endPointer);
-exteriorCanvas.addEventListener('pointercancel', endPointer);
-interiorCanvas.addEventListener('pointercancel', endPointer);
-
-function onWheel(e, face) {
-  if (mode !== 'design') return;
-  setActiveFace(face);
-  const l = layers.find((x) => x.id === selected && (x.face || 'exterior') === face);
-  if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
-  e.preventDefault();
-  l.scale = clamp((l.scale || 1) * (e.deltaY > 0 ? 0.94 : 1.06), 0.08, 6);
-  render();
-  syncTransform(l);
-  scheduleSave();
-}
-exteriorCanvas.addEventListener('wheel', (e) => onWheel(e, 'exterior'), { passive: false });
-interiorCanvas.addEventListener('wheel', (e) => onWheel(e, 'interior'), { passive: false });
-
-$$('.case-face').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    setActiveFace(btn.dataset.face);
-    if (mode !== 'design') setMode('design');
-  });
-});
-
 function renderLayers() {
   const html = (list) => {
+    if (!list) return;
     list.innerHTML = '';
     [...layers].reverse().forEach((l, i) => {
       const li = document.createElement('li');
@@ -506,32 +241,13 @@ function renderLayers() {
       li.innerHTML = `<span class="thumb">${thumb}</span><span><strong>${esc(l.name || 'Layer')}</strong><small>${faceTag} · ${l.type} · ${layers.length - i}</small></span>`;
       li.onclick = () => {
         selected = l.id;
-        setActiveFace(l.face || 'exterior');
-        render();
         renderLayers();
-        syncTransform(l);
       };
       list.appendChild(li);
     });
   };
   html($('#layerList'));
   html($('#layerListSide'));
-  const l = layers.find((x) => x.id === selected);
-  if (l && ['image', 'text', 'pattern'].includes(l.type)) syncTransform(l);
-  else {
-    $('#transformHelp').hidden = false;
-    $('#transformControls').hidden = true;
-  }
-}
-
-function syncTransform(l) {
-  $('#transformHelp').hidden = true;
-  $('#transformControls').hidden = false;
-  $('#scaleRange').value = Math.round((l.scale || 1) * 100);
-  $('#scaleOut').textContent = `${Math.round((l.scale || 1) * 100)}%`;
-  const deg = Math.round(((l.rotation || 0) * 180) / Math.PI);
-  $('#rotRange').value = deg;
-  $('#rotOut').textContent = `${deg}°`;
 }
 
 function syncUI() {
@@ -539,33 +255,37 @@ function syncUI() {
   $$('#interiorSwatches .swatch').forEach((b) => b.classList.toggle('is-on', b.dataset.color === interiorColor));
   $$('.mat').forEach((b) => b.classList.toggle('is-on', b.dataset.mat === material));
   $$('.seg-btn').forEach((b) => b.classList.toggle('is-on', b.dataset.tool === tool));
-  $('#brushSize').value = brushSize;
-  $('#brushSizeOut').textContent = String(brushSize);
-  $('#gloss').value = Math.round(gloss * 100);
-  $('#glossOut').textContent = `${Math.round(gloss * 100)}%`;
-  $('#finishSelect').value = material === 'gloss' ? 'gloss' : material === 'matte' ? 'matte' : 'soft';
-  setActiveFace(activeFace);
-}
-
-function setMode(next) {
-  mode = next;
-  stage.dataset.mode = next;
-  $$('.view-toggle button').forEach((b) => b.classList.toggle('is-on', b.dataset.mode === next));
-  if (next === 'preview') {
-    updateTexture(true);
-    resize3D();
-    say('3D preview · drag to orbit');
-  } else {
-    say('2D design · draw, upload, transform');
+  if ($('#brushSize')) $('#brushSize').value = brushSize;
+  if ($('#brushSizeOut')) $('#brushSizeOut').textContent = String(brushSize);
+  if ($('#brushColor')) $('#brushColor').value = brushColor;
+  if ($('#gloss')) $('#gloss').value = Math.round(gloss * 100);
+  if ($('#glossOut')) $('#glossOut').textContent = `${Math.round(gloss * 100)}%`;
+  if ($('#finishSelect')) {
+    $('#finishSelect').value = material === 'gloss' ? 'gloss' : material === 'matte' ? 'matte' : 'soft';
   }
+  setOrbitLocked(orbitLocked, false);
 }
 
 function setPanel(name) {
   $$('.rail-btn').forEach((b) => b.classList.toggle('is-active', b.dataset.panel === name));
   $$('.panel-view').forEach((v) => v.classList.toggle('is-on', v.dataset.view === name));
   if (name === 'draw') tool = 'brush';
-  if (name === 'select') tool = 'select';
   syncUI();
+}
+
+function setOrbitLocked(on, announce = true) {
+  orbitLocked = !!on;
+  if (lockBtn) {
+    lockBtn.classList.toggle('is-on', orbitLocked);
+    lockBtn.setAttribute('aria-pressed', orbitLocked ? 'true' : 'false');
+    lockBtn.textContent = orbitLocked ? 'Locked' : 'Lock';
+  }
+  previewHost?.classList.toggle('is-locked', orbitLocked);
+  if (announce) {
+    say(orbitLocked
+      ? 'Scene locked · draw on the leather case'
+      : 'Unlocked · drag to orbit · Lock before drawing');
+  }
 }
 
 function addImageFromFile(file) {
@@ -578,11 +298,11 @@ function addImageFromFile(file) {
   reader.onload = () => {
     const im = new Image();
     im.onload = () => {
-      const ratio = Math.min((W * 0.78) / im.width, (H * 0.42) / im.height);
+      const ratio = Math.min((W * 0.72) / im.width, (H * 0.4) / im.height);
       const layer = {
         id: uid(),
         type: 'image',
-        face: activeFace,
+        face: 'exterior',
         name: file.name.slice(0, 28),
         src: reader.result,
         image: im,
@@ -597,12 +317,10 @@ function addImageFromFile(file) {
       };
       layers.push(layer);
       selected = layer.id;
-      setMode('design');
-      setPanel('select');
       snapshot();
       render();
       renderLayers();
-      say(`Artwork added on ${activeFace} · drag and resize.`);
+      say('Artwork stamped on exterior case.');
     };
     im.src = reader.result;
   };
@@ -610,15 +328,14 @@ function addImageFromFile(file) {
 }
 
 function addPattern(index) {
-  const colors = ['#111111', '#f4f1ea', '#111111', '#f4f1ea'];
   const amps = [34, 22, 40, 18];
-  const base = faceColor(activeFace);
+  const base = exteriorColor;
   const layer = {
     id: uid(),
     type: 'pattern',
-    face: activeFace,
+    face: 'exterior',
     name: `Pattern ${index + 1}`,
-    color: colors[index % 4],
+    color: '#f4f1ea',
     amp: amps[index % 4],
     step: 70 + index * 12,
     x: W / 2,
@@ -630,19 +347,18 @@ function addPattern(index) {
     opacity: 1,
     visible: true
   };
-  if (base === '#1a1a1c' || base === '#2f4a3a' || base === '#2a2420') layer.color = '#f4f1ea';
-  else layer.color = '#111111';
+  if (base === '#f4f1ea' || base === '#d8c3a8') layer.color = '#111111';
   layers.push(layer);
   selected = layer.id;
-  setMode('design');
   snapshot();
   render();
   renderLayers();
-  say(`Pattern applied on ${activeFace}.`);
+  say('Pattern applied on exterior.');
 }
 
 function buildPatterns() {
   const grid = $('#patternGrid');
+  if (!grid) return;
   for (let i = 0; i < 4; i++) {
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -679,8 +395,9 @@ function mutate(act) {
     selected = null;
   }
   if (act === 'duplicate') {
-    const copy = { ...l, id: uid(), name: `${l.name} copy`, x: l.x + 30, y: l.y + 30 };
+    const copy = { ...l, id: uid(), name: `${l.name} copy`, x: (l.x || 0) + 30, y: (l.y || 0) + 30 };
     if (l.image) copy.image = l.image;
+    if (l.points) copy.points = l.points.map((p) => ({ ...p }));
     layers.splice(i + 1, 0, copy);
     selected = copy.id;
   }
@@ -738,9 +455,8 @@ function exportPNG() {
   say('Exported exterior + interior PNG.');
 }
 
-// ——— UI bindings ———
+// ——— UI ———
 $$('.rail-btn').forEach((b) => b.addEventListener('click', () => setPanel(b.dataset.panel)));
-$$('.view-toggle button').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
 $$('[data-act]').forEach((b) => b.addEventListener('click', () => {
   const act = b.dataset.act;
   if (act === 'undo') undo();
@@ -753,7 +469,6 @@ $$('#exteriorSwatches .swatch, #interiorSwatches .swatch').forEach((b) => b.addE
   const target = b.closest('.swatches')?.dataset.target || 'exterior';
   if (target === 'interior') interiorColor = b.dataset.color;
   else exteriorColor = b.dataset.color;
-  setActiveFace(target);
   syncUI();
   snapshot();
   render();
@@ -773,7 +488,11 @@ $$('.mat').forEach((b) => b.addEventListener('click', () => {
 $$('.seg-btn').forEach((b) => b.addEventListener('click', () => {
   tool = b.dataset.tool;
   syncUI();
-  setMode('design');
+  setPanel('draw');
+  if (!orbitLocked) {
+    setOrbitLocked(true);
+    say('Locked for drawing · unlock to orbit again');
+  }
 }));
 
 $('#brushColor').oninput = (e) => { brushColor = e.target.value; };
@@ -792,22 +511,6 @@ $('#finishSelect').onchange = (e) => {
   applyCaseTo3D();
   snapshot();
 };
-$('#scaleRange').oninput = (e) => {
-  const l = layers.find((x) => x.id === selected);
-  if (!l) return;
-  l.scale = +e.target.value / 100;
-  $('#scaleOut').textContent = `${e.target.value}%`;
-  render();
-};
-$('#scaleRange').onchange = () => snapshot();
-$('#rotRange').oninput = (e) => {
-  const l = layers.find((x) => x.id === selected);
-  if (!l) return;
-  l.rotation = (+e.target.value * Math.PI) / 180;
-  $('#rotOut').textContent = `${e.target.value}°`;
-  render();
-};
-$('#rotRange').onchange = () => snapshot();
 $('#caseTitle').oninput = () => scheduleSave();
 
 $('#addTextBtn').onclick = () => {
@@ -816,7 +519,7 @@ $('#addTextBtn').onclick = () => {
   const layer = {
     id: uid(),
     type: 'text',
-    face: activeFace,
+    face: 'exterior',
     name: text.split('\n')[0].slice(0, 24),
     text,
     fontSize,
@@ -830,19 +533,19 @@ $('#addTextBtn').onclick = () => {
     w: 400,
     h: fontSize
   };
-  measureText(faceCtx(activeFace), layer);
+  measureText(exteriorTexCtx, layer);
   layers.push(layer);
   selected = layer.id;
-  setMode('design');
-  setPanel('select');
   snapshot();
   render();
   renderLayers();
-  say(`Text added on ${activeFace}.`);
+  say('Text stamped on exterior case.');
 };
 
 $('#fileInput').onchange = (e) => { addImageFromFile(e.target.files[0]); e.target.value = ''; };
 $('#fileInput2').onchange = (e) => { addImageFromFile(e.target.files[0]); e.target.value = ''; };
+
+lockBtn?.addEventListener('click', () => setOrbitLocked(!orbitLocked));
 
 document.addEventListener('keydown', (e) => {
   const tag = (e.target.tagName || '').toLowerCase();
@@ -853,11 +556,12 @@ document.addEventListener('keydown', (e) => {
   } else if ((e.key === 'Delete' || e.key === 'Backspace') && selected) {
     e.preventDefault();
     mutate('delete');
+  } else if (e.key.toLowerCase() === 'l') {
+    setOrbitLocked(!orbitLocked);
   }
 });
 
 // ——— 3D ———
-// Must be an absolute URL — `new URL(rel, '/path/...')` throws Invalid URL in browsers.
 const ASSET_BASE = (() => {
   const path = window.location.pathname;
   const marker = '/case-studio';
@@ -868,7 +572,7 @@ const ASSET_BASE = (() => {
   }
   return new URL('./assets/', window.location.href).href;
 })();
-const PRODUCT_GLB = new URL('iphone-14-pro-leather-case.glb?v=dual1', ASSET_BASE).href;
+const PRODUCT_GLB = new URL('iphone-14-pro-leather-case.glb?v=3donly1', ASSET_BASE).href;
 
 let renderer, scene, camera, root, phoneSize;
 let exteriorTex = null;
@@ -876,9 +580,14 @@ let interiorTex = null;
 let exteriorMat = null;
 let interiorMat = null;
 let caseMats = [];
-let orbit = { x: 0.28, y: Math.PI - 0.55 };
-let dist = 7.6;
+let casePickMeshes = [];
+let orbit = { x: 0.18, y: Math.PI };
+let dist = 7.3;
 let dragging3d = null;
+let painting = false;
+let paintStroke = null;
+const raycaster = new THREE.Raycaster();
+const pointerNDC = new THREE.Vector2();
 
 function isLeatherCaseMesh(mesh) {
   const name = `${mesh.name || ''} ${mesh.parent?.name || ''}`.toLowerCase();
@@ -922,7 +631,6 @@ function applyCaseTo3D() {
   const roughness = clamp(1 - g, 0.08, 0.85);
   const clearcoat = material === 'gloss' ? 1 : material === 'soft' ? 0.35 : 0.15;
   const clearcoatRoughness = material === 'gloss' ? 0.08 : 0.4;
-
   for (const mat of caseMats) {
     mat.color.set(0xffffff);
     mat.roughness = roughness;
@@ -983,7 +691,7 @@ function splitCaseByFacing(mesh) {
     const i = t * 3;
     const ax = (pos.getX(i) + pos.getX(i + 1) + pos.getX(i + 2)) / 3;
     const ay = (pos.getY(i) + pos.getY(i + 1) + pos.getY(i + 2)) / 3;
-    const az = (pos.getZ(i) + pos.getZ(i + 2) + pos.getZ(i + 1)) / 3;
+    const az = (pos.getZ(i) + pos.getZ(i + 1) + pos.getZ(i + 2)) / 3;
     let nx = 0;
     let ny = 0;
     let nz = 0;
@@ -1012,15 +720,13 @@ function splitCaseByFacing(mesh) {
     for (const name of attrs) {
       const attr = src.attributes[name];
       const itemSize = attr.itemSize;
-      const array = new attr.array.constructor(tris.length * 3 * itemSize);
+      const array = new attr.array.constructor(Math.max(1, tris.length) * 3 * itemSize);
       let w = 0;
       for (const t of tris) {
         const base = t * 3;
         for (let v = 0; v < 3; v++) {
           const vi = base + v;
-          for (let c = 0; c < itemSize; c++) {
-            array[w++] = attr.array[vi * itemSize + c];
-          }
+          for (let c = 0; c < itemSize; c++) array[w++] = attr.array[vi * itemSize + c];
         }
       }
       g.setAttribute(name, new THREE.BufferAttribute(array, itemSize));
@@ -1057,7 +763,6 @@ function seatCaseOnPhone(product) {
   const caseCenter = caseBox.getCenter(new THREE.Vector3());
   const caseSize = caseBox.getSize(new THREE.Vector3());
 
-  // Align centers in XY, seat case on phone rear in Z (fixes Sketchfab side-by-side offset).
   const target = new THREE.Vector3(
     phoneCenter.x,
     phoneCenter.y,
@@ -1070,6 +775,7 @@ function seatCaseOnPhone(product) {
 
 function prepareProduct(sceneRoot) {
   caseMats = [];
+  casePickMeshes = [];
   exteriorMat = null;
   interiorMat = null;
   updateTexture(true);
@@ -1100,14 +806,13 @@ function prepareProduct(sceneRoot) {
 
   for (const mesh of caseMeshes) {
     caseCount += 1;
-    if (mesh.geometry && !mesh.geometry.getAttribute('normal')) {
-      mesh.geometry.computeVertexNormals();
-    }
+    if (mesh.geometry && !mesh.geometry.getAttribute('normal')) mesh.geometry.computeVertexNormals();
     const { exterior, interior } = splitCaseByFacing(mesh);
     const parent = mesh.parent || sceneRoot;
 
     const exteriorMesh = new THREE.Mesh(exterior, exteriorMat);
     exteriorMesh.name = `${mesh.name || 'Leather'}_Exterior`;
+    exteriorMesh.userData.face = 'exterior';
     exteriorMesh.castShadow = true;
     exteriorMesh.receiveShadow = true;
     exteriorMesh.position.copy(mesh.position);
@@ -1116,12 +821,12 @@ function prepareProduct(sceneRoot) {
 
     const interiorMesh = new THREE.Mesh(interior, interiorMat);
     interiorMesh.name = `${mesh.name || 'Leather'}_Interior`;
+    interiorMesh.userData.face = 'interior';
     interiorMesh.castShadow = true;
     interiorMesh.receiveShadow = true;
     interiorMesh.position.copy(mesh.position);
     interiorMesh.quaternion.copy(mesh.quaternion);
     interiorMesh.scale.copy(mesh.scale);
-    // Avoid z-fighting between coincident shells
     interiorMesh.renderOrder = 1;
     interiorMat.polygonOffset = true;
     interiorMat.polygonOffsetFactor = 1;
@@ -1129,13 +834,12 @@ function prepareProduct(sceneRoot) {
 
     parent.add(exteriorMesh);
     parent.add(interiorMesh);
+    casePickMeshes.push(exteriorMesh, interiorMesh);
     mesh.visible = false;
     mesh.geometry.dispose?.();
   }
 
-  if (!caseCount) {
-    throw new Error('Leather case mesh not found in product GLB');
-  }
+  if (!caseCount) throw new Error('Leather case mesh not found in product GLB');
 
   seatCaseOnPhone(sceneRoot);
   phoneSize = fit(sceneRoot, 4.1);
@@ -1152,17 +856,10 @@ function framePhone(size) {
 }
 
 function resize3D() {
-  if (!renderer || !camera) return;
-  const host = $('#previewHost');
+  if (!renderer || !camera || !previewHost) return;
   const stageEl = $('#stage');
-  const w = Math.max(
-    2,
-    host.clientWidth || stageEl?.clientWidth || host.parentElement?.clientWidth || 800
-  );
-  const h = Math.max(
-    2,
-    host.clientHeight || stageEl?.clientHeight || host.parentElement?.clientHeight || 600
-  );
+  const w = Math.max(2, previewHost.clientWidth || stageEl?.clientWidth || 800);
+  const h = Math.max(2, previewHost.clientHeight || stageEl?.clientHeight || 600);
   renderer.setSize(w, h, false);
   renderer.domElement.style.width = '100%';
   renderer.domElement.style.height = '100%';
@@ -1180,15 +877,111 @@ function animate() {
 }
 
 function setCam(name) {
-  $$('.view-angles button').forEach((b) => b.classList.toggle('is-on', b.dataset.cam === name));
+  $$('.view-angles button[data-cam]').forEach((b) => b.classList.toggle('is-on', b.dataset.cam === name));
   if (name === 'front') { orbit = { x: 0.05, y: 0 }; dist = 7.3; }
   if (name === 'back') { orbit = { x: 0.18, y: Math.PI }; dist = 7.3; }
   if (name === 'angle') { orbit = { x: 0.32, y: Math.PI - 0.7 }; dist = 7.8; }
 }
 
+function hitCase(clientX, clientY) {
+  if (!renderer || !camera || !casePickMeshes.length) return null;
+  const rect = renderer.domElement.getBoundingClientRect();
+  pointerNDC.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+  pointerNDC.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(pointerNDC, camera);
+  const hits = raycaster.intersectObjects(casePickMeshes, false);
+  return hits[0] || null;
+}
+
+function uvToCanvas(uv) {
+  return {
+    x: clamp(uv.x, 0, 1) * W,
+    y: (1 - clamp(uv.y, 0, 1)) * H
+  };
+}
+
+function paintAtHit(hit) {
+  if (!hit?.uv) return false;
+  const face = hit.object?.userData?.face === 'interior' ? 'interior' : 'exterior';
+  const pt = uvToCanvas(hit.uv);
+  if (!painting || !paintStroke) {
+    painting = true;
+    paintStroke = {
+      id: uid(),
+      type: 'stroke',
+      face,
+      name: tool === 'eraser' ? 'Eraser' : 'Brush',
+      color: brushColor,
+      size: brushSize,
+      erase: tool === 'eraser',
+      visible: true,
+      opacity: 1,
+      points: [pt]
+    };
+    layers.push(paintStroke);
+    selected = paintStroke.id;
+  } else if (paintStroke.face === face) {
+    paintStroke.points.push(pt);
+  } else {
+    return false;
+  }
+  render();
+  return true;
+}
+
+function bindViewportPointer(el) {
+  el.addEventListener('pointerdown', (e) => {
+    if (e.button != null && e.button !== 0) return;
+    el.setPointerCapture(e.pointerId);
+
+    if (orbitLocked && (tool === 'brush' || tool === 'eraser')) {
+      const hit = hitCase(e.clientX, e.clientY);
+      if (hit) {
+        paintAtHit(hit);
+        renderLayers();
+        return;
+      }
+      say('Aim at the leather case to draw');
+      return;
+    }
+
+    dragging3d = { x: e.clientX, y: e.clientY };
+  });
+
+  el.addEventListener('pointermove', (e) => {
+    if (painting && orbitLocked) {
+      const hit = hitCase(e.clientX, e.clientY);
+      if (hit) paintAtHit(hit);
+      return;
+    }
+    if (!dragging3d || orbitLocked) return;
+    orbit.y += (e.clientX - dragging3d.x) * 0.009;
+    orbit.x = clamp(orbit.x + (e.clientY - dragging3d.y) * 0.009, -1.1, 1.1);
+    dragging3d = { x: e.clientX, y: e.clientY };
+  });
+
+  const end = () => {
+    if (painting) {
+      painting = false;
+      paintStroke = null;
+      snapshot();
+      renderLayers();
+      say('Stroke saved on case');
+    }
+    dragging3d = null;
+  };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+
+  el.addEventListener('wheel', (e) => {
+    if (orbitLocked) return;
+    e.preventDefault();
+    dist = clamp(dist + e.deltaY * 0.004, 5.2, 9.5);
+  }, { passive: false });
+}
+
 async function init3D() {
-  const host = $('#previewHost');
-  if (!host || host.querySelector('canvas')) return;
+  if (!previewHost || previewHost.querySelector('canvas')) return;
   try {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
@@ -1198,7 +991,7 @@ async function init3D() {
     renderer.toneMappingExposure = 1.15;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    host.append(renderer.domElement);
+    previewHost.append(renderer.domElement);
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf0f2f5);
@@ -1232,30 +1025,16 @@ async function init3D() {
     el.style.display = 'block';
     el.style.width = '100%';
     el.style.height = '100%';
-    el.addEventListener('pointerdown', (e) => {
-      el.setPointerCapture(e.pointerId);
-      dragging3d = { x: e.clientX, y: e.clientY };
-    });
-    el.addEventListener('pointermove', (e) => {
-      if (!dragging3d) return;
-      orbit.y += (e.clientX - dragging3d.x) * 0.009;
-      orbit.x = clamp(orbit.x + (e.clientY - dragging3d.y) * 0.009, -1.1, 1.1);
-      dragging3d = { x: e.clientX, y: e.clientY };
-    });
-    el.addEventListener('pointerup', () => { dragging3d = null; });
-    el.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      dist = clamp(dist + e.deltaY * 0.004, 5.2, 9.5);
-    }, { passive: false });
+    bindViewportPointer(el);
 
-    $$('.view-angles button').forEach((b) => b.addEventListener('click', () => setCam(b.dataset.cam)));
+    $$('.view-angles button[data-cam]').forEach((b) => b.addEventListener('click', () => setCam(b.dataset.cam)));
 
     resize3D();
     animate();
     window.addEventListener('resize', resize3D);
     if (window.ResizeObserver) {
       const ro = new ResizeObserver(() => resize3D());
-      ro.observe(host);
+      ro.observe(previewHost);
       const stageEl = $('#stage');
       if (stageEl) ro.observe(stageEl);
     }
@@ -1271,13 +1050,13 @@ async function init3D() {
     while (root.children.length) root.remove(root.children[0]);
     const product = productGltf.scene;
     product.name = 'iphone-14-pro-leather-case';
-    const caseCount = prepareProduct(product);
+    prepareProduct(product);
     root.add(product);
     framePhone(phoneSize);
     root.rotation.set(orbit.x, orbit.y, 0);
     applyCaseTo3D();
     resize3D();
-    say(`Exterior + interior separate · case seated · Front = screen · Back = case`);
+    say('3D only · orbit free, then Lock and draw on the case');
   } catch (err) {
     console.error(err);
     say('Could not load 3D model.');
@@ -1286,10 +1065,9 @@ async function init3D() {
 
 // boot
 buildPatterns();
-setPanel('artwork');
-setMode('preview');
+setPanel('draw');
 setCam('back');
-setActiveFace('exterior');
+setOrbitLocked(false, false);
 
 (async () => {
   try {
@@ -1299,7 +1077,6 @@ setActiveFace('exterior');
       await restore(JSON.parse(saved), false);
       say('Welcome back — last design restored.');
     } else {
-      // Clean dual faces (photo-3 style) — no old single-case pattern.
       layers = [];
       history = [JSON.stringify(serial())];
       future = [];
