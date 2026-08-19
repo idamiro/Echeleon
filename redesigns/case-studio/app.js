@@ -61,6 +61,10 @@ function serial() {
     layers: layers.map((l) => {
       const o = { ...l };
       delete o.image;
+      delete o._sampleCanvas;
+      delete o._sampleCtx;
+      delete o._sampleData;
+      delete o.livePreview;
       return o;
     })
   };
@@ -133,6 +137,11 @@ function measureText(c, l) {
 
 function drawLayer(c, l, s = 1) {
   if (l.visible === false) return;
+  if (l.type === 'image' && l.useProjection) {
+    if (l.livePreview) return; // 3D preview plane handles live placement
+    stampProjectedImage(c, l);
+    return;
+  }
   c.save();
   c.globalAlpha = l.opacity ?? 1;
   if (l.type === 'stroke') {
@@ -190,6 +199,250 @@ function drawLayer(c, l, s = 1) {
     c.fill();
   }
   c.restore();
+}
+
+/** Planar-project a photo onto the case mesh and bake into the UV canvas. */
+function stampProjectedImage(ctx, layer) {
+  const img = layer.image;
+  const mesh = faceMeshes[layer.face || 'exterior'];
+  const p = layer.proj;
+  if (!img || !mesh?.geometry || !p) return;
+
+  mesh.updateMatrixWorld(true);
+  const geo = mesh.geometry;
+  const posAttr = geo.attributes.position;
+  const uvAttr = geo.attributes.uv;
+  if (!posAttr || !uvAttr) return;
+
+  const origin = new THREE.Vector3(p.ox, p.oy, p.oz);
+  let right = new THREE.Vector3(p.rx, p.ry, p.rz);
+  let up = new THREE.Vector3(p.ux, p.uy, p.uz);
+  const rot = layer.rotation || 0;
+  if (rot) {
+    const c = Math.cos(rot);
+    const s = Math.sin(rot);
+    const r2 = right.clone().multiplyScalar(c).addScaledVector(up, s);
+    const u2 = up.clone().multiplyScalar(c).addScaledVector(right, -s);
+    right = r2.normalize();
+    up = u2.normalize();
+  }
+  const halfW = Math.max(1e-4, (p.worldW || 1) * 0.5 * (layer.scale || 1));
+  const halfH = Math.max(1e-4, (p.worldH || 1) * 0.5 * (layer.scale || 1));
+
+  // Sample from an offscreen copy for getImageData speed
+  const iw = img.naturalWidth || img.width;
+  const ih = img.naturalHeight || img.height;
+  if (!iw || !ih) return;
+  if (!layer._sampleCanvas) {
+    layer._sampleCanvas = document.createElement('canvas');
+    layer._sampleCanvas.width = iw;
+    layer._sampleCanvas.height = ih;
+    layer._sampleCtx = layer._sampleCanvas.getContext('2d', { willReadFrequently: true });
+    layer._sampleCtx.drawImage(img, 0, 0);
+    layer._sampleData = layer._sampleCtx.getImageData(0, 0, iw, ih).data;
+  }
+  const src = layer._sampleData;
+  const out = ctx.getImageData(0, 0, W, H);
+  const dd = out.data;
+  const opacity = layer.opacity ?? 1;
+
+  const mw = mesh.matrixWorld;
+  const v0 = new THREE.Vector3();
+  const v1 = new THREE.Vector3();
+  const v2 = new THREE.Vector3();
+  const triCount = posAttr.count / 3;
+  const margin = 1.12;
+
+  for (let t = 0; t < triCount; t++) {
+    const i = t * 3;
+    v0.fromBufferAttribute(posAttr, i).applyMatrix4(mw);
+    v1.fromBufferAttribute(posAttr, i + 1).applyMatrix4(mw);
+    v2.fromBufferAttribute(posAttr, i + 2).applyMatrix4(mw);
+
+    const s0 = (v0.x - origin.x) * right.x + (v0.y - origin.y) * right.y + (v0.z - origin.z) * right.z;
+    const t0c = (v0.x - origin.x) * up.x + (v0.y - origin.y) * up.y + (v0.z - origin.z) * up.z;
+    const s1 = (v1.x - origin.x) * right.x + (v1.y - origin.y) * right.y + (v1.z - origin.z) * right.z;
+    const t1c = (v1.x - origin.x) * up.x + (v1.y - origin.y) * up.y + (v1.z - origin.z) * up.z;
+    const s2 = (v2.x - origin.x) * right.x + (v2.y - origin.y) * right.y + (v2.z - origin.z) * right.z;
+    const t2c = (v2.x - origin.x) * up.x + (v2.y - origin.y) * up.y + (v2.z - origin.z) * up.z;
+    const S0 = s0 / halfW; const T0 = t0c / halfH;
+    const S1 = s1 / halfW; const T1 = t1c / halfH;
+    const S2 = s2 / halfW; const T2 = t2c / halfH;
+
+    if (
+      (S0 < -margin && S1 < -margin && S2 < -margin) ||
+      (S0 > margin && S1 > margin && S2 > margin) ||
+      (T0 < -margin && T1 < -margin && T2 < -margin) ||
+      (T0 > margin && T1 > margin && T2 > margin)
+    ) continue;
+
+    const u0 = uvAttr.getX(i);
+    const vv0 = uvAttr.getY(i);
+    const u1 = uvAttr.getX(i + 1);
+    const vv1 = uvAttr.getY(i + 1);
+    const u2 = uvAttr.getX(i + 2);
+    const vv2 = uvAttr.getY(i + 2);
+
+    const x0 = u0 * W;
+    const y0 = (1 - vv0) * H;
+    const x1 = u1 * W;
+    const y1 = (1 - vv1) * H;
+    const x2 = u2 * W;
+    const y2 = (1 - vv2) * H;
+
+    const minX = Math.max(0, Math.floor(Math.min(x0, x1, x2)));
+    const maxX = Math.min(W - 1, Math.ceil(Math.max(x0, x1, x2)));
+    const minY = Math.max(0, Math.floor(Math.min(y0, y1, y2)));
+    const maxY = Math.min(H - 1, Math.ceil(Math.max(y0, y1, y2)));
+    if (minX > maxX || minY > maxY) continue;
+
+    const area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
+    if (Math.abs(area) < 1e-6) continue;
+    const invA = 1 / area;
+
+    for (let py = minY; py <= maxY; py++) {
+      for (let px = minX; px <= maxX; px++) {
+        const cx = px + 0.5;
+        const cy = py + 0.5;
+        const w0 = ((x1 - cx) * (y2 - cy) - (x2 - cx) * (y1 - cy)) * invA;
+        const w1 = ((x2 - cx) * (y0 - cy) - (x0 - cx) * (y2 - cy)) * invA;
+        const w2 = 1 - w0 - w1;
+        if (w0 < -0.01 || w1 < -0.01 || w2 < -0.01) continue;
+
+        const ss = w0 * S0 + w1 * S1 + w2 * S2;
+        const tt = w0 * T0 + w1 * T1 + w2 * T2;
+        if (ss < -1 || ss > 1 || tt < -1 || tt > 1) continue;
+
+        const ix = Math.min(iw - 1, Math.max(0, ((ss + 1) * 0.5 * iw) | 0));
+        const iy = Math.min(ih - 1, Math.max(0, ((1 - (tt + 1) * 0.5) * ih) | 0));
+        const si = (iy * iw + ix) << 2;
+        const srcA = src[si + 3] / 255;
+        if (srcA < 0.02) continue;
+        const a = srcA * opacity;
+        const di = (py * W + px) << 2;
+        const inv = 1 - a;
+        dd[di] = (src[si] * a + dd[di] * inv) | 0;
+        dd[di + 1] = (src[si + 1] * a + dd[di + 1] * inv) | 0;
+        dd[di + 2] = (src[si + 2] * a + dd[di + 2] * inv) | 0;
+        dd[di + 3] = 255;
+      }
+    }
+  }
+  ctx.putImageData(out, 0, 0);
+}
+
+function applyProjection(layer, point, normal) {
+  const n = normal.clone().normalize();
+  let up = new THREE.Vector3(0, 1, 0);
+  if (Math.abs(n.dot(up)) > 0.92) up.set(1, 0, 0);
+  up.addScaledVector(n, -up.dot(n)).normalize();
+  const right = new THREE.Vector3().crossVectors(n, up).normalize();
+  up.crossVectors(right, n).normalize();
+
+  const caseH = phoneSize?.y || 4.1;
+  const worldH = layer.proj?.worldH || caseH * 0.32;
+  const aspect = (layer.w && layer.h) ? layer.w / layer.h : 1;
+  const worldW = layer.proj?.worldW || worldH * aspect;
+
+  layer.proj = {
+    ox: point.x, oy: point.y, oz: point.z,
+    nx: n.x, ny: n.y, nz: n.z,
+    rx: right.x, ry: right.y, rz: right.z,
+    ux: up.x, uy: up.y, uz: up.z,
+    worldW,
+    worldH
+  };
+  layer.projBase = { x: point.x, y: point.y, z: point.z };
+  layer.useProjection = true;
+}
+
+function refreshProjectionFromSliders(layer) {
+  if (!layer?.proj || !layer.projBase) return;
+  const span = (phoneSize?.y || 4.1) * 0.85;
+  const ox = ((layer.x / W) - 0.5) * span;
+  const oy = ((layer.y / H) - 0.5) * span;
+  const b = layer.projBase;
+  const p = layer.proj;
+  p.ox = b.x + p.rx * ox - p.ux * oy;
+  p.oy = b.y + p.ry * ox - p.uy * oy;
+  p.oz = b.z + p.rz * ox - p.uz * oy;
+}
+
+function ensurePhotoPreview(layer) {
+  if (!scene) return;
+  if (!photoPreview) {
+    const mat = new THREE.MeshBasicMaterial({
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      polygonOffset: true,
+      polygonOffsetFactor: -2,
+      polygonOffsetUnits: -2
+    });
+    photoPreview = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
+    photoPreview.renderOrder = 20;
+    photoPreview.frustumCulled = false;
+    scene.add(photoPreview);
+  }
+  const map = photoPreview.material.map;
+  if (!map || map.image !== layer.image) {
+    if (map) map.dispose();
+    const tex = new THREE.Texture(layer.image);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.needsUpdate = true;
+    photoPreview.material.map = tex;
+    photoPreview.material.needsUpdate = true;
+  }
+  updatePhotoPreview(layer);
+  photoPreview.visible = true;
+}
+
+function updatePhotoPreview(layer) {
+  if (!photoPreview || !layer?.proj) return;
+  refreshProjectionFromSliders(layer);
+  const p = layer.proj;
+  const origin = new THREE.Vector3(p.ox, p.oy, p.oz);
+  const n = new THREE.Vector3(p.nx, p.ny, p.nz).normalize();
+  let right = new THREE.Vector3(p.rx, p.ry, p.rz).normalize();
+  let up = new THREE.Vector3(p.ux, p.uy, p.uz).normalize();
+  const rot = layer.rotation || 0;
+  if (rot) {
+    const c = Math.cos(rot);
+    const s = Math.sin(rot);
+    const r2 = right.clone().multiplyScalar(c).addScaledVector(up, s);
+    const u2 = up.clone().multiplyScalar(c).addScaledVector(right, -s);
+    right = r2.normalize();
+    up = u2.normalize();
+  }
+  const w = (p.worldW || 1) * (layer.scale || 1);
+  const h = (p.worldH || 1) * (layer.scale || 1);
+  origin.addScaledVector(n, 0.012);
+  photoPreview.position.copy(origin);
+  const m = new THREE.Matrix4().makeBasis(right, up, n);
+  photoPreview.quaternion.setFromRotationMatrix(m);
+  photoPreview.scale.set(w, h, 1);
+  photoPreview.visible = true;
+}
+
+function hidePhotoPreview() {
+  if (photoPreview) photoPreview.visible = false;
+}
+
+function initImageProjection(layer) {
+  const mesh = faceMeshes.exterior || casePickMeshes.find((m) => m.userData.face === 'exterior');
+  const point = new THREE.Vector3();
+  const normal = new THREE.Vector3(0, 0, 1);
+  if (mesh) {
+    const box = new THREE.Box3().setFromObject(mesh);
+    box.getCenter(point);
+    if (camera) normal.copy(camera.position).sub(point).normalize();
+  }
+  applyProjection(layer, point, normal);
+  layer.x = W / 2;
+  layer.y = H / 2;
+  layer.face = 'exterior';
+  layer.livePreview = true;
+  ensurePhotoPreview(layer);
 }
 
 function roundRect(c, x, y, w, h, r) {
@@ -303,6 +556,11 @@ function beginLiveMove(face, layerId) {
   liveMode = 'move';
   liveFace = face;
   liveExcludeId = layerId;
+  const layer = layers.find((x) => x.id === layerId);
+  if (layer?.type === 'image' && layer.useProjection) {
+    layer.livePreview = true;
+    ensurePhotoPreview(layer);
+  }
   paintFace(liveBaseCtx, face, 1, layerId);
   const ctx = faceTexCtx(face);
   ctx.drawImage(liveBase, 0, 0);
@@ -312,6 +570,14 @@ function beginLiveMove(face, layerId) {
 function liveMoveTick(layer) {
   const face = layer.face || 'exterior';
   if (face !== liveFace) beginLiveMove(face, layer.id);
+  if (layer.type === 'image' && layer.useProjection) {
+    layer.livePreview = true;
+    updatePhotoPreview(layer);
+    const ctx = faceTexCtx(face);
+    ctx.drawImage(liveBase, 0, 0);
+    markFaceTex(face);
+    return;
+  }
   const ctx = faceTexCtx(face);
   ctx.drawImage(liveBase, 0, 0);
   drawLayer(ctx, layer, 1);
@@ -320,6 +586,11 @@ function liveMoveTick(layer) {
 
 function endLive() {
   const face = liveFace;
+  const layer = layers.find((x) => x.id === liveExcludeId || x.id === selected);
+  if (layer?.type === 'image' && layer.useProjection) {
+    layer.livePreview = false;
+    hidePhotoPreview();
+  }
   liveMode = null;
   liveExcludeId = null;
   dirtyFaces[face] = true;
@@ -445,18 +716,21 @@ function addImageFromFile(file) {
         scale: 1,
         rotation: 0,
         opacity: 1,
-        visible: true
+        visible: true,
+        useProjection: true,
+        livePreview: true
       };
       layers.push(layer);
       selected = layer.id;
       tool = 'select';
       placingArtwork = true;
       setOrbitLocked(true);
+      initImageProjection(layer);
       snapshot();
       render();
       renderLayers();
       syncTransform(layer);
-      say('Photo added · drag on the locked case to place it');
+      say('Photo on case · Lock, drag to place · scroll to scale');
     };
     im.src = reader.result;
   };
@@ -656,31 +930,49 @@ $('#scaleRange')?.addEventListener('input', (e) => {
   if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
   l.scale = +e.target.value / 100;
   $('#scaleOut').textContent = `${e.target.value}%`;
-  render(l.face || 'exterior');
+  if (l.type === 'image' && l.useProjection) {
+    if (liveMode !== 'move') beginLiveMove(l.face || 'exterior', l.id);
+    liveMoveTick(l);
+  } else render(l.face || 'exterior');
 });
 $('#posXRange')?.addEventListener('input', (e) => {
   const l = layers.find((x) => x.id === selected);
   if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
   l.x = (+e.target.value / 100) * W;
   $('#posXOut').textContent = `${e.target.value}%`;
-  render(l.face || 'exterior');
+  if (l.type === 'image' && l.useProjection) {
+    refreshProjectionFromSliders(l);
+    if (liveMode !== 'move') beginLiveMove(l.face || 'exterior', l.id);
+    liveMoveTick(l);
+  } else render(l.face || 'exterior');
 });
 $('#posYRange')?.addEventListener('input', (e) => {
   const l = layers.find((x) => x.id === selected);
   if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
   l.y = (+e.target.value / 100) * H;
   $('#posYOut').textContent = `${e.target.value}%`;
-  render(l.face || 'exterior');
+  if (l.type === 'image' && l.useProjection) {
+    refreshProjectionFromSliders(l);
+    if (liveMode !== 'move') beginLiveMove(l.face || 'exterior', l.id);
+    liveMoveTick(l);
+  } else render(l.face || 'exterior');
 });
 $('#rotRange')?.addEventListener('input', (e) => {
   const l = layers.find((x) => x.id === selected);
   if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
   l.rotation = (+e.target.value * Math.PI) / 180;
   $('#rotOut').textContent = `${e.target.value}°`;
-  render(l.face || 'exterior');
+  if (l.type === 'image' && l.useProjection) {
+    if (liveMode !== 'move') beginLiveMove(l.face || 'exterior', l.id);
+    liveMoveTick(l);
+  } else render(l.face || 'exterior');
 });
 ['posXRange', 'posYRange', 'scaleRange', 'rotRange'].forEach((id) => {
-  $(`#${id}`)?.addEventListener('change', () => snapshot());
+  $(`#${id}`)?.addEventListener('change', () => {
+    const l = layers.find((x) => x.id === selected);
+    if (l?.type === 'image' && l.useProjection && liveMode === 'move') endLive();
+    snapshot();
+  });
 });
 
 $('#placeOnCaseBtn')?.addEventListener('click', () => {
@@ -732,6 +1024,8 @@ let exteriorMat = null;
 let interiorMat = null;
 let caseMats = [];
 let casePickMeshes = [];
+let faceMeshes = { exterior: null, interior: null };
+let photoPreview = null;
 let orbit = { x: 0.18, y: Math.PI };
 let dist = 7.3;
 let dragging3d = null;
@@ -966,6 +1260,7 @@ function seatCaseOnPhone(product) {
 function prepareProduct(sceneRoot) {
   caseMats = [];
   casePickMeshes = [];
+  faceMeshes = { exterior: null, interior: null };
   exteriorMat = null;
   interiorMat = null;
 
@@ -1040,6 +1335,8 @@ function prepareProduct(sceneRoot) {
     parent.add(exteriorMesh);
     parent.add(interiorMesh);
     casePickMeshes.push(exteriorMesh, interiorMesh);
+    faceMeshes.exterior = exteriorMesh;
+    faceMeshes.interior = interiorMesh;
     mesh.visible = false;
   }
 
@@ -1106,8 +1403,29 @@ function uvToCanvas(uv) {
 
 function moveSelectedToUv(hit) {
   const l = layers.find((x) => x.id === selected);
-  if (!l || !['image', 'text', 'pattern'].includes(l.type) || !hit?.uv) return false;
+  if (!l || !['image', 'text', 'pattern'].includes(l.type) || !hit) return false;
   const face = hit.object?.userData?.face === 'interior' ? 'interior' : 'exterior';
+  if (l.type === 'image') {
+    const n = hit.face?.normal
+      ? hit.face.normal.clone().transformDirection(hit.object.matrixWorld).normalize()
+      : hit.normal?.clone?.() || new THREE.Vector3(0, 0, 1);
+    if (camera) {
+      const toCam = camera.position.clone().sub(hit.point).normalize();
+      if (n.dot(toCam) < 0) n.negate();
+    }
+    l.face = face;
+    l.x = W / 2;
+    l.y = H / 2;
+    const keepW = l.proj?.worldW;
+    const keepH = l.proj?.worldH;
+    applyProjection(l, hit.point.clone(), n);
+    if (keepW) l.proj.worldW = keepW;
+    if (keepH) l.proj.worldH = keepH;
+    if (liveMode !== 'move') beginLiveMove(face, l.id);
+    liveMoveTick(l);
+    return true;
+  }
+  if (!hit.uv) return false;
   const pt = uvToCanvas(hit.uv);
   if (liveMode !== 'move') beginLiveMove(face, l.id);
   l.face = face;
