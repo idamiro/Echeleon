@@ -782,14 +782,18 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ——— 3D ———
+// Must be an absolute URL — `new URL(rel, '/path/...')` throws Invalid URL in browsers.
 const ASSET_BASE = (() => {
   const path = window.location.pathname;
-  const marker = '/case-studio/';
+  const marker = '/case-studio';
   const i = path.indexOf(marker);
-  if (i !== -1) return path.slice(0, i + marker.length) + 'assets/';
+  if (i !== -1) {
+    const root = `${path.slice(0, i + marker.length).replace(/\/?$/, '/')}`;
+    return new URL(`${root}assets/`, window.location.origin).href;
+  }
   return new URL('./assets/', window.location.href).href;
 })();
-const PRODUCT_GLB = new URL('iphone-14-pro-leather-case.glb?v=leather1', ASSET_BASE).href;
+const PRODUCT_GLB = new URL('iphone-14-pro-leather-case.glb?v=leather2', ASSET_BASE).href;
 
 let renderer, scene, camera, root, caseTex, caseMat, phoneSize;
 let caseMats = [];
