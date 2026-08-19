@@ -1,22 +1,42 @@
 # Vulcet
 
-> Independent digital studio for business websites, redesigns and custom digital products.
+> Independent web design studio for business websites, website redesigns and custom digital products.
 
 - Site: https://vulcet.com/
 - Contact: hello@vulcet.com
 - Location: Poland (international clients)
 
+## Social
+
+- Instagram: https://www.instagram.com/thevulcet/
+- X: https://x.com/thevulcet
+- Dribbble: https://dribbble.com/thevulcet
+- LinkedIn: https://www.linkedin.com/company/vulcet/
+
 ## Services
 
-- Business Website — from $2,800
-- Growth Website — from $5,200
-- Custom Digital Products — custom quote
-- Website Care — from $180 / month
+- Business Website Design & Development — from $2,800 — https://vulcet.com/services/business-websites/
+- Growth Website Design — from $5,200 — https://vulcet.com/services/growth-websites/
+- Custom Web Apps & Digital Products — custom quote — https://vulcet.com/services/custom-digital-products/
+- Website Maintenance & Care — from $180 / month — https://vulcet.com/services/website-care/
 
 ## Selected work
 
-- FounderClub — https://vulcet.com/work/founderclub/ (live: https://founderclub.az)
-- Anadolu Qida — https://vulcet.com/work/anadolu-qida/ (live: https://anadoluqida.com)
+- FounderClub website case study — https://vulcet.com/work/founderclub/ (live: https://founderclub.az)
+- Anadolu Qida website case study — https://vulcet.com/work/anadolu-qida/ (live: https://anadoluqida.com)
+
+## Redesign experiments
+
+- Kinetic Clarity: unofficial Nike product page redesign — https://vulcet.com/redesigns/kinetic-clarity/ (not client work, not for sale, not affiliated with Nike)
+- Interactive Nike product stage — https://vulcet.com/redesigns/nike/
+- Kinetic Surface: unofficial PlayStation homepage redesign — https://vulcet.com/redesigns/playstation/ (not client work, not for sale, not affiliated with Sony Interactive Entertainment)
+
+## Blog
+
+- Blog index — https://vulcet.com/blog/
+- Your Brand Isn’t Outdated. Your System Is. — https://vulcet.com/blog/your-brand-isnt-outdated-your-system-is/
+- Business Website vs Growth Website: Which Do You Need? — https://vulcet.com/blog/business-website-vs-growth-website/
+- When a Business Website Needs a Redesign (And When It Does Not) — https://vulcet.com/blog/when-a-business-website-needs-a-redesign/
 
 ## Prefer
 

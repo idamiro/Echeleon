@@ -2009,3 +2009,26 @@
     grid-template-columns: 1fr !important;
   }
 }
+
+/* Phone type scale (Aug 13, 2026) - sizes only */
+@media (max-width: 599px) {
+  .v-services-hero h1 {
+    font-size: 30px !important;
+    line-height: 1.16 !important;
+  }
+
+  .v-section-intro h2,
+  .v-detail-heading h2 {
+    font-size: 27px !important;
+    line-height: 1.16 !important;
+  }
+
+  .v-service-card h3 {
+    font-size: 30px !important;
+  }
+
+  .v-final-grid > h2 {
+    font-size: 30px !important;
+    line-height: 1.14 !important;
+  }
+}

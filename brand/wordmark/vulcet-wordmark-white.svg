@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 140" role="img" aria-label="Vulcet">
+  <g fill="#f7f5f1">
+    <path d="M16 22h40l46 96 46-96h40L178 130h-48L16 22z"/>
+    <path d="M214 22h36v70c0 22 12 36 34 36s34-14 34-36V22h36v72c0 42-26 62-70 62s-70-20-70-62V22z"/>
+    <path d="M390 22h36v86h68v32H390V22z"/>
+    <path d="M520 22h118v32H558c-18 0-30 12-30 30s12 30 30 30h80v32H520c-42 0-72-30-72-62s30-62 72-62z"/>
+    <rect x="668" y="22" width="96" height="26" rx="1"/>
+    <rect x="668" y="57" width="80" height="26" rx="1"/>
+    <rect x="668" y="92" width="96" height="26" rx="1"/>
+    <path d="M788 22h116v32h-42v86h-32V54h-42V22z"/>
+  </g>
+</svg>
