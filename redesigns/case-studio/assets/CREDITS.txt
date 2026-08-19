@@ -2,5 +2,6 @@ iPhone 14 Pro + Leather Case
 File: iphone-14-pro-leather-case.glb
 Combined phone + leather case model (Sketchfab export).
 Used in Vulcet Case Studio as an unofficial concept.
+Exterior and interior case surfaces are painted separately.
 2D artwork maps onto the leather case only — never onto the phone.
 Not affiliated with Apple.
