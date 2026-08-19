@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const W = 1170;
 const H = 2532;
-const STORE = 'vulcet-case-studio-v5';
+const STORE = 'vulcet-case-studio-v6';
 
 const $ = (s, p = document) => p.querySelector(s);
 const $$ = (s, p = document) => [...p.querySelectorAll(s)];
@@ -205,20 +205,18 @@ function paintFace(target, face, scale = 1) {
     artOff.width = aw;
     artOff.height = ah;
   }
+  // Artwork only on a transparent canvas. Base leather colour comes from material.color
+  // so interior/exterior colours never bleed through shared UVs.
   const a = artOff.getContext('2d', { alpha: true });
   a.clearRect(0, 0, aw, ah);
   layers.filter((l) => (l.face || 'exterior') === face).forEach((l) => drawLayer(a, l, scale));
 
+  // target canvases used for CanvasTexture must stay opaque for WebGL sampling stability:
+  // fill white, then draw artwork. material.color tints the white → case colour.
   target.clearRect(0, 0, aw, ah);
-  target.fillStyle = faceColor(face);
-  roundRect(target, 0, 0, aw, ah, 120 * scale);
-  target.fill();
-
-  target.save();
-  roundRect(target, 0, 0, aw, ah, 120 * scale);
-  target.clip();
+  target.fillStyle = '#ffffff';
+  target.fillRect(0, 0, aw, ah);
   target.drawImage(artOff, 0, 0);
-  target.restore();
   dirtyTex = true;
 }
 
@@ -242,12 +240,46 @@ function renderLayers() {
       li.onclick = () => {
         selected = l.id;
         renderLayers();
+        syncTransform(l);
+        if (['image', 'text', 'pattern'].includes(l.type)) {
+          placingArtwork = false;
+          say('Layer selected · Lock, then drag on case to move · or use sliders');
+        }
       };
       list.appendChild(li);
     });
   };
   html($('#layerList'));
   html($('#layerListSide'));
+  const l = layers.find((x) => x.id === selected);
+  if (l && ['image', 'text', 'pattern'].includes(l.type)) syncTransform(l);
+  else {
+    if ($('#transformHelp')) $('#transformHelp').hidden = false;
+    if ($('#transformControls')) $('#transformControls').hidden = true;
+  }
+}
+
+function syncTransform(l) {
+  if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
+  if ($('#transformHelp')) $('#transformHelp').hidden = true;
+  if ($('#transformControls')) $('#transformControls').hidden = false;
+  if ($('#posXRange')) {
+    $('#posXRange').value = Math.round((l.x / W) * 100);
+    $('#posXOut').textContent = `${Math.round((l.x / W) * 100)}%`;
+  }
+  if ($('#posYRange')) {
+    $('#posYRange').value = Math.round((l.y / H) * 100);
+    $('#posYOut').textContent = `${Math.round((l.y / H) * 100)}%`;
+  }
+  if ($('#scaleRange')) {
+    $('#scaleRange').value = Math.round((l.scale || 1) * 100);
+    $('#scaleOut').textContent = `${Math.round((l.scale || 1) * 100)}%`;
+  }
+  if ($('#rotRange')) {
+    const deg = Math.round(((l.rotation || 0) * 180) / Math.PI);
+    $('#rotRange').value = deg;
+    $('#rotOut').textContent = `${deg}°`;
+  }
 }
 
 function syncUI() {
@@ -317,10 +349,14 @@ function addImageFromFile(file) {
       };
       layers.push(layer);
       selected = layer.id;
+      tool = 'select';
+      placingArtwork = true;
+      setOrbitLocked(true);
       snapshot();
       render();
       renderLayers();
-      say('Artwork stamped on exterior case.');
+      syncTransform(layer);
+      say('Photo added · drag on the locked case to place it');
     };
     im.src = reader.result;
   };
@@ -438,16 +474,29 @@ function exportPNG() {
   const c = out.getContext('2d');
   c.fillStyle = '#c5c8cf';
   c.fillRect(0, 0, out.width, out.height);
-  const left = document.createElement('canvas');
-  left.width = W;
-  left.height = H;
-  const right = document.createElement('canvas');
-  right.width = W;
-  right.height = H;
-  paintFace(left.getContext('2d'), 'exterior', 1);
-  paintFace(right.getContext('2d'), 'interior', 1);
-  c.drawImage(left, 0, 0);
-  c.drawImage(right, W + gap, 0);
+
+  function bake(face) {
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = faceColor(face);
+    roundRect(ctx, 0, 0, W, H, 120);
+    ctx.fill();
+    ctx.save();
+    roundRect(ctx, 0, 0, W, H, 120);
+    ctx.clip();
+    // reuse current face texture bake
+    const src = face === 'interior' ? interiorTexOff : exteriorTexOff;
+    paintFace(face === 'interior' ? interiorTexCtx : exteriorTexCtx, face, 1);
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.drawImage(src, 0, 0);
+    ctx.restore();
+    return canvas;
+  }
+
+  c.drawImage(bake('exterior'), 0, 0);
+  c.drawImage(bake('interior'), W + gap, 0);
   const a = document.createElement('a');
   a.download = `${($('#caseTitle').value || 'case').replace(/\s+/g, '-').toLowerCase()}-exterior-interior.png`;
   a.href = out.toDataURL('image/png');
@@ -545,6 +594,51 @@ $('#addTextBtn').onclick = () => {
 $('#fileInput').onchange = (e) => { addImageFromFile(e.target.files[0]); e.target.value = ''; };
 $('#fileInput2').onchange = (e) => { addImageFromFile(e.target.files[0]); e.target.value = ''; };
 
+$('#posXRange')?.addEventListener('input', (e) => {
+  const l = layers.find((x) => x.id === selected);
+  if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
+  l.x = (+e.target.value / 100) * W;
+  $('#posXOut').textContent = `${e.target.value}%`;
+  render();
+});
+$('#posYRange')?.addEventListener('input', (e) => {
+  const l = layers.find((x) => x.id === selected);
+  if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
+  l.y = (+e.target.value / 100) * H;
+  $('#posYOut').textContent = `${e.target.value}%`;
+  render();
+});
+$('#scaleRange')?.addEventListener('input', (e) => {
+  const l = layers.find((x) => x.id === selected);
+  if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
+  l.scale = +e.target.value / 100;
+  $('#scaleOut').textContent = `${e.target.value}%`;
+  render();
+});
+$('#rotRange')?.addEventListener('input', (e) => {
+  const l = layers.find((x) => x.id === selected);
+  if (!l || !['image', 'text', 'pattern'].includes(l.type)) return;
+  l.rotation = (+e.target.value * Math.PI) / 180;
+  $('#rotOut').textContent = `${e.target.value}°`;
+  render();
+});
+['posXRange', 'posYRange', 'scaleRange', 'rotRange'].forEach((id) => {
+  $(`#${id}`)?.addEventListener('change', () => snapshot());
+});
+
+$('#placeOnCaseBtn')?.addEventListener('click', () => {
+  const l = layers.find((x) => x.id === selected);
+  if (!l || !['image', 'text', 'pattern'].includes(l.type)) {
+    say('Select a photo or text layer first');
+    return;
+  }
+  placingArtwork = true;
+  setOrbitLocked(true);
+  tool = 'select';
+  syncUI();
+  say('Locked · click/drag on the case to place artwork');
+});
+
 lockBtn?.addEventListener('click', () => setOrbitLocked(!orbitLocked));
 
 document.addEventListener('keydown', (e) => {
@@ -572,7 +666,7 @@ const ASSET_BASE = (() => {
   }
   return new URL('./assets/', window.location.href).href;
 })();
-const PRODUCT_GLB = new URL('iphone-14-pro-leather-case.glb?v=3donly1', ASSET_BASE).href;
+const PRODUCT_GLB = new URL('iphone-14-pro-leather-case.glb?v=fix1', ASSET_BASE).href;
 
 let renderer, scene, camera, root, phoneSize;
 let exteriorTex = null;
@@ -586,6 +680,8 @@ let dist = 7.3;
 let dragging3d = null;
 let painting = false;
 let paintStroke = null;
+let placingArtwork = false;
+let draggingArtwork = false;
 const raycaster = new THREE.Raycaster();
 const pointerNDC = new THREE.Vector2();
 
@@ -594,9 +690,9 @@ function isLeatherCaseMesh(mesh) {
   return name.includes('leather') || (name.includes('case') && !/(iphone|ipohne|phone|glass|screen|body)/.test(name));
 }
 
-function makeCaseMat(map) {
-  return new THREE.MeshPhysicalMaterial({
-    color: 0xffffff,
+function makeCaseMat(map, hex) {
+  const mat = new THREE.MeshPhysicalMaterial({
+    color: new THREE.Color(hex || '#ffffff'),
     map: map || null,
     roughness: 0.55,
     metalness: 0.05,
@@ -604,6 +700,7 @@ function makeCaseMat(map) {
     clearcoatRoughness: 0.45,
     side: THREE.FrontSide
   });
+  return mat;
 }
 
 function ensureFaceTexture(face) {
@@ -615,7 +712,8 @@ function ensureFaceTexture(face) {
   if (!tex) {
     tex = new THREE.CanvasTexture(off);
     tex.colorSpace = THREE.SRGBColorSpace;
-    tex.flipY = false;
+    // CanvasTexture default flipY=true matches glTF UV (v=0 at bottom) with canvasY=(1-v)*H
+    tex.flipY = true;
     tex.anisotropy = Math.min(16, renderer?.capabilities.getMaxAnisotropy?.() || 1);
     if (isIn) interiorTex = tex;
     else exteriorTex = tex;
@@ -631,14 +729,19 @@ function applyCaseTo3D() {
   const roughness = clamp(1 - g, 0.08, 0.85);
   const clearcoat = material === 'gloss' ? 1 : material === 'soft' ? 0.35 : 0.15;
   const clearcoatRoughness = material === 'gloss' ? 0.08 : 0.4;
-  for (const mat of caseMats) {
-    mat.color.set(0xffffff);
-    mat.roughness = roughness;
-    if ('clearcoat' in mat) {
-      mat.clearcoat = clearcoat;
-      mat.clearcoatRoughness = clearcoatRoughness;
-    }
-    mat.needsUpdate = true;
+  if (exteriorMat) {
+    exteriorMat.color.set(exteriorColor);
+    exteriorMat.roughness = roughness;
+    exteriorMat.clearcoat = clearcoat;
+    exteriorMat.clearcoatRoughness = clearcoatRoughness;
+    exteriorMat.needsUpdate = true;
+  }
+  if (interiorMat) {
+    interiorMat.color.set(interiorColor);
+    interiorMat.roughness = Math.min(0.92, roughness + 0.12);
+    interiorMat.clearcoat = clearcoat * 0.4;
+    interiorMat.clearcoatRoughness = Math.min(1, clearcoatRoughness + 0.2);
+    interiorMat.needsUpdate = true;
   }
   dirtyTex = true;
   updateTexture(true);
@@ -678,11 +781,12 @@ function loadGltf(loader, url) {
 }
 
 function splitCaseByFacing(mesh) {
+  // Classify with geometric face normal · (centroid - volumeCenter).
+  // Prefer geometric normal over averaged vertex normals (more stable on leather shells).
   const src = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
   src.computeBoundingBox();
   const center = src.boundingBox.getCenter(new THREE.Vector3());
   const pos = src.attributes.position;
-  const nor = src.attributes.normal;
   const triCount = pos.count / 3;
   const extTris = [];
   const intTris = [];
@@ -692,24 +796,15 @@ function splitCaseByFacing(mesh) {
     const ax = (pos.getX(i) + pos.getX(i + 1) + pos.getX(i + 2)) / 3;
     const ay = (pos.getY(i) + pos.getY(i + 1) + pos.getY(i + 2)) / 3;
     const az = (pos.getZ(i) + pos.getZ(i + 1) + pos.getZ(i + 2)) / 3;
-    let nx = 0;
-    let ny = 0;
-    let nz = 0;
-    if (nor) {
-      nx = (nor.getX(i) + nor.getX(i + 1) + nor.getX(i + 2)) / 3;
-      ny = (nor.getY(i) + nor.getY(i + 1) + nor.getY(i + 2)) / 3;
-      nz = (nor.getZ(i) + nor.getZ(i + 1) + nor.getZ(i + 2)) / 3;
-    } else {
-      const e1x = pos.getX(i + 1) - pos.getX(i);
-      const e1y = pos.getY(i + 1) - pos.getY(i);
-      const e1z = pos.getZ(i + 1) - pos.getZ(i);
-      const e2x = pos.getX(i + 2) - pos.getX(i);
-      const e2y = pos.getY(i + 2) - pos.getY(i);
-      const e2z = pos.getZ(i + 2) - pos.getZ(i);
-      nx = e1y * e2z - e1z * e2y;
-      ny = e1z * e2x - e1x * e2z;
-      nz = e1x * e2y - e1y * e2x;
-    }
+    const e1x = pos.getX(i + 1) - pos.getX(i);
+    const e1y = pos.getY(i + 1) - pos.getY(i);
+    const e1z = pos.getZ(i + 1) - pos.getZ(i);
+    const e2x = pos.getX(i + 2) - pos.getX(i);
+    const e2y = pos.getY(i + 2) - pos.getY(i);
+    const e2z = pos.getZ(i + 2) - pos.getZ(i);
+    const nx = e1y * e2z - e1z * e2y;
+    const ny = e1z * e2x - e1x * e2z;
+    const nz = e1x * e2y - e1y * e2x;
     const dot = nx * (ax - center.x) + ny * (ay - center.y) + nz * (az - center.z);
     (dot >= 0 ? extTris : intTris).push(t);
   }
@@ -731,6 +826,10 @@ function splitCaseByFacing(mesh) {
       }
       g.setAttribute(name, new THREE.BufferAttribute(array, itemSize));
     }
+    // Drop unused UV channels that can confuse raycast/material sampling.
+    if (g.getAttribute('uv1')) g.deleteAttribute('uv1');
+    if (g.getAttribute('uv2')) g.deleteAttribute('uv2');
+    g.computeVertexNormals();
     g.computeBoundingBox();
     g.computeBoundingSphere();
     return g;
@@ -780,8 +879,8 @@ function prepareProduct(sceneRoot) {
   interiorMat = null;
   updateTexture(true);
 
-  exteriorMat = makeCaseMat(exteriorTex);
-  interiorMat = makeCaseMat(interiorTex);
+  exteriorMat = makeCaseMat(exteriorTex, exteriorColor);
+  interiorMat = makeCaseMat(interiorTex, interiorColor);
   exteriorMat.userData.face = 'exterior';
   interiorMat.userData.face = 'interior';
   caseMats = [exteriorMat, interiorMat];
@@ -894,10 +993,24 @@ function hitCase(clientX, clientY) {
 }
 
 function uvToCanvas(uv) {
+  // glTF UV: v=0 at bottom. CanvasTexture flipY=true → canvas top is v=1.
   return {
     x: clamp(uv.x, 0, 1) * W,
     y: (1 - clamp(uv.y, 0, 1)) * H
   };
+}
+
+function moveSelectedToUv(hit) {
+  const l = layers.find((x) => x.id === selected);
+  if (!l || !['image', 'text', 'pattern'].includes(l.type) || !hit?.uv) return false;
+  const face = hit.object?.userData?.face === 'interior' ? 'interior' : 'exterior';
+  const pt = uvToCanvas(hit.uv);
+  l.face = face;
+  l.x = pt.x;
+  l.y = pt.y;
+  render();
+  syncTransform(l);
+  return true;
 }
 
 function paintAtHit(hit) {
@@ -921,6 +1034,9 @@ function paintAtHit(hit) {
     layers.push(paintStroke);
     selected = paintStroke.id;
   } else if (paintStroke.face === face) {
+    const last = paintStroke.points[paintStroke.points.length - 1];
+    // Skip tiny gaps to keep strokes smooth without UV jumps
+    if (Math.hypot(pt.x - last.x, pt.y - last.y) < 0.5) return true;
     paintStroke.points.push(pt);
   } else {
     return false;
@@ -934,21 +1050,38 @@ function bindViewportPointer(el) {
     if (e.button != null && e.button !== 0) return;
     el.setPointerCapture(e.pointerId);
 
-    if (orbitLocked && (tool === 'brush' || tool === 'eraser')) {
+    if (orbitLocked) {
       const hit = hitCase(e.clientX, e.clientY);
-      if (hit) {
-        paintAtHit(hit);
-        renderLayers();
+      const sel = layers.find((x) => x.id === selected);
+
+      if (placingArtwork || (sel && ['image', 'text', 'pattern'].includes(sel.type) && tool !== 'brush' && tool !== 'eraser')) {
+        if (hit && moveSelectedToUv(hit)) {
+          draggingArtwork = true;
+          placingArtwork = true;
+          return;
+        }
+      }
+
+      if (tool === 'brush' || tool === 'eraser') {
+        if (hit) {
+          paintAtHit(hit);
+          renderLayers();
+          return;
+        }
+        say('Aim at the leather case to draw');
         return;
       }
-      say('Aim at the leather case to draw');
-      return;
     }
 
     dragging3d = { x: e.clientX, y: e.clientY };
   });
 
   el.addEventListener('pointermove', (e) => {
+    if (orbitLocked && draggingArtwork) {
+      const hit = hitCase(e.clientX, e.clientY);
+      if (hit) moveSelectedToUv(hit);
+      return;
+    }
     if (painting && orbitLocked) {
       const hit = hitCase(e.clientX, e.clientY);
       if (hit) paintAtHit(hit);
@@ -967,6 +1100,13 @@ function bindViewportPointer(el) {
       snapshot();
       renderLayers();
       say('Stroke saved on case');
+    }
+    if (draggingArtwork) {
+      draggingArtwork = false;
+      placingArtwork = false;
+      snapshot();
+      renderLayers();
+      say('Artwork moved on case');
     }
     dragging3d = null;
   };
