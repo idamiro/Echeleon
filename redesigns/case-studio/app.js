@@ -813,44 +813,22 @@ function loadGltf(loader, url) {
 }
 
 function splitCaseByFacing(mesh, phoneCenterWorld) {
-  // Exterior = outer back + outer side walls only.
-  // Interior = cavity floor + inner side walls only.
-  // Never assign the same shell face to both; no colour bleed across the wall.
+  // Exterior = faces looking away from the phone (outer back + outer sides).
+  // Interior = faces looking toward the phone (cavity + inner side walls).
+  // Requires the case to already be seated around the phone.
   const src = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
   mesh.updateMatrixWorld(true);
   const normalMatrix = new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld);
   const pos = src.attributes.position;
   const triCount = pos.count / 3;
-
-  // Reference point must sit inside the cavity (not outside / on the shell).
-  const caseBox = new THREE.Box3().setFromObject(mesh);
-  const caseCenter = caseBox.getCenter(new THREE.Vector3());
-  const inside = phoneCenterWorld.clone();
-  if (caseBox.isEmpty()) {
-    inside.copy(caseCenter);
-  } else {
-    const pad = caseBox.getSize(new THREE.Vector3()).multiplyScalar(0.08);
-    const lo = caseBox.min.clone().add(pad);
-    const hi = caseBox.max.clone().sub(pad);
-    inside.clamp(lo, hi);
-    // Bias toward case center so outer rims do not flip classification.
-    inside.lerp(caseCenter, 0.35);
-  }
-
+  const extTris = [];
+  const intTris = [];
   const cLocal = new THREE.Vector3();
   const cWorld = new THREE.Vector3();
   const nLocal = new THREE.Vector3();
   const nWorld = new THREE.Vector3();
-  const toInside = new THREE.Vector3();
-  const fromCenterXY = new THREE.Vector3();
+  const toPhone = new THREE.Vector3();
 
-  // Dominant thin axis of the phone/case (depth) — used to separate back vs sides.
-  const size = caseBox.getSize(new THREE.Vector3());
-  let depthAxis = 2; // z
-  if (size.x <= size.y && size.x <= size.z) depthAxis = 0;
-  else if (size.y <= size.x && size.y <= size.z) depthAxis = 1;
-
-  const metrics = [];
   for (let t = 0; t < triCount; t++) {
     const i = t * 3;
     cLocal.set(
@@ -872,80 +850,16 @@ function splitCaseByFacing(mesh, phoneCenterWorld) {
       e1x * e2y - e1y * e2x
     );
     if (nLocal.lengthSq() < 1e-20) {
-      metrics.push({ t, toward: 0, dist: cWorld.distanceTo(inside), radialOut: 0 });
+      extTris.push(t);
       continue;
     }
     nLocal.normalize();
     nWorld.copy(nLocal).applyMatrix3(normalMatrix).normalize();
-
-    toInside.copy(inside).sub(cWorld);
-    const dist = toInside.length();
-    if (dist > 1e-8) toInside.multiplyScalar(1 / dist);
-    const toward = nWorld.dot(toInside);
-
-    // Radial outward in the plane perpendicular to depth: outer walls > 0, inner walls < 0.
-    fromCenterXY.copy(cWorld).sub(inside);
-    if (depthAxis === 0) fromCenterXY.x = 0;
-    else if (depthAxis === 1) fromCenterXY.y = 0;
-    else fromCenterXY.z = 0;
-    const nRad = nWorld.clone();
-    if (depthAxis === 0) nRad.x = 0;
-    else if (depthAxis === 1) nRad.y = 0;
-    else nRad.z = 0;
-    const radialOut = fromCenterXY.lengthSq() > 1e-12 && nRad.lengthSq() > 1e-12
-      ? fromCenterXY.normalize().dot(nRad.normalize())
-      : 0;
-
-    metrics.push({ t, toward, dist, radialOut });
+    toPhone.copy(phoneCenterWorld).sub(cWorld);
+    // Strict: only clearly inward-facing faces are interior.
+    // Outer side walls face away from the phone → exterior.
+    (nWorld.dot(toPhone) > 0 ? intTris : extTris).push(t);
   }
-
-  // Clear labels: must face cavity (= interior) or face away (= exterior).
-  // Side walls use radial sign so outer/inner skins never share a colour.
-  const CLEAR = 0.15;
-  const clearInt = [];
-  const clearExt = [];
-  const amb = [];
-  for (const m of metrics) {
-    const wallLike = Math.abs(m.radialOut) > 0.35 && Math.abs(m.toward) < 0.55;
-    if (wallLike) {
-      if (m.radialOut < 0) clearInt.push(m);
-      else clearExt.push(m);
-      continue;
-    }
-    if (m.toward > CLEAR) clearInt.push(m);
-    else if (m.toward < -CLEAR) clearExt.push(m);
-    else amb.push(m);
-  }
-
-  const meanDist = (arr) => {
-    if (!arr.length) return 0;
-    return arr.reduce((s, x) => s + x.dist, 0) / arr.length;
-  };
-  let intMean = meanDist(clearInt);
-  let extMean = meanDist(clearExt);
-  if (!clearInt.length && clearExt.length) intMean = extMean * 0.85;
-  if (!clearExt.length && clearInt.length) extMean = intMean * 1.15;
-  const midDist = (intMean + extMean) * 0.5 || meanDist(metrics);
-
-  for (const m of amb) {
-    // Rim / bevel: closer to cavity centre → interior, farther → exterior.
-    if (m.dist < midDist) clearInt.push(m);
-    else clearExt.push(m);
-  }
-
-  // Sanity: interior shell must be closer to cavity than exterior on average.
-  // If inverted (winding / phone offset wrong), swap once.
-  intMean = meanDist(clearInt);
-  extMean = meanDist(clearExt);
-  let intList = clearInt;
-  let extList = clearExt;
-  if (intList.length && extList.length && intMean > extMean * 1.02) {
-    intList = clearExt;
-    extList = clearInt;
-  }
-
-  const extTris = extList.map((m) => m.t);
-  const intTris = intList.map((m) => m.t);
 
   function buildFromTris(tris) {
     const g = new THREE.BufferGeometry();
@@ -992,7 +906,8 @@ function seatCaseOnPhone(product) {
   product.traverse((o) => {
     const n = (o.name || '').toLowerCase();
     if (!phoneNode && (n.includes('ipohne') || n.includes('iphone')) && !n.includes('leather')) phoneNode = o;
-    if (!caseNode && n === 'leather case') caseNode = o;
+    // Sketchfab node is "Leather_Case" (underscore), not "leather case".
+    if (!caseNode && !o.isMesh && n.includes('leather') && n.includes('case')) caseNode = o;
   });
   if (!phoneNode || !caseNode) return;
 
@@ -1005,13 +920,22 @@ function seatCaseOnPhone(product) {
   const caseBox = new THREE.Box3().setFromObject(caseNode);
   const phoneCenter = phoneBox.getCenter(new THREE.Vector3());
   const caseCenter = caseBox.getCenter(new THREE.Vector3());
+  const phoneSize = phoneBox.getSize(new THREE.Vector3());
   const caseSize = caseBox.getSize(new THREE.Vector3());
 
-  const target = new THREE.Vector3(
-    phoneCenter.x,
-    phoneCenter.y,
-    phoneBox.min.z - caseSize.z * 0.12
-  );
+  // Asset ships with phone + case side-by-side. Nest the case onto the phone:
+  // match centres on the two long axes; bias slightly on the thin (depth) axis
+  // so the phone sits in the cavity (screen / +thin side stays open).
+  const axes = [
+    { key: 'x', p: phoneSize.x, c: caseSize.x },
+    { key: 'y', p: phoneSize.y, c: caseSize.y },
+    { key: 'z', p: phoneSize.z, c: caseSize.z }
+  ].sort((a, b) => a.p - b.p);
+  const thin = axes[0].key;
+  const target = phoneCenter.clone();
+  const overhang = Math.max(0, caseSize[thin] - phoneSize[thin]);
+  target[thin] = phoneCenter[thin] - overhang * 0.25;
+
   const localBefore = caseCenter.clone().applyMatrix4(inv);
   const localAfter = target.clone().applyMatrix4(inv);
   caseNode.position.add(localAfter.sub(localBefore));
