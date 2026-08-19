@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./app.css?v=20260818-leather2">
+  <link rel="stylesheet" href="./app.css?v=20260819-dual1">
   <script type="importmap">
   {
     "imports": {
@@ -30,7 +30,7 @@
     }
   }
   </script>
-  <script type="module" src="./app.js?v=20260818-leather2"></script>
+  <script type="module" src="./app.js?v=20260819-dual1"></script>
 </head>
 <body>
   <div class="app" id="app">
@@ -108,7 +108,7 @@
           </div>
           <label class="field">Colour<input id="brushColor" type="color" value="#111111"></label>
           <label class="field">Size <output id="brushSizeOut">16</output><input id="brushSize" type="range" min="2" max="90" value="16"></label>
-          <p class="help">Draw directly on the 2D case. Switch to 3D to inspect.</p>
+          <p class="help">Draw on the active face (Exterior or Interior). Faces do not mix.</p>
         </div>
 
         <div class="panel-view" data-view="upload">
@@ -150,9 +150,20 @@
 
         <div class="stage" id="stage" data-mode="preview">
           <div class="design-host" id="designHost">
-            <div class="case-2d" id="case2d">
-              <canvas id="art" width="1170" height="2532" aria-label="Case artwork canvas"></canvas>
-              <div class="cam-cutout" aria-hidden="true"></div>
+            <div class="case-2d-board" id="case2d" data-face="exterior">
+              <div class="case-face is-active" data-face="exterior" role="button" tabindex="0" aria-pressed="true">
+                <span class="face-label">Exterior</span>
+                <canvas id="artExterior" width="1170" height="2532" aria-label="Exterior case artwork"></canvas>
+                <span class="cam-cutout" aria-hidden="true"></span>
+              </div>
+              <div class="case-face" data-face="interior" role="button" tabindex="0" aria-pressed="false">
+                <span class="face-label">Interior</span>
+                <canvas id="artInterior" width="1170" height="2532" aria-label="Interior case artwork"></canvas>
+                <span class="magsafe" aria-hidden="true">
+                  <span class="magsafe-ring"></span>
+                  <span class="magsafe-pill"></span>
+                </span>
+              </div>
             </div>
           </div>
           <div class="preview-host" id="previewHost"></div>
@@ -172,12 +183,19 @@
               <option>iPhone 14 Pro · leather case</option>
             </select>
           </label>
-          <p class="section-label">Case colour</p>
-          <div class="swatches" id="caseSwatches">
+          <p class="section-label">Exterior colour</p>
+          <div class="swatches" id="exteriorSwatches" data-target="exterior">
             <button type="button" class="swatch is-on" data-color="#1a1a1c" style="--c:#1a1a1c" aria-label="Black"></button>
             <button type="button" class="swatch" data-color="#f4f1ea" style="--c:#f4f1ea" aria-label="White"></button>
             <button type="button" class="swatch" data-color="#d8c3a8" style="--c:#d8c3a8" aria-label="Beige"></button>
             <button type="button" class="swatch" data-color="#2f4a3a" style="--c:#2f4a3a" aria-label="Dark green"></button>
+          </div>
+          <p class="section-label">Interior colour</p>
+          <div class="swatches" id="interiorSwatches" data-target="interior">
+            <button type="button" class="swatch is-on" data-color="#1a1a1c" style="--c:#1a1a1c" aria-label="Black"></button>
+            <button type="button" class="swatch" data-color="#2a2420" style="--c:#2a2420" aria-label="Dark brown"></button>
+            <button type="button" class="swatch" data-color="#f4f1ea" style="--c:#f4f1ea" aria-label="White"></button>
+            <button type="button" class="swatch" data-color="#d8c3a8" style="--c:#d8c3a8" aria-label="Beige"></button>
           </div>
         </div>
 
