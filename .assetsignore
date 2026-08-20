@@ -2,6 +2,12 @@
 .*
 **/.*
 
+# Studio / marketing source folders — not public site content.
+brand/**
+social/**
+linkedin-posts/**
+drafts/**
+
 # Build and development files are not website content.
 wrangler.jsonc
 **/wrangler.jsonc

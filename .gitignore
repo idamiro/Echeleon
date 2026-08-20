@@ -1,0 +1,25 @@
+# Dependencies & tooling
+node_modules/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.code-workspace
+
+# Env / logs
+*.log
+.env
+.env.*
+!.env.example
+
+# Build / cache / test
+.cache/
+dist/
+tmp/
+.tmp/
+*.local
+test-results/
+playwright-report/
+blob-report/
