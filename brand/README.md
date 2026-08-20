@@ -1,6 +1,8 @@
-# Vulcet brand kit
+# Vulcet brand kit (source — not deployed)
 
 Black / white identity. Signature device: **three-bar E** (no vertical stem).
+
+Excluded from Cloudflare Pages via `.assetsignore`. Live site copies live in `/assets/brand/` and root favicons.
 
 ## Type
 
@@ -8,7 +10,7 @@ Black / white identity. Signature device: **three-bar E** (no vertical stem).
 |------|------|
 | Wordmark letters (V U L C T) | **Syne Bold** |
 | Signature E | Three horizontal bars — middle optically shorter |
-| Site UI (unchanged) | Inter + Instrument Serif for editorial emphasis |
+| Site UI | Inter + Instrument Serif for editorial emphasis |
 
 Syne is OFL — see `fonts/OFL.txt`.
 
@@ -28,7 +30,7 @@ Syne is OFL — see `fonts/OFL.txt`.
 - `mark/vulcet-mark-badge-light.svg` / `.png`
 
 ### Favicon
-- `favicon/favicon.svg` — source of truth for `../favicon.svg`
+- `favicon/favicon.svg` — source of truth for `/favicon.svg`
 
 ## Rules
 
@@ -36,7 +38,3 @@ Syne is OFL — see `fonts/OFL.txt`.
 2. Black `#07080b` on paper / white `#f7f5f1` on coal.
 3. Do not recolor, add gradients, or outline the bars.
 4. Clear space: at least the height of one bar around the mark.
-
-## Preview
-
-See `preview/wordmark-preview.jpg`.

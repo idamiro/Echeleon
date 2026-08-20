@@ -1,0 +1,20 @@
+# Legacy root media → organized paths (Cloudflare Pages)
+/og-vulcet.png                  /assets/brand/og-vulcet.png                  301
+/og-vulcet.svg                  /assets/brand/og-vulcet.svg                  301
+/vulcet-wordmark.png            /assets/brand/vulcet-wordmark.png            301
+/vulcet-wordmark.svg            /assets/brand/vulcet-wordmark.svg            301
+
+/anadolu-og.jpg                 /work/anadolu-qida/media/anadolu-og.jpg     301
+/anadolu-hero.webp              /work/anadolu-qida/media/anadolu-hero.webp  301
+/anadolu-hero-small.jpg         /work/anadolu-qida/media/anadolu-hero-small.jpg 301
+/anadolu-catalog.jpg            /work/anadolu-qida/media/anadolu-catalog.jpg 301
+/anadolu-flour-10.jpg           /work/anadolu-qida/media/anadolu-flour-10.jpg 301
+/anadolu-flour-25.jpg           /work/anadolu-qida/media/anadolu-flour-25.jpg 301
+/anadolu-warehouse.jpg          /work/anadolu-qida/media/anadolu-warehouse.jpg 301
+
+/founderclub-hero.webp          /work/founderclub/media/founderclub-hero.webp 301
+/founderclub-hero-small.webp    /work/founderclub/media/founderclub-hero-small.webp 301
+/founderclub-event-networking.webp /work/founderclub/media/founderclub-event-networking.webp 301
+/founderclub-event-office.webp  /work/founderclub/media/founderclub-event-office.webp 301
+/founderclub-news-atameken.webp /work/founderclub/media/founderclub-news-atameken.webp 301
+/founderclub-news-seabreeze.webp /work/founderclub/media/founderclub-news-seabreeze.webp 301
