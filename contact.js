@@ -99,7 +99,7 @@
       if (typeof window.gtag === 'function') window.gtag('event', 'generate_lead', { form_name: 'project_brief' });
     } catch (error) {
       status.setAttribute('role', 'alert');
-      status.textContent = 'The brief could not be sent. Please try again or email hello@vulcet.com.';
+      status.textContent = 'The brief could not be sent. Please try again or email studio@vulcet.com.';
       submitButton.disabled = false;
       submitButton.removeAttribute('aria-busy');
     }
