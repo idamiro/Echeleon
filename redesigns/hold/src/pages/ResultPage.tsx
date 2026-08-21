@@ -14,9 +14,9 @@ function categoryLabel(value: string): string {
   return CATEGORY_OPTIONS.find((o) => o.value === value)?.label ?? value
 }
 
-function holdPeriodLabel(days: number): string {
-  if (days === 1) return '24 HOURS'
-  return `${days} DAYS`
+function holdPeriodParts(days: number): { amount: string; unit: string } {
+  if (days === 1) return { amount: '24', unit: 'HOURS' }
+  return { amount: String(days), unit: 'DAYS' }
 }
 
 function holdCtaLabel(days: number): string {
@@ -28,16 +28,20 @@ function recommendationHero(
   recommendation: Recommendation,
   holdDays: number,
   blurb: string
-): { primary: string; secondary: string | null; blurb: string } {
+): {
+  primary: string
+  secondary: { amount: string; unit: string } | null
+  blurb: string
+} {
   if (recommendation === 'BUYING_NOW_SEEMS_REASONABLE') {
-    return { primary: 'BUY', secondary: 'NOW', blurb }
+    return { primary: 'BUY', secondary: { amount: '', unit: 'NOW' }, blurb }
   }
   if (recommendation === 'CONSIDER_LETTING_IT_GO') {
     return { primary: 'LET IT GO', secondary: null, blurb }
   }
   return {
     primary: 'HOLD',
-    secondary: holdPeriodLabel(holdDays),
+    secondary: holdPeriodParts(holdDays),
     blurb,
   }
 }
@@ -176,7 +180,12 @@ export function ResultPage() {
           <p className="result-rec-line">
             <span className="result-rec-primary">{hero.primary}</span>
             {hero.secondary ? (
-              <span className="result-rec-secondary">{hero.secondary}</span>
+              <span className="result-rec-secondary">
+                {hero.secondary.amount ? (
+                  <span className="result-rec-amount">{hero.secondary.amount}</span>
+                ) : null}
+                <span className="result-rec-unit">{hero.secondary.unit}</span>
+              </span>
             ) : null}
           </p>
           <p className="result-rec-blurb">{hero.blurb}</p>
