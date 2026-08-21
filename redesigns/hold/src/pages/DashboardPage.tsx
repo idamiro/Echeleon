@@ -52,7 +52,7 @@ export function DashboardPage() {
         </p>
       </header>
 
-      <section className="panel money-panel">
+      <section className="glass-panel money-panel">
         <h2 className="section-title">Money not spent</h2>
         <p className="muted">
           Increases only after an explicit Let it go. Expired or ignored holds do not count.
@@ -71,7 +71,7 @@ export function DashboardPage() {
         )}
       </section>
 
-      <section className="panel">
+      <section className="glass-panel">
         <h2 className="section-title">Holds</h2>
         {holds.length === 0 ? (
           <p className="muted">
@@ -116,7 +116,7 @@ export function DashboardPage() {
         )}
       </section>
 
-      <section className="panel">
+      <section className="glass-panel">
         <h2 className="section-title">Products assessed</h2>
         {products.length === 0 ? (
           <p className="muted">Nothing assessed in this browser yet.</p>

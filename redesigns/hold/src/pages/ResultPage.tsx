@@ -102,7 +102,7 @@ export function ResultPage() {
         </p>
       </header>
 
-      <section className="panel" aria-labelledby="scores-heading">
+      <section className="glass-panel" aria-labelledby="scores-heading">
         <h2 id="scores-heading" className="section-title">
           Independent scores
         </h2>
@@ -131,7 +131,7 @@ export function ResultPage() {
       </section>
 
       <section className="signal-split">
-        <div className="panel signal-panel">
+        <div className="glass-panel signal-panel">
           <h2 className="section-title">Why it makes sense</h2>
           <ol>
             {r.whyItMakesSense.map((s) => (
@@ -139,7 +139,7 @@ export function ResultPage() {
             ))}
           </ol>
         </div>
-        <div className="panel signal-panel">
+        <div className="glass-panel signal-panel">
           <h2 className="section-title">What gives us pause</h2>
           <ol>
             {r.whatGivesPause.map((s) => (
@@ -149,7 +149,7 @@ export function ResultPage() {
         </div>
       </section>
 
-      <section className="panel recommend-panel">
+      <section className="glass-panel recommend-panel">
         <p className="eyebrow">Recommendation</p>
         <h2 className="rec-label">{r.recommendationLabel}</h2>
         <p>{r.recommendationBlurb}</p>
@@ -172,7 +172,7 @@ export function ResultPage() {
             </label>
             <button
               type="button"
-              className="btn btn-primary"
+              className="btn btn-solid"
               onClick={startHold}
               disabled={busy}
             >
@@ -196,7 +196,7 @@ export function ResultPage() {
             </label>
             <button
               type="button"
-              className="btn btn-primary"
+              className="btn btn-solid"
               onClick={startHold}
               disabled={busy}
             >

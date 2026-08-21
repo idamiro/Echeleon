@@ -145,13 +145,13 @@ export function RevisitPage() {
       </header>
 
       {mode === 'decide' ? (
-        <section className="panel stack-gap">
+        <section className="glass-panel stack-gap">
           <h2 className="section-title">Final decision</h2>
           <p className="muted">
             Expired or ignored holds do not change money not spent. Only an explicit Let it go does.
           </p>
           <div className="action-stack">
-            <button type="button" className="btn btn-primary" disabled={busy} onClick={onBought}>
+            <button type="button" className="btn btn-solid" disabled={busy} onClick={onBought}>
               I bought it
             </button>
             <button type="button" className="btn btn-danger" disabled={busy} onClick={onLetGo}>
@@ -180,7 +180,7 @@ export function RevisitPage() {
       ) : null}
 
       {mode === 'hold_again' ? (
-        <form className="panel stack-form" onSubmit={onHoldAgain}>
+        <form className="glass-panel stack-form" onSubmit={onHoldAgain}>
           <button type="button" className="text-back" onClick={() => setMode('decide')}>
             ← Back
           </button>
@@ -217,14 +217,14 @@ export function RevisitPage() {
             </select>
           </label>
           {error ? <p className="form-error">{error}</p> : null}
-          <button type="submit" className="btn btn-primary" disabled={busy}>
+          <button type="submit" className="btn btn-solid" disabled={busy}>
             Start new hold
           </button>
         </form>
       ) : null}
 
       {mode === 'something_changed' ? (
-        <form className="panel stack-form" onSubmit={onReassess}>
+        <form className="glass-panel stack-form" onSubmit={onReassess}>
           <button type="button" className="text-back" onClick={() => setMode('decide')}>
             ← Back
           </button>
@@ -338,7 +338,7 @@ export function RevisitPage() {
           </label>
 
           {error ? <p className="form-error">{error}</p> : null}
-          <button type="submit" className="btn btn-primary" disabled={busy}>
+          <button type="submit" className="btn btn-solid" disabled={busy}>
             Recalculate scores
           </button>
         </form>

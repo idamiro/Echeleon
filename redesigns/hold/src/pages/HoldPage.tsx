@@ -71,7 +71,7 @@ export function HoldPage() {
         <p className="lede">{formatMoney(product.price, product.currency)}</p>
       </header>
 
-      <section className="panel countdown-panel">
+      <section className="glass-panel countdown-panel">
         <p className="countdown-label">{ended ? 'Hold ended' : 'Time remaining'}</p>
         <p className="countdown-value" aria-live="polite">
           {ended ? 'Ready to decide' : remaining.label}
@@ -93,7 +93,7 @@ export function HoldPage() {
         {ended ? (
           <button
             type="button"
-            className="btn btn-primary"
+            className="btn btn-solid"
             onClick={() => navigate(`/revisit/${hold.id}`)}
           >
             Revisit decision

@@ -61,7 +61,7 @@ export function AuthModal({
         <p className="eyebrow">Account</p>
         <h2 id="auth-title">{title}</h2>
         <p className="lede">{blurb}</p>
-        <form onSubmit={submit} className="stack-form">
+        <form className="glass-panel stack-form" onSubmit={submit}>
           <label>
             <span>Display name</span>
             <input
@@ -82,7 +82,7 @@ export function AuthModal({
             />
           </label>
           {error ? <p className="form-error">{error}</p> : null}
-          <button type="submit" className="btn btn-primary" disabled={busy}>
+          <button type="submit" className="btn btn-solid" disabled={busy}>
             {busy ? 'Saving…' : 'Continue'}
           </button>
         </form>

@@ -11,7 +11,13 @@ import {
   OVERLAP_OPTIONS,
   REASON_OPTIONS,
 } from '../lib/options'
-import type { AssessmentInput } from '../scoring/types'
+import {
+  inferProductFromUrl,
+  looksLikeUrl,
+  type ProductInference,
+} from '../lib/productFromUrl'
+import { suggestAssessmentForProduct } from '../lib/suggestAssessment'
+import type { AssessmentInput, Category } from '../scoring/types'
 
 function emptyDraft(): DraftAssessment {
   return {
@@ -34,6 +40,9 @@ export function EntryPage() {
   const navigate = useNavigate()
   const [step, setStep] = useState<1 | 2>(1)
   const [draft, setDraft] = useState<DraftAssessment>(emptyDraft)
+  const [inference, setInference] = useState<ProductInference | null>(null)
+  const [suggestBlurb, setSuggestBlurb] = useState('')
+  const [hints, setHints] = useState<Record<string, string>>({})
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -46,11 +55,71 @@ export function EntryPage() {
     setDraft((d) => ({ ...d, [key]: value }))
   }
 
+  function applyInference(inf: ProductInference, current: DraftAssessment): DraftAssessment {
+    const suggestion = suggestAssessmentForProduct({
+      category: inf.category,
+      name: inf.name,
+    })
+    return {
+      ...current,
+      productName: current.productName.trim() ? current.productName : inf.name,
+      category: inf.category,
+      frequency: current.frequency || suggestion.frequency,
+      overlap: current.overlap || suggestion.overlap,
+      reason: current.reason || suggestion.reason,
+      considered: current.considered || suggestion.considered,
+      affordability: current.affordability || suggestion.affordability,
+      ownershipYears: current.ownershipYears || suggestion.ownershipYears,
+      importance: current.importance || suggestion.importance,
+    }
+  }
+
+  function onUrlChange(value: string) {
+    if (!looksLikeUrl(value)) {
+      setInference(null)
+      setDraft((d) => ({ ...d, url: value }))
+      return
+    }
+    const inf = inferProductFromUrl(value)
+    setInference(inf)
+    if (inf) {
+      const suggestion = suggestAssessmentForProduct({
+        category: inf.category,
+        name: inf.name,
+      })
+      setHints(suggestion.hints as Record<string, string>)
+      setSuggestBlurb(suggestion.blurb)
+      setDraft((d) => applyInference(inf, { ...d, url: value }))
+    } else {
+      setDraft((d) => ({ ...d, url: value }))
+    }
+  }
+
+  function onCategoryChange(category: Category) {
+    const suggestion = suggestAssessmentForProduct({
+      category,
+      name: draft.productName || inference?.name || category,
+    })
+    setHints(suggestion.hints as Record<string, string>)
+    setSuggestBlurb(suggestion.blurb)
+    setDraft((d) => ({
+      ...d,
+      category,
+      frequency: suggestion.frequency,
+      overlap: suggestion.overlap,
+      reason: suggestion.reason,
+      considered: suggestion.considered,
+      affordability: suggestion.affordability,
+      ownershipYears: suggestion.ownershipYears,
+      importance: suggestion.importance,
+    }))
+  }
+
   function goAssess(e: FormEvent) {
     e.preventDefault()
     setError('')
     if (!draft.productName.trim()) {
-      setError('Give the product a name.')
+      setError('Give the product a name — or paste a link first.')
       return
     }
     const price = Number(draft.price)
@@ -61,6 +130,25 @@ export function EntryPage() {
     if (!/^[A-Z]{3}$/.test(draft.currency)) {
       setError('Currency must be a 3-letter code (e.g. EUR, TRY, JPY).')
       return
+    }
+    // Refresh suggestions when entering assessment if still empty
+    if (!draft.frequency) {
+      const suggestion = suggestAssessmentForProduct({
+        category: draft.category,
+        name: draft.productName,
+      })
+      setHints(suggestion.hints as Record<string, string>)
+      setSuggestBlurb(suggestion.blurb)
+      setDraft((d) => ({
+        ...d,
+        frequency: suggestion.frequency,
+        overlap: suggestion.overlap,
+        reason: suggestion.reason,
+        considered: suggestion.considered,
+        affordability: suggestion.affordability,
+        ownershipYears: suggestion.ownershipYears,
+        importance: suggestion.importance,
+      }))
     }
     setStep(2)
   }
@@ -118,32 +206,73 @@ export function EntryPage() {
   return (
     <div className="page entry-page">
       <header className="page-intro">
-        <p className="eyebrow">Purchase decision tool</p>
+        <p className="eyebrow">Cool the purchase</p>
         <h1>HOLD</h1>
         <p className="lede">
-          Cool the impulse. Score utility, need, value, and risk as separate signals — then wait on
-          purpose.
+          Paste a link. We read what it is, suggest answers for that product type, then score the
+          decision — not the store page hype.
         </p>
       </header>
 
       {step === 1 ? (
-        <form className="panel stack-form" onSubmit={goAssess}>
+        <form className="glass-panel stack-form" onSubmit={goAssess}>
           <h2 className="section-title">Product</h2>
-          <label>
-            <span>What are you considering?</span>
+
+          <label className="url-field">
+            <span>Paste product link</span>
             <input
-              value={draft.productName}
-              onChange={(e) => update('productName', e.target.value)}
-              placeholder="e.g. Noise-cancelling headphones"
-              required
+              type="url"
+              value={draft.url}
+              onChange={(e) => onUrlChange(e.target.value)}
+              onPaste={(e) => {
+                const text = e.clipboardData.getData('text')
+                if (looksLikeUrl(text)) {
+                  // let paste apply, then infer on next tick with full value
+                  requestAnimationFrame(() => onUrlChange(text.trim()))
+                }
+              }}
+              placeholder="https://…"
               autoFocus
             />
           </label>
+
+          {inference ? (
+            <div className="infer-card" data-confidence={inference.confidence}>
+              <div className="infer-top">
+                <span className="infer-store">{inference.storeLabel}</span>
+                <span className="infer-conf">{inference.confidence} match</span>
+              </div>
+              <p className="infer-name">{inference.name}</p>
+              <p className="infer-meta">
+                Category → <strong>{inference.category}</strong>
+              </p>
+              <ul className="infer-notes">
+                {inference.notes.map((n) => (
+                  <li key={n}>{n}</li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="muted tip-line">
+              No scrape, no AI — we parse the URL path and store. You can still type a name manually.
+            </p>
+          )}
+
+          <label>
+            <span>Product name</span>
+            <input
+              value={draft.productName}
+              onChange={(e) => update('productName', e.target.value)}
+              placeholder="What are you considering?"
+              required
+            />
+          </label>
+
           <label>
             <span>Category</span>
             <select
               value={draft.category}
-              onChange={(e) => update('category', e.target.value as DraftAssessment['category'])}
+              onChange={(e) => onCategoryChange(e.target.value as Category)}
             >
               {CATEGORY_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -152,6 +281,7 @@ export function EntryPage() {
               ))}
             </select>
           </label>
+
           <div className="row-2">
             <label>
               <span>Price</span>
@@ -177,35 +307,32 @@ export function EntryPage() {
               </select>
             </label>
           </div>
-          <label>
-            <span>Link (optional)</span>
-            <input
-              type="url"
-              value={draft.url}
-              onChange={(e) => update('url', e.target.value)}
-              placeholder="https://"
-            />
-          </label>
+
           {error ? <p className="form-error">{error}</p> : null}
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn btn-solid">
             Continue to assessment
           </button>
         </form>
       ) : (
-        <form className="panel stack-form" onSubmit={submitAssessment}>
+        <form className="glass-panel stack-form" onSubmit={submitAssessment}>
           <button type="button" className="text-back" onClick={() => setStep(1)}>
             ← {draft.productName}
           </button>
           <h2 className="section-title">Assessment</h2>
+          {suggestBlurb ? <p className="suggest-blurb">{suggestBlurb}</p> : null}
           <p className="muted">
-            Behavioral context matters more than the story you tell yourself about why.
+            Pre-filled from product type. Behavioral context beats the story you tell yourself.
           </p>
 
           <fieldset>
             <legend>How often would you use it?</legend>
+            {hints.frequency ? <p className="hint">{hints.frequency}</p> : null}
             <div className="choice-grid">
               {FREQUENCY_OPTIONS.map((o) => (
-                <label key={o.value} className="choice">
+                <label
+                  key={o.value}
+                  className={`choice glass-choice${draft.frequency === o.value ? ' is-on' : ''}`}
+                >
                   <input
                     type="radio"
                     name="frequency"
@@ -220,9 +347,13 @@ export function EntryPage() {
 
           <fieldset>
             <legend>Do you already own something that does the same job?</legend>
+            {hints.overlap ? <p className="hint">{hints.overlap}</p> : null}
             <div className="choice-grid">
               {OVERLAP_OPTIONS.map((o) => (
-                <label key={o.value} className="choice">
+                <label
+                  key={o.value}
+                  className={`choice glass-choice${draft.overlap === o.value ? ' is-on' : ''}`}
+                >
                   <input
                     type="radio"
                     name="overlap"
@@ -237,9 +368,13 @@ export function EntryPage() {
 
           <fieldset>
             <legend>Why are you considering it?</legend>
+            {hints.reason ? <p className="hint">{hints.reason}</p> : null}
             <div className="choice-grid">
               {REASON_OPTIONS.map((o) => (
-                <label key={o.value} className="choice">
+                <label
+                  key={o.value}
+                  className={`choice glass-choice${draft.reason === o.value ? ' is-on' : ''}`}
+                >
                   <input
                     type="radio"
                     name="reason"
@@ -254,9 +389,13 @@ export function EntryPage() {
 
           <fieldset>
             <legend>How long have you been considering this?</legend>
+            {hints.considered ? <p className="hint">{hints.considered}</p> : null}
             <div className="choice-grid">
               {CONSIDERED_OPTIONS.map((o) => (
-                <label key={o.value} className="choice">
+                <label
+                  key={o.value}
+                  className={`choice glass-choice${draft.considered === o.value ? ' is-on' : ''}`}
+                >
                   <input
                     type="radio"
                     name="considered"
@@ -271,9 +410,13 @@ export function EntryPage() {
 
           <fieldset>
             <legend>How would buying this affect your available money?</legend>
+            {hints.affordability ? <p className="hint">{hints.affordability}</p> : null}
             <div className="choice-grid">
               {AFFORDABILITY_OPTIONS.map((o) => (
-                <label key={o.value} className="choice">
+                <label
+                  key={o.value}
+                  className={`choice glass-choice${draft.affordability === o.value ? ' is-on' : ''}`}
+                >
                   <input
                     type="radio"
                     name="affordability"
@@ -288,6 +431,7 @@ export function EntryPage() {
 
           <label>
             <span>Expected ownership / use span (years)</span>
+            {hints.ownershipYears ? <p className="hint">{hints.ownershipYears}</p> : null}
             <input
               inputMode="decimal"
               value={draft.ownershipYears}
@@ -299,6 +443,7 @@ export function EntryPage() {
             <span>
               Importance if you could not buy it — {draft.importance}/5
             </span>
+            {hints.importance ? <p className="hint">{hints.importance}</p> : null}
             <input
               type="range"
               min={1}
@@ -310,7 +455,7 @@ export function EntryPage() {
           </label>
 
           {error ? <p className="form-error">{error}</p> : null}
-          <button type="submit" className="btn btn-primary" disabled={busy}>
+          <button type="submit" className="btn btn-solid" disabled={busy}>
             {busy ? 'Scoring…' : 'See scores'}
           </button>
         </form>
