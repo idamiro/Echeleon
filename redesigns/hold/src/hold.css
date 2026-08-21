@@ -355,13 +355,14 @@ legend {
 
 .btn {
   font: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  padding: 0.9rem 1.15rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--line-strong);
-  background: var(--glass-2);
+  font-size: 0.88rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  padding: 0.95rem 1.35rem;
+  border-radius: 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
   color: var(--ink);
   cursor: pointer;
   text-decoration: none;
@@ -369,21 +370,29 @@ legend {
   justify-content: center;
   align-items: center;
   gap: 0.45rem;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 10px 28px rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 12px 32px rgba(0, 0, 0, 0.35);
   transition:
-    transform 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
 }
 
 .btn:hover {
-  transform: translateY(-1px);
-  background: var(--glass-3);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.985);
 }
 
 .btn:disabled {
@@ -394,15 +403,17 @@ legend {
 
 .btn-solid,
 .btn-primary {
-  background: var(--solid);
-  color: var(--solid-ink);
+  background: linear-gradient(180deg, #fff, #e8e8e8);
+  color: #0a0a0a;
   border-color: transparent;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 14px 34px rgba(0, 0, 0, 0.45);
 }
 
 .btn-solid:hover,
 .btn-primary:hover {
-  background: #fff;
+  background: linear-gradient(180deg, #fff, #f2f2f2);
 }
 
 .btn-ghost {
@@ -412,6 +423,167 @@ legend {
 .btn-danger {
   background: rgba(255, 255, 255, 0.08);
 }
+
+.field-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin-bottom: 0.45rem;
+}
+
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.chip {
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-soft);
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.chip:hover {
+  transform: translateY(-1px);
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.chip.is-on {
+  background: rgba(255, 255, 255, 0.88);
+  color: #0a0a0a;
+  border-color: transparent;
+  font-weight: 650;
+}
+
+.ask-stage {
+  overflow: hidden;
+}
+
+.ask-progress {
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.ask-progress-bar {
+  height: 100%;
+  background: #fff;
+  border-radius: inherit;
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ask-count {
+  margin: 0 0 0.85rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.ask-legend {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+}
+
+.ask-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.ask-option {
+  text-align: left;
+  font: inherit;
+  padding: 0.95rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+  color: var(--ink);
+  cursor: pointer;
+  backdrop-filter: blur(16px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.ask-option:hover {
+  transform: translateY(-2px) scale(1.01);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.ask-option.is-on,
+.ask-option:active {
+  background: rgba(255, 255, 255, 0.9);
+  color: #0a0a0a;
+  border-color: transparent;
+}
+
+.ask-card {
+  margin-bottom: 1rem;
+}
+
+.ask-in {
+  animation: ask-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ask-out {
+  animation: ask-out 0.2s ease both;
+}
+
+@keyframes ask-in {
+  from {
+    opacity: 0;
+    transform: translateX(28px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes ask-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+}
+
+.infer-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 3vw, 1.45rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
 
 .form-error {
   color: var(--danger);
@@ -845,21 +1017,22 @@ input[type='range'] {
   position: relative;
   isolation: isolate;
   width: 100%;
-  min-height: 3.4rem;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.06);
+  min-height: 3.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
   color: var(--ink);
   font: inherit;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   cursor: pointer;
   overflow: hidden;
   user-select: none;
   touch-action: none;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
     0 14px 36px rgba(0, 0, 0, 0.4);
   transition:
     transform 0.2s ease,

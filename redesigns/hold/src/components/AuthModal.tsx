@@ -91,8 +91,8 @@ export function AuthModal({
           </button>
         </form>
         <p className="fine-print">
-          First HOLD email requires a one-click FormSubmit confirmation in your inbox — after that,
-          hold started / decision messages arrive automatically.
+          Mail goes through Vulcet’s Web3Forms channel (same as contact) — from HOLD · Vulcet /
+          studio@vulcet.com. Check spam if it is quiet.
         </p>
       </div>
     </div>,

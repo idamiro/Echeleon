@@ -1,4 +1,5 @@
 import type { Category } from '../scoring/types'
+import { cleanProductName } from './cleanName'
 
 export interface ProductInference {
   name: string
@@ -353,6 +354,7 @@ export function inferProductFromUrl(rawUrl: string): ProductInference | null {
     name = `${storeLabel} product`
     notes.push('Could not read a clear product name from the path — edit it.')
   } else {
+    name = cleanProductName(name) || name
     notes.push('Name inferred from the link.')
   }
 

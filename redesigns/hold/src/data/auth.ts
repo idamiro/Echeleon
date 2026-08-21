@@ -37,6 +37,7 @@ export async function signIn(input: {
     to: user.email,
     subject: isNew ? 'Welcome to HOLD' : 'HOLD — signed in',
     message: welcomeEmailBody(user.displayName),
+    name: user.displayName,
   })
 
   return {

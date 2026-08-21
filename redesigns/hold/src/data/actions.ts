@@ -127,6 +127,7 @@ export async function createHold(args: {
         endsAt: hold.endsAt,
         days: hold.holdDays,
       }),
+      name: user.displayName,
     })
   }
   return hold
@@ -209,6 +210,7 @@ export async function decideHold(args: {
             ? `Money not spent: ${formatMoney(product.price, product.currency)}`
             : undefined,
       }),
+      name: user.displayName,
     })
   }
 

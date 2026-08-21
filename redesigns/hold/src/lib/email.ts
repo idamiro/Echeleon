@@ -1,48 +1,59 @@
 /**
- * Transactional mail via FormSubmit (no backend key).
- * First email to a new address requires one inbox confirmation click.
+ * Transactional HOLD mail via the same Web3Forms pipeline as vulcet.com/contact.
+ * Notifications land in studio@vulcet.com; user is CC'd so they get a copy.
+ * From-name: HOLD · Vulcet (company channel, not FormSubmit spam).
  */
+const WEB3FORMS_KEY = '471f1056-9d23-4678-b1fd-87a01108f652'
+const FROM_NAME = 'HOLD · Vulcet'
+const REPLY_TO = 'studio@vulcet.com'
+
 export async function sendUserEmail(args: {
   to: string
   subject: string
   message: string
+  name?: string
 }): Promise<{ ok: boolean; detail: string }> {
   const to = args.to.trim().toLowerCase()
-  if (!to.includes('@')) {
-    return { ok: false, detail: 'Invalid email' }
-  }
+  if (!to.includes('@')) return { ok: false, detail: 'Invalid email' }
 
   try {
-    const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
+    const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
       body: JSON.stringify({
-        _subject: args.subject,
+        access_key: WEB3FORMS_KEY,
+        subject: args.subject,
+        from_name: FROM_NAME,
+        name: args.name || 'HOLD user',
+        email: to,
+        replyto: REPLY_TO,
+        cc: to,
         message: args.message,
-        from: 'HOLD by Vulcet',
-        _template: 'box',
-        _captcha: 'false',
-        _honey: '',
+        // Honeypot
+        botcheck: '',
       }),
     })
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => '')
-      return { ok: false, detail: text || `HTTP ${res.status}` }
+    const data = (await res.json().catch(() => ({}))) as {
+      success?: boolean
+      message?: string
+    }
+
+    if (!res.ok || data.success === false) {
+      return { ok: false, detail: data.message || `HTTP ${res.status}` }
     }
 
     return {
       ok: true,
-      detail:
-        'Email queued. If this is your first HOLD mail, confirm the activation link FormSubmit sent you.',
+      detail: 'Sent via Vulcet mail (studio@vulcet.com channel). Check inbox + spam.',
     }
   } catch (e) {
     return {
       ok: false,
-      detail: e instanceof Error ? e.message : 'Network error sending email',
+      detail: e instanceof Error ? e.message : 'Network error',
     }
   }
 }
@@ -57,12 +68,17 @@ export function holdStartedEmailBody(args: {
   return [
     `Hi ${args.name},`,
     '',
-    `Your HOLD is active for: ${args.product} (${args.priceLabel}).`,
-    `Waiting period: ${args.days === 1 ? '24 hours' : `${args.days} days`}.`,
-    `Revisit after: ${new Date(args.endsAt).toLocaleString()}.`,
+    `Your HOLD is active.`,
     '',
-    'Open HOLD on Vulcet to decide when the timer ends.',
-    '— HOLD · Vulcet',
+    `Product: ${args.product}`,
+    `Price: ${args.priceLabel}`,
+    `Wait: ${args.days === 1 ? '24 hours' : `${args.days} days`}`,
+    `Revisit after: ${new Date(args.endsAt).toLocaleString()}`,
+    '',
+    'Open https://vulcet.com/redesigns/hold/ when you are ready to decide.',
+    '',
+    '— HOLD',
+    'Vulcet · studio@vulcet.com',
   ].join('\n')
 }
 
@@ -70,12 +86,11 @@ export function welcomeEmailBody(name: string): string {
   return [
     `Hi ${name},`,
     '',
-    'Welcome to HOLD. Your account is saved in this browser.',
-    'You will get a message when you start a HOLD, and when you decide.',
+    'Welcome to HOLD — Vulcet’s purchase cooling-off tool.',
+    'You will get a message when a HOLD starts and when you decide.',
     '',
-    'If this is the first email from HOLD, click FormSubmit’s confirmation link once so future messages arrive.',
-    '',
-    '— HOLD · Vulcet',
+    '— HOLD',
+    'Vulcet · studio@vulcet.com',
   ].join('\n')
 }
 
@@ -88,10 +103,11 @@ export function decisionEmailBody(args: {
   return [
     `Hi ${args.name},`,
     '',
-    `Decision recorded for ${args.product}: ${args.decision}.`,
+    `Decision for ${args.product}: ${args.decision}.`,
     args.moneyNote || '',
     '',
-    '— HOLD · Vulcet',
+    '— HOLD',
+    'Vulcet · studio@vulcet.com',
   ]
     .filter(Boolean)
     .join('\n')
