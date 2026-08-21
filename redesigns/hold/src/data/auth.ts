@@ -1,13 +1,10 @@
 import { createId } from '../lib/id'
+import { sendUserEmail, welcomeEmailBody } from '../lib/email'
 import * as db from './db'
 import type { UserProfile } from './types'
 
 const SESSION_KEY = 'hold_auth_session'
 
-/**
- * Auth is local-first for MVP (static deploy).
- * Gate only when the user first tries to persist a HOLD.
- */
 export async function getCurrentUser(): Promise<UserProfile | null> {
   const session = localStorage.getItem(SESSION_KEY)
   if (!session) return null
@@ -17,9 +14,10 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
 export async function signIn(input: {
   displayName: string
   email: string
-}): Promise<UserProfile> {
+}): Promise<{ user: UserProfile; emailStatus: string }> {
   const existing = await db.getUser()
   const now = Date.now()
+  const isNew = !existing
   const user: UserProfile = existing
     ? {
         ...existing,
@@ -34,7 +32,19 @@ export async function signIn(input: {
       }
   await db.saveUser(user)
   localStorage.setItem(SESSION_KEY, user.id)
-  return user
+
+  const mail = await sendUserEmail({
+    to: user.email,
+    subject: isNew ? 'Welcome to HOLD' : 'HOLD — signed in',
+    message: welcomeEmailBody(user.displayName),
+  })
+
+  return {
+    user,
+    emailStatus: mail.ok
+      ? mail.detail
+      : `Could not send email yet: ${mail.detail}`,
+  }
 }
 
 export async function signOut(): Promise<void> {

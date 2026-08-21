@@ -16,11 +16,12 @@ export function AuthModal({
   onClose,
   onSignedIn,
   title = 'Save this hold',
-  blurb = 'Sign in once to persist holds and see money you chose not to spend. Assessment results stay available without an account.',
+  blurb = 'Sign in once to persist holds and receive email updates. Assessment stays available without an account.',
 }: AuthModalProps) {
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
+  const [info, setInfo] = useState('')
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
@@ -37,13 +38,15 @@ export function AuthModal({
   async function submit(e: FormEvent) {
     e.preventDefault()
     setError('')
+    setInfo('')
     if (!displayName.trim() || !email.trim() || !email.includes('@')) {
       setError('Name and a valid email are required.')
       return
     }
     setBusy(true)
     try {
-      const user = await auth.signIn({ displayName, email })
+      const { user, emailStatus } = await auth.signIn({ displayName, email })
+      setInfo(emailStatus)
       onSignedIn(user)
     } catch {
       setError('Could not sign in. Try again.')
@@ -61,7 +64,7 @@ export function AuthModal({
         <p className="eyebrow">Account</p>
         <h2 id="auth-title">{title}</h2>
         <p className="lede">{blurb}</p>
-        <form className="glass-panel stack-form" onSubmit={submit}>
+        <form className="stack-form" onSubmit={submit}>
           <label>
             <span>Display name</span>
             <input
@@ -82,12 +85,14 @@ export function AuthModal({
             />
           </label>
           {error ? <p className="form-error">{error}</p> : null}
+          {info ? <p className="fine-print">{info}</p> : null}
           <button type="submit" className="btn btn-solid" disabled={busy}>
             {busy ? 'Saving…' : 'Continue'}
           </button>
         </form>
         <p className="fine-print">
-          Local MVP auth — stored in this browser only. No password; email is your account key for now.
+          First HOLD email requires a one-click FormSubmit confirmation in your inbox — after that,
+          hold started / decision messages arrive automatically.
         </p>
       </div>
     </div>,

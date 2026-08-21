@@ -1,6 +1,18 @@
 /** HOLD scoring types — ruleset v1 */
 
-export type Category = 'clothing' | 'tech' | 'home' | 'hobby' | 'other';
+export type Category =
+  | 'clothing'
+  | 'footwear'
+  | 'tech'
+  | 'audio'
+  | 'home'
+  | 'kitchen'
+  | 'beauty'
+  | 'hobby'
+  | 'sports'
+  | 'travel'
+  | 'digital'
+  | 'other';
 
 export type Frequency =
   | 'daily'

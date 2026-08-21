@@ -1,5 +1,11 @@
 import { addDays } from '../lib/format'
 import { createId } from '../lib/id'
+import {
+  decisionEmailBody,
+  holdStartedEmailBody,
+  sendUserEmail,
+} from '../lib/email'
+import { formatMoney } from '../lib/currency'
 import { scoreAssessment } from '../scoring/engine'
 import type { AssessmentInput, Recommendation } from '../scoring/types'
 import * as auth from './auth'
@@ -111,6 +117,17 @@ export async function createHold(args: {
   const product = await db.getProduct(args.productId)
   if (product) {
     await db.putProduct({ ...product, updatedAt: now })
+    void sendUserEmail({
+      to: user.email,
+      subject: `HOLD started — ${product.name}`,
+      message: holdStartedEmailBody({
+        name: user.displayName,
+        product: product.name,
+        priceLabel: formatMoney(product.price, product.currency),
+        endsAt: hold.endsAt,
+        days: hold.holdDays,
+      }),
+    })
   }
   return hold
 }
@@ -177,6 +194,24 @@ export async function decideHold(args: {
   }
 
   await db.putHold(updated)
+
+  const user = await auth.getCurrentUser()
+  if (user && product) {
+    void sendUserEmail({
+      to: user.email,
+      subject: `HOLD decision — ${product.name}`,
+      message: decisionEmailBody({
+        name: user.displayName,
+        product: product.name,
+        decision: args.decision === 'let_it_go' ? 'Let it go' : 'Bought',
+        moneyNote:
+          args.decision === 'let_it_go'
+            ? `Money not spent: ${formatMoney(product.price, product.currency)}`
+            : undefined,
+      }),
+    })
+  }
+
   return updated
 }
 

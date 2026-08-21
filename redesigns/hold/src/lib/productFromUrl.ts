@@ -7,6 +7,8 @@ export interface ProductInference {
   storeLabel: string
   confidence: 'high' | 'medium' | 'low'
   notes: string[]
+  priceFromQuery: number | null
+  currencyFromQuery: string | null
 }
 
 const TRACKING_PARAMS = new Set([
@@ -17,11 +19,8 @@ const TRACKING_PARAMS = new Set([
   'utm_content',
   'gclid',
   'fbclid',
-  'mc_cid',
-  'mc_eid',
   'ref',
   'tag',
-  'ascsubtag',
 ])
 
 const NOISE_SEGMENTS = new Set([
@@ -35,8 +34,6 @@ const NOISE_SEGMENTS = new Set([
   'p',
   'pd',
   'en',
-  'en-us',
-  'en-gb',
   'tr',
   'de',
   'fr',
@@ -44,7 +41,6 @@ const NOISE_SEGMENTS = new Set([
   'store',
   'buy',
   'cart',
-  'checkout',
   'search',
   'category',
   'categories',
@@ -52,25 +48,19 @@ const NOISE_SEGMENTS = new Set([
   'collections',
   'c',
   's',
-  'u',
-  'us',
-  'uk',
-  'eu',
-  'ip',
-  'webapp',
-  'app',
   'm',
   'mobile',
+  't',
 ])
 
 const CATEGORY_RULES: { category: Category; words: string[] }[] = [
   {
+    category: 'footwear',
+    words: ['shoe', 'shoes', 'sneaker', 'boot', 'boots', 'sandal', 'loafer', 'runner', 'trainer'],
+  },
+  {
     category: 'clothing',
     words: [
-      'shoe',
-      'shoes',
-      'sneaker',
-      'boot',
       'jacket',
       'hoodie',
       'shirt',
@@ -78,23 +68,28 @@ const CATEGORY_RULES: { category: Category; words: string[] }[] = [
       'dress',
       'jean',
       'pants',
-      'trouser',
       'coat',
-      'sock',
-      'hat',
-      'cap',
-      'bag',
-      'backpack',
-      'watch-strap',
       'apparel',
-      'clothing',
       'fashion',
-      'nike',
-      'adidas',
       'zara',
       'uniqlo',
-      'h&m',
       'asos',
+    ],
+  },
+  {
+    category: 'audio',
+    words: [
+      'headphone',
+      'headphones',
+      'earbud',
+      'earbuds',
+      'airpods',
+      'speaker',
+      'soundbar',
+      'microphone',
+      'bose',
+      'sony-wh',
+      'wh-1000',
     ],
   },
   {
@@ -103,37 +98,40 @@ const CATEGORY_RULES: { category: Category; words: string[] }[] = [
       'iphone',
       'ipad',
       'macbook',
-      'airpods',
       'pixel',
       'galaxy',
       'laptop',
-      'notebook',
       'keyboard',
       'mouse',
       'monitor',
-      'headphone',
-      'earbuds',
       'ssd',
       'gpu',
       'camera',
       'drone',
       'router',
       'charger',
-      'usb',
-      'bluetooth',
       'smartwatch',
-      'watch',
       'console',
       'playstation',
       'xbox',
-      'switch',
-      'tech',
-      'electronics',
       'apple',
       'samsung',
-      'sony',
-      'bose',
       'anker',
+    ],
+  },
+  {
+    category: 'kitchen',
+    words: [
+      'kitchen',
+      'cookware',
+      'blender',
+      'knife',
+      'toaster',
+      'kettle',
+      'espresso',
+      'coffee',
+      'pan',
+      'skillet',
     ],
   },
   {
@@ -145,42 +143,65 @@ const CATEGORY_RULES: { category: Category; words: string[] }[] = [
       'lamp',
       'mattress',
       'pillow',
-      'kitchen',
-      'cookware',
-      'blender',
       'vacuum',
-      'cleaner',
       'desk',
       'shelf',
       'furniture',
       'ikea',
-      'home',
-      'decor',
       'bedding',
+      'decor',
     ],
   },
   {
-    category: 'hobby',
+    category: 'beauty',
     words: [
-      'guitar',
-      'piano',
+      'serum',
+      'skincare',
+      'moisturizer',
+      'perfume',
+      'fragrance',
+      'makeup',
+      'shampoo',
+      'beauty',
+      'cosmetic',
+    ],
+  },
+  {
+    category: 'sports',
+    words: [
       'yoga',
+      'gym',
+      'fitness',
+      'dumbbell',
       'bike',
       'bicycle',
-      'camping',
-      'fishing',
-      'lego',
-      'board-game',
-      'puzzle',
-      'sketch',
-      'paint',
-      'camera-lens',
-      'triathlon',
       'running',
-      'fitness',
-      'gym',
-      'hobby',
-      'craft',
+      'football',
+      'tennis',
+      'sport',
+    ],
+  },
+  {
+    category: 'travel',
+    words: ['luggage', 'suitcase', 'travel', 'backpack', 'passport', 'carry-on', 'packing'],
+  },
+  {
+    category: 'hobby',
+    words: ['guitar', 'piano', 'lego', 'puzzle', 'sketch', 'paint', 'camera-lens', 'craft', 'hobby'],
+  },
+  {
+    category: 'digital',
+    words: [
+      'subscription',
+      'premium',
+      'saas',
+      'license',
+      'software',
+      'membership',
+      'notion',
+      'adobe',
+      'spotify',
+      'netflix',
     ],
   },
 ]
@@ -190,25 +211,19 @@ const STORE_LABELS: Record<string, string> = {
   'amazon.co.uk': 'Amazon UK',
   'amazon.de': 'Amazon DE',
   'amazon.com.tr': 'Amazon TR',
-  'amzn.to': 'Amazon',
   'apple.com': 'Apple',
-  'store.steampowered.com': 'Steam',
   'nike.com': 'Nike',
   'adidas.com': 'Adidas',
   'ebay.com': 'eBay',
   'etsy.com': 'Etsy',
   'ikea.com': 'IKEA',
-  'bestbuy.com': 'Best Buy',
-  'walmart.com': 'Walmart',
-  'target.com': 'Target',
-  'mediamarkt.com.tr': 'MediaMarkt',
   'trendyol.com': 'Trendyol',
   'hepsiburada.com': 'Hepsiburada',
   'n11.com': 'n11',
-  'teknosa.com': 'Teknosa',
+  'mediamarkt.com.tr': 'MediaMarkt',
   'zara.com': 'Zara',
   'asos.com': 'ASOS',
-  'uniqlo.com': 'Uniqlo',
+  'sephora.com': 'Sephora',
 }
 
 function titleCase(s: string): string {
@@ -225,7 +240,6 @@ function humanizeSlug(raw: string): string {
   s = s.replace(/[_+/]+/g, ' ')
   s = s.replace(/-+/g, ' ')
   s = s.replace(/\s+/g, ' ').trim()
-  // Drop trailing ids like 123456 or B0XXXX
   s = s.replace(/\b[a-z]?\d{5,}\b/gi, '').trim()
   s = s.replace(/\bB0[A-Z0-9]{8,}\b/gi, '').trim()
   return titleCase(s)
@@ -236,12 +250,11 @@ function isNoiseSegment(seg: string): boolean {
   if (!seg || seg.length < 2) return true
   if (NOISE_SEGMENTS.has(lower)) return true
   if (/^\d+$/.test(seg)) return true
-  if (/^[a-f0-9]{8,}$/i.test(seg) && !/[aeiou]/i.test(seg)) return true
   if (/^B0[A-Z0-9]{8,}$/i.test(seg)) return true
   return false
 }
 
-function scoreCategory(text: string): { category: Category; hits: number } {
+export function scoreCategory(text: string): { category: Category; hits: number } {
   const hay = text.toLowerCase()
   let best: Category = 'other'
   let bestHits = 0
@@ -261,21 +274,29 @@ function scoreCategory(text: string): { category: Category; hits: number } {
 function storeLabelForHost(host: string): string {
   const h = host.replace(/^www\./, '').toLowerCase()
   if (STORE_LABELS[h]) return STORE_LABELS[h]
-  for (const [key, label] of Object.entries(STORE_LABELS)) {
-    if (h.endsWith(key) || h.includes(key.split('.')[0]!)) {
-      // prefer exact-ish
-      if (h === key || h.endsWith('.' + key) || h.includes(key)) return label
-    }
-  }
-  // Amazon regional
   if (h.includes('amazon.')) return 'Amazon'
-  const base = h.split('.')[0] || h
-  return titleCase(base)
+  for (const [key, label] of Object.entries(STORE_LABELS)) {
+    if (h.endsWith(key)) return label
+  }
+  return titleCase(h.split('.')[0] || h)
 }
 
-/**
- * Infer product identity from a pasted commerce URL — no network / scraping.
- */
+function parseQueryPrice(url: URL): { price: number | null; currency: string | null } {
+  for (const key of ['price', 'amount', 'p', 'cost', 'value']) {
+    const v = url.searchParams.get(key)
+    if (!v) continue
+    const n = Number(String(v).replace(/[^\d.]/g, ''))
+    if (Number.isFinite(n) && n > 0) {
+      const cur = url.searchParams.get('currency') || url.searchParams.get('cur')
+      return {
+        price: n,
+        currency: cur && /^[a-z]{3}$/i.test(cur) ? cur.toUpperCase() : null,
+      }
+    }
+  }
+  return { price: null, currency: null }
+}
+
 export function inferProductFromUrl(rawUrl: string): ProductInference | null {
   const trimmed = rawUrl.trim()
   if (!trimmed) return null
@@ -286,14 +307,13 @@ export function inferProductFromUrl(rawUrl: string): ProductInference | null {
   } catch {
     return null
   }
-
   if (!/^https?:$/i.test(url.protocol)) return null
 
   const host = url.hostname.replace(/^www\./, '')
   const storeLabel = storeLabelForHost(host)
   const notes: string[] = [`Detected store: ${storeLabel}`]
+  const qPrice = parseQueryPrice(url)
 
-  // Clean tracking noise for display / parsing
   for (const key of [...url.searchParams.keys()]) {
     if (TRACKING_PARAMS.has(key.toLowerCase())) url.searchParams.delete(key)
   }
@@ -303,12 +323,10 @@ export function inferProductFromUrl(rawUrl: string): ProductInference | null {
     .map((s) => s.trim())
     .filter((s) => s && !isNoiseSegment(s))
 
-  // Prefer query titles some shops use
   const qTitle =
     url.searchParams.get('title') ||
     url.searchParams.get('name') ||
-    url.searchParams.get('product') ||
-    url.searchParams.get('q')
+    url.searchParams.get('product')
 
   let name = ''
   if (qTitle && qTitle.length > 2 && qTitle.length < 120) {
@@ -316,7 +334,6 @@ export function inferProductFromUrl(rawUrl: string): ProductInference | null {
   }
 
   if (!name && segments.length) {
-    // Longest human-looking segment usually is the product slug
     const ranked = [...segments].sort((a, b) => {
       const ha = /[a-z]/i.test(a) ? a.length : 0
       const hb = /[a-z]/i.test(b) ? b.length : 0
@@ -326,7 +343,6 @@ export function inferProductFromUrl(rawUrl: string): ProductInference | null {
     if (pick) name = humanizeSlug(pick)
   }
 
-  // Amazon dp/ASIN — try previous segment for name
   if ((!name || name.length < 4) && /amazon\./i.test(host)) {
     const parts = url.pathname.split('/').filter(Boolean)
     const dpIdx = parts.findIndex((p) => p === 'dp' || p === 'product')
@@ -337,17 +353,16 @@ export function inferProductFromUrl(rawUrl: string): ProductInference | null {
     name = `${storeLabel} product`
     notes.push('Could not read a clear product name from the path — edit it.')
   } else {
-    notes.push('Name inferred from the link path (no page scrape).')
+    notes.push('Name inferred from the link.')
   }
 
-  const { category, hits } = scoreCategory(
-    `${host} ${url.pathname} ${name} ${storeLabel}`.toLowerCase()
-  )
-  if (hits > 0) {
-    notes.push(`Category lean: ${category}`)
-  } else {
-    notes.push('Category unclear — pick the closest fit.')
+  if (qPrice.price != null) {
+    notes.push(`Price found in link parameters: ${qPrice.price}`)
   }
+
+  const { category, hits } = scoreCategory(`${host} ${url.pathname} ${name} ${storeLabel}`)
+  if (hits > 0) notes.push(`Category lean: ${category}`)
+  else notes.push('Category unclear — pick the closest fit.')
 
   const confidence: ProductInference['confidence'] =
     hits >= 2 && name.length > 6 && !name.endsWith('product')
@@ -363,6 +378,8 @@ export function inferProductFromUrl(rawUrl: string): ProductInference | null {
     storeLabel,
     confidence,
     notes,
+    priceFromQuery: qPrice.price,
+    currencyFromQuery: qPrice.currency,
   }
 }
 

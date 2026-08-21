@@ -57,13 +57,22 @@ export const AFFORDABILITY_SCORE: Record<Affordability, number> = {
 export function categoryCpuFactor(category: Category): number {
   switch (category) {
     case 'clothing':
-      return 1.15; // fashion often lower use density — slightly stricter Value
+    case 'footwear':
+    case 'beauty':
+      return 1.15;
     case 'tech':
+    case 'audio':
       return 0.95;
     case 'home':
-      return 0.9; // long-lived household items
+    case 'kitchen':
+      return 0.9;
     case 'hobby':
+    case 'sports':
       return 1.05;
+    case 'travel':
+      return 1.08;
+    case 'digital':
+      return 1.2; // subscriptions / low physical reuse
     default:
       return 1;
   }

@@ -15,25 +15,10 @@ export interface AssessmentSuggestion {
   affordability: Affordability
   ownershipYears: string
   importance: number
-  hints: Partial<
-    Record<
-      | 'frequency'
-      | 'overlap'
-      | 'reason'
-      | 'considered'
-      | 'affordability'
-      | 'ownershipYears'
-      | 'importance',
-      string
-    >
-  >
+  hints: Record<string, string>
   blurb: string
 }
 
-/**
- * Soft defaults / hints by product category — never invents buy advice,
- * only pre-fills common patterns the user can override.
- */
 export function suggestAssessmentForProduct(args: {
   category: Category
   name: string
@@ -53,25 +38,45 @@ export function suggestAssessmentForProduct(args: {
   }
 
   switch (args.category) {
+    case 'footwear':
+      return {
+        ...base,
+        frequency: 'few_times_week',
+        ownershipYears: '1.5',
+        reason: 'just_like',
+        hints: {
+          frequency: 'Be honest about rotation — many pairs die in the closet.',
+          overlap: 'Do you already own a pair for the same weather / use?',
+        },
+        blurb: 'Footwear lean: wear frequency and overlap beat the unboxing urge.',
+      }
     case 'clothing':
       return {
         ...base,
         frequency: 'few_times_week',
         ownershipYears: '1.5',
         reason: text.includes('sale') ? 'on_sale' : 'just_like',
-        considered: 'few_days',
-        importance: 3,
         hints: {
-          frequency: 'Clothes often land at a few wears a week — adjust if this is daily uniform.',
-          ownershipYears: 'Fashion cycles are shorter; 1–2 years is a common planning horizon.',
-          reason: 'Style pulls are easy to overstate as need.',
+          frequency: 'Cost-per-wear only works if it actually leaves the hanger.',
         },
-        blurb: 'Clothing lean: focus on real wear frequency and whether something already covers it.',
+        blurb: 'Clothing lean: real wears and closet overlap matter most.',
+      }
+    case 'audio':
+      return {
+        ...base,
+        frequency: 'daily',
+        ownershipYears: '3',
+        reason: 'improve_regular',
+        importance: 4,
+        hints: {
+          overlap: 'Working headphones already owned is a classic pause signal.',
+        },
+        blurb: 'Audio lean: daily listening vs “nice upgrade” is the whole game.',
       }
     case 'tech':
       return {
         ...base,
-        frequency: /phone|laptop|headphone|earbud|keyboard|mouse|watch/.test(text)
+        frequency: /phone|laptop|watch|keyboard|mouse/.test(text)
           ? 'daily'
           : 'few_times_week',
         ownershipYears: '3',
@@ -79,11 +84,19 @@ export function suggestAssessmentForProduct(args: {
         considered: 'few_weeks',
         importance: 4,
         hints: {
-          frequency: 'Daily-driver tech should show up as daily or a few times a week.',
-          overlap: 'Working phone/laptop/headphones already owned is a common pause signal.',
-          ownershipYears: 'Tech often lasts 2–4 years before you want an upgrade.',
+          overlap: 'A working device that already does the job should slow you down.',
         },
-        blurb: 'Tech lean: ownership overlap and daily use matter more than the launch story.',
+        blurb: 'Tech lean: ownership overlap and daily use beat launch hype.',
+      }
+    case 'kitchen':
+      return {
+        ...base,
+        frequency: 'few_times_week',
+        ownershipYears: '5',
+        reason: 'improve_regular',
+        considered: 'few_weeks',
+        importance: 3,
+        blurb: 'Kitchen lean: counter space and cook frequency tell the truth.',
       }
     case 'home':
       return {
@@ -93,11 +106,37 @@ export function suggestAssessmentForProduct(args: {
         reason: 'genuine_need',
         considered: 'few_weeks',
         importance: 4,
+        blurb: 'Home lean: longevity and replacement need usually win.',
+      }
+    case 'beauty':
+      return {
+        ...base,
+        frequency: 'daily',
+        ownershipYears: '0.5',
+        reason: 'just_like',
+        importance: 2,
         hints: {
-          ownershipYears: 'Home goods are long-lived — stretch the ownership span if it will stay.',
-          frequency: 'Household items can score lower on “daily” and still be high need.',
+          ownershipYears: 'Many beauty products empty in months — plan accordingly.',
         },
-        blurb: 'Home lean: longevity and replacement need usually outweigh impulse timing.',
+        blurb: 'Beauty lean: routine fit and unfinished bottles already at home.',
+      }
+    case 'sports':
+      return {
+        ...base,
+        frequency: 'few_times_week',
+        ownershipYears: '3',
+        reason: 'wanted_awhile',
+        considered: 'few_weeks',
+        blurb: 'Sports lean: session count beats aspirational gear.',
+      }
+    case 'travel':
+      return {
+        ...base,
+        frequency: 'few_times_month',
+        ownershipYears: '4',
+        reason: 'genuine_need',
+        considered: 'few_weeks',
+        blurb: 'Travel lean: trip frequency vs one-off packing fantasy.',
       }
     case 'hobby':
       return {
@@ -106,20 +145,22 @@ export function suggestAssessmentForProduct(args: {
         ownershipYears: '3',
         reason: 'wanted_awhile',
         considered: 'few_weeks',
-        importance: 3,
-        hints: {
-          frequency: 'Hobbies are often sparse but meaningful — be honest about session count.',
-          reason: '“Wanted awhile” is healthier than “just discovered” for gear.',
-        },
-        blurb: 'Hobby lean: sparse use is normal — watch impulse and budget impact.',
+        blurb: 'Hobby lean: sparse use is normal — watch impulse and budget.',
       }
-    default:
+    case 'digital':
       return {
         ...base,
+        frequency: 'few_times_week',
+        ownershipYears: '1',
+        reason: 'improve_regular',
+        affordability: 'noticeably',
         hints: {
-          frequency: 'Start from how often you would actually reach for this.',
+          ownershipYears: 'Think in years you would keep renewing.',
+          frequency: 'Subscriptions die when you stop opening them.',
         },
-        blurb: 'General lean: answer from behavior, not the store page story.',
+        blurb: 'Digital lean: renewals and open-rate matter more than features.',
       }
+    default:
+      return base
   }
 }

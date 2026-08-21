@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AuthModal } from '../components/AuthModal'
+import { HoldPressButton } from '../components/HoldPressButton'
 import { ScoreBlock } from '../components/ScoreBlock'
 import { createHold } from '../data/actions'
 import * as auth from '../data/auth'
@@ -154,59 +155,35 @@ export function ResultPage() {
         <h2 className="rec-label">{r.recommendationLabel}</h2>
         <p>{r.recommendationBlurb}</p>
 
-        {r.recommendation !== 'CONSIDER_LETTING_IT_GO' &&
-        r.recommendation !== 'BUYING_NOW_SEEMS_REASONABLE' ? (
-          <div className="hold-picker">
-            <label>
-              <span>Waiting period</span>
-              <select
-                value={holdDays}
-                onChange={(e) => setHoldDays(Number(e.target.value))}
-              >
-                {HOLD_DAY_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              type="button"
-              className="btn btn-solid"
-              onClick={startHold}
-              disabled={busy}
+        <div className="hold-picker">
+          <label>
+            <span>Waiting period</span>
+            <select
+              value={holdDays}
+              onChange={(e) => setHoldDays(Number(e.target.value))}
             >
-              {busy ? 'Starting…' : 'Start HOLD'}
-            </button>
-          </div>
-        ) : (
-          <div className="hold-picker">
-            <label>
-              <span>Still want a cooling-off period?</span>
-              <select
-                value={holdDays}
-                onChange={(e) => setHoldDays(Number(e.target.value))}
-              >
-                {HOLD_DAY_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              type="button"
-              className="btn btn-solid"
-              onClick={startHold}
-              disabled={busy}
-            >
-              {busy ? 'Starting…' : 'Start HOLD anyway'}
-            </button>
-          </div>
-        )}
+              {HOLD_DAY_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <HoldPressButton
+            label={
+              r.recommendation === 'BUYING_NOW_SEEMS_REASONABLE' ||
+              r.recommendation === 'CONSIDER_LETTING_IT_GO'
+                ? 'Hold to start HOLD anyway'
+                : 'Hold to start HOLD'
+            }
+            disabled={busy}
+            onComplete={startHold}
+          />
+        </div>
 
         <p className="fine-print">
-          Creating a hold is the first step that needs an account. Scores above stay available without signing in.
+          Press and hold the button to lock the waiting period. First HOLD needs an account — then
+          we email you.
         </p>
         {error ? <p className="form-error">{error}</p> : null}
       </section>
