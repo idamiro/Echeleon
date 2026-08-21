@@ -147,25 +147,31 @@ export function ResultPage() {
 
   const r = assessment.result
   const hero = recommendationHero(r.recommendation, holdDays, r.recommendationBlurb)
+  const theRead = buildTheRead({
+    utility: r.utility,
+    need: r.need,
+    value: r.value,
+    impulseRisk: r.impulseRisk,
+  })
   const isHoldRec = r.recommendation.startsWith('HOLD_')
   const cat = categoryLabel(product.category)
 
   return (
     <div className="page result-page">
-      <article className="result-editorial">
-        <header className="result-context">
+      <article className="result-stack">
+        <section className="result-hero-card result-order-hero" aria-labelledby="result-rec-heading">
           <p className="result-kicker">Assessment result</p>
-          <h1 className="result-product-name">{product.name}</h1>
-          <p className="result-product-meta">
-            <span>{formatMoney(product.price, product.currency)}</span>
-            <span className="result-meta-dot" aria-hidden="true">
-              ·
-            </span>
-            <span>{cat}</span>
-          </p>
-        </header>
+          <div className="result-hero-product">
+            <h1 className="result-product-name">{product.name}</h1>
+            <p className="result-product-meta">
+              <span>{formatMoney(product.price, product.currency)}</span>
+              <span className="result-meta-dot" aria-hidden="true">
+                ·
+              </span>
+              <span>{cat}</span>
+            </p>
+          </div>
 
-        <section className="result-rec" aria-labelledby="result-rec-heading">
           <h2 id="result-rec-heading" className="visually-hidden">
             Recommendation
           </h2>
@@ -176,8 +182,8 @@ export function ResultPage() {
             ) : null}
           </div>
           <p className="result-rec-blurb">{hero.blurb}</p>
-          <p className="result-confidence">
-            <span>{r.confidence} confidence</span>
+          <span className="result-confidence-badge">
+            {r.confidence} confidence
             <span
               className="result-confidence-tip"
               title="Based on how consistent your answers were."
@@ -186,10 +192,10 @@ export function ResultPage() {
             >
               i
             </span>
-          </p>
+          </span>
         </section>
 
-        <section className="result-actions" aria-label="Decision actions">
+        <section className="result-actions result-order-actions" aria-label="Decision actions">
           {isHoldRec ? (
             <>
               <button
@@ -289,30 +295,25 @@ export function ResultPage() {
           {error ? <p className="form-error">{error}</p> : null}
         </section>
 
-        <section className="result-signals-strip" aria-labelledby="signals-heading">
-          <h2 id="signals-heading" className="result-section-label">
-            The read
-          </h2>
-          <div className="signal-strip" role="list">
-            {buildTheRead({
-              utility: r.utility,
-              need: r.need,
-              value: r.value,
-              impulseRisk: r.impulseRisk,
-            }).map((s) => (
-              <div key={s.key} className={`signal-strip-item tone-${s.tone}`} role="listitem">
-                <span className="signal-strip-label">{s.name}</span>
-                <span className="signal-strip-value">{s.level}</span>
-              </div>
+        <section className="result-panel result-order-read" aria-labelledby="signals-heading">
+          <header className="result-panel-head">
+            <h2 id="signals-heading">The read</h2>
+          </header>
+          <ul className="read-list">
+            {theRead.map((s) => (
+              <li key={s.key} className={`read-row tone-${s.tone}`}>
+                <span className="read-name">{s.name}</span>
+                <span className="read-level">{s.level}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
 
         {whyHold.length > 0 ? (
-          <section className="result-why" aria-labelledby="why-heading">
-            <h2 id="why-heading" className="result-section-label">
-              {isHoldRec ? 'Why hold?' : 'Why this?'}
-            </h2>
+          <section className="result-panel result-order-why" aria-labelledby="why-heading">
+            <header className="result-panel-head">
+              <h2 id="why-heading">{isHoldRec ? 'Why hold?' : 'Why this?'}</h2>
+            </header>
             <ul className="result-why-list">
               {whyHold.map((item) => (
                 <li key={item.id} className={item.marker === '+' ? 'is-sense' : 'is-pause'}>
@@ -327,11 +328,16 @@ export function ResultPage() {
         ) : null}
 
         {r.costPerUse != null ? (
-          <section className="result-cpu" aria-label="Estimated cost per use">
-            <span className="result-section-label">Estimated cost per use</span>
-            <span className="result-cpu-value">
-              {formatMoney(r.costPerUse, product.currency)}
-            </span>
+          <section
+            className="result-panel result-panel-compact result-order-cpu"
+            aria-label="Estimated cost per use"
+          >
+            <div className="result-cpu-row">
+              <span className="result-section-label">Estimated cost per use</span>
+              <span className="result-cpu-value">
+                {formatMoney(r.costPerUse, product.currency)}
+              </span>
+            </div>
           </section>
         ) : null}
       </article>
