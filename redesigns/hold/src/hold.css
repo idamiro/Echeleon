@@ -19,6 +19,7 @@
   --content: 40rem;
   --font-display: 'Plus Jakarta Sans', 'Avenir Next', sans-serif;
   --font-body: 'Manrope', 'Avenir Next', sans-serif;
+  --font-rec: 'Manrope', 'Avenir Next', sans-serif;
   --blur: 22px;
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
 }
@@ -1377,19 +1378,20 @@ input[type='range'] {
   gap: 0.4rem;
   color: var(--ink);
   line-height: 1;
+  font-family: var(--font-rec);
 }
 
 .result-rec-amount {
-  font-family: var(--font-display);
-  font-weight: 800;
+  font-family: inherit;
+  font-weight: 700;
   font-size: clamp(2.85rem, 9vw, 4rem);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   font-variant-numeric: lining-nums tabular-nums;
   font-feature-settings: 'tnum' 1, 'lnum' 1;
 }
 
 .result-rec-unit {
-  font-family: var(--font-display);
+  font-family: inherit;
   font-weight: 700;
   font-size: clamp(1.35rem, 3.8vw, 1.85rem);
   letter-spacing: 0.04em;
