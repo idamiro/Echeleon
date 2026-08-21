@@ -7,6 +7,7 @@ import * as db from '../data/db'
 import type { AssessmentRecord, ProductRecord } from '../data/types'
 import { formatMoney } from '../lib/currency'
 import { CATEGORY_OPTIONS, HOLD_DAY_OPTIONS } from '../lib/options'
+import { buildTheRead } from '../lib/readLabels'
 import type { Recommendation, SignalItem } from '../scoring/types'
 
 function categoryLabel(value: string): string {
@@ -290,25 +291,20 @@ export function ResultPage() {
 
         <section className="result-signals-strip" aria-labelledby="signals-heading">
           <h2 id="signals-heading" className="result-section-label">
-            Your signals
+            The read
           </h2>
-          <div className="signal-strip">
-            <div className="signal-strip-item">
-              <span className="signal-strip-label">Utility</span>
-              <span className="signal-strip-value">{r.utility}</span>
-            </div>
-            <div className="signal-strip-item">
-              <span className="signal-strip-label">Need</span>
-              <span className="signal-strip-value">{r.need}</span>
-            </div>
-            <div className="signal-strip-item">
-              <span className="signal-strip-label">Value</span>
-              <span className="signal-strip-value">{r.value}</span>
-            </div>
-            <div className="signal-strip-item">
-              <span className="signal-strip-label">Impulse</span>
-              <span className="signal-strip-value">{r.impulseRisk}</span>
-            </div>
+          <div className="signal-strip" role="list">
+            {buildTheRead({
+              utility: r.utility,
+              need: r.need,
+              value: r.value,
+              impulseRisk: r.impulseRisk,
+            }).map((s) => (
+              <div key={s.key} className={`signal-strip-item tone-${s.tone}`} role="listitem">
+                <span className="signal-strip-label">{s.name}</span>
+                <span className="signal-strip-value">{s.level}</span>
+              </div>
+            ))}
           </div>
         </section>
 
