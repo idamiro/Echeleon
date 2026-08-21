@@ -42,12 +42,8 @@ export async function publishStatic() {
   await mkdir(assetsOut, { recursive: true })
   await cp(path.join(dist, 'assets'), assetsOut, { recursive: true })
 
-  // SPA fallback for Cloudflare Pages when this folder is the URL root segment
-  await writeFile(
-    path.join(root, '_redirects'),
-    `/redesigns/hold/*  /redesigns/hold/index.html  200\n`,
-    'utf8'
-  )
+  // No _redirects — Workers static deploy rejects /* → index.html as an infinite loop.
+  // Routing uses HashRouter instead.
 }
 
 const cmd = process.argv[2]

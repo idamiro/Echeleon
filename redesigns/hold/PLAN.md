@@ -21,4 +21,4 @@ Product entry → Assessment → Scores → Why it makes sense / What gives us p
 
 - Ruleset id: `v1` under `src/scoring/`
 - Persistence: IndexedDB (`idb`) + local auth gate for holds
-- Static Vite SPA published to `/redesigns/hold/`
+- Static Vite SPA published to `/redesigns/hold/` (HashRouter — no `_redirects`)

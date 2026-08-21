@@ -33,4 +33,6 @@ npm run dev
 npm run build
 ```
 
-Publishes `index.html` + `assets/` for Cloudflare Pages at `/redesigns/hold/`.
+Publishes `index.html` + `assets/` for Cloudflare at `/redesigns/hold/`.
+
+Routing uses **HashRouter** (`/#/...`) so deep links work without `_redirects` (Workers rejects `/* → index.html` as an infinite loop).

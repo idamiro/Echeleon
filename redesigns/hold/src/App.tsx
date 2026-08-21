@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { DashboardPage } from './pages/DashboardPage'
 import { EntryPage } from './pages/EntryPage'
@@ -7,9 +7,13 @@ import { ResultPage } from './pages/ResultPage'
 import { RevisitPage } from './pages/RevisitPage'
 import './hold.css'
 
+/**
+ * HashRouter: Cloudflare Workers static deploy rejects SPA _redirects that
+ * rewrite /redesigns/hold/* → index.html (infinite loop). Hash routes need no redirects.
+ */
 export default function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || '/'}>
+    <HashRouter>
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<EntryPage />} />
@@ -20,6 +24,6 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
