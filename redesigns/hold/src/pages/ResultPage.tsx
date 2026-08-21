@@ -173,8 +173,8 @@ export function ResultPage() {
             label={
               r.recommendation === 'BUYING_NOW_SEEMS_REASONABLE' ||
               r.recommendation === 'CONSIDER_LETTING_IT_GO'
-                ? 'Hold to start HOLD anyway'
-                : 'Hold to start HOLD'
+                ? 'Hold to lock anyway'
+                : 'Hold to lock HOLD'
             }
             disabled={busy}
             onComplete={startHold}

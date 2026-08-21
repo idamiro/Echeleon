@@ -1,6 +1,6 @@
 import type { Category } from '../scoring/types'
 import { cleanProductName } from './cleanName'
-import { extractBestPrice } from './extractPrice'
+import { extractBestPrice, extractPriceFromHtmlMeta } from './extractPrice'
 import { inferProductFromUrl, scoreCategory, type ProductInference } from './productFromUrl'
 
 export interface EnrichedProduct extends Omit<
@@ -24,6 +24,32 @@ function extractTitleFromMarkdown(md: string): string | null {
   return null
 }
 
+async function tryJina(target: string, signal?: AbortSignal): Promise<string | null> {
+  try {
+    const res = await fetch(`https://r.jina.ai/${target}`, {
+      signal,
+      headers: { Accept: 'text/plain' },
+    })
+    if (!res.ok) return null
+    return await res.text()
+  } catch {
+    return null
+  }
+}
+
+async function tryHtmlProxy(target: string, signal?: AbortSignal): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`,
+      { signal }
+    )
+    if (!res.ok) return null
+    return await res.text()
+  } catch {
+    return null
+  }
+}
+
 export async function enrichProductFromUrl(
   rawUrl: string,
   signal?: AbortSignal
@@ -36,39 +62,51 @@ export async function enrichProductFromUrl(
   let source: EnrichedProduct['source'] = 'url'
   let name = cleanProductName(base.name) || base.name
   const notes: string[] = [`Store: ${base.storeLabel}`]
+  const target = rawUrl.includes('://') ? rawUrl : `https://${rawUrl}`
 
-  try {
-    const target = rawUrl.includes('://') ? rawUrl : `https://${rawUrl}`
-    const res = await fetch(`https://r.jina.ai/${target}`, {
-      signal,
-      headers: { Accept: 'text/plain' },
-    })
-    if (res.ok) {
-      const text = await res.text()
-      const titled = extractTitleFromMarkdown(text.slice(0, 4000))
-      if (titled && titled.length > 3) {
-        name = titled
-        notes.push('Name from product page title')
-      }
+  const jina = await tryJina(target, signal)
+  if (jina) {
+    const titled = extractTitleFromMarkdown(jina.slice(0, 4000))
+    if (titled && titled.length > 3) {
+      name = titled
+      notes.push('Name from page')
+    }
+    const found = extractBestPrice(jina.slice(0, 60000), currency)
+    if (found) {
+      price = found.price
+      currency = found.currency
+      source = 'mixed'
+      notes.push(`Price ${found.price} ${found.currency}`)
+    }
+  }
 
-      const found = extractBestPrice(text.slice(0, 50000), currency)
-      if (found) {
-        price = found.price
-        currency = found.currency
+  if (price == null) {
+    const html = await tryHtmlProxy(target, signal)
+    if (html) {
+      const meta = extractPriceFromHtmlMeta(html)
+      if (meta) {
+        price = meta.price
+        currency = meta.currency || currency
         source = 'mixed'
-        notes.push(`Price ${found.price} ${found.currency}`)
-      } else {
-        notes.push('Price not found on page — enter it')
+        notes.push(`Price ${meta.price} ${meta.currency || ''}`.trim())
+      }
+      if (!name || name.endsWith('product')) {
+        const ogTitle = html.match(
+          /property=["']og:title["'][^>]*content=["']([^"']+)["']/i
+        ) || html.match(/content=["']([^"']+)["'][^>]*property=["']og:title["']/i)
+        if (ogTitle?.[1]) {
+          name = cleanProductName(ogTitle[1]) || name
+          notes.push('Name from og:title')
+        }
       }
     }
-  } catch {
-    notes.push('Page read failed — using link only')
   }
+
+  if (price == null) notes.push('Price not found — enter it')
 
   name = cleanProductName(name) || name
   const { category, hits } = scoreCategory(`${base.host} ${name} ${rawUrl}`)
   const finalCategory: Category = hits > 0 ? category : base.category
-  notes.push(`Category: ${finalCategory}`)
 
   return {
     name,
@@ -83,5 +121,4 @@ export async function enrichProductFromUrl(
   }
 }
 
-// keep for tests
 export { extractBestPrice as extractPriceFromText }

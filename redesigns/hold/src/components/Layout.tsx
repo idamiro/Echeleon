@@ -12,17 +12,17 @@ export function Layout() {
             <NavLink to="/" end>
               Assess
             </NavLink>
-            <NavLink to="/dashboard">History</NavLink>
+            <NavLink to="/dashboard">Holds</NavLink>
           </nav>
-          <a className="header-ext" href="/redesigns/">
-            Redesigns
+          <a className="header-ext" href="https://vulcet.com/">
+            Vulcet <span aria-hidden="true">↗</span>
           </a>
         </header>
         <main className="app-main">
           <Outlet />
         </main>
         <footer className="app-footer">
-          <p>HOLD · Vulcet — cool the purchase, keep the signals separate.</p>
+          <p>HOLD · Vulcet</p>
           <a href="https://vulcet.com">vulcet.com</a>
         </footer>
       </div>

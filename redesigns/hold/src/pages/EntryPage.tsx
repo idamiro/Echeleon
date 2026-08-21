@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createProductAndAssessment } from '../data/actions'
 import type { DraftAssessment } from '../data/types'
-import { COMMON_CURRENCIES, defaultCurrencyFromLocale } from '../lib/currency'
+import { COMMON_CURRENCIES, defaultCurrencyFromLocale, formatMoney } from '../lib/currency'
 import { enrichProductFromUrl, type EnrichedProduct } from '../lib/enrichProduct'
 import { buildQuestionsForProduct, CATEGORY_OPTIONS } from '../lib/options'
 import { looksLikeUrl } from '../lib/productFromUrl'
@@ -27,8 +27,17 @@ function emptyDraft(): DraftAssessment {
 }
 
 type QKey = 'frequency' | 'overlap' | 'reason' | 'considered' | 'affordability'
+type AskStep = { kind: 'category' } | { kind: 'field'; key: QKey }
 
-const Q_ORDER: QKey[] = ['frequency', 'overlap', 'reason', 'considered', 'affordability']
+const FIELD_ORDER: QKey[] = [
+  'frequency',
+  'overlap',
+  'reason',
+  'considered',
+  'affordability',
+]
+
+const ASK_STEPS: AskStep[] = [{ kind: 'category' }, ...FIELD_ORDER.map((key) => ({ kind: 'field' as const, key }))]
 
 export function EntryPage() {
   const navigate = useNavigate()
@@ -37,7 +46,6 @@ export function EntryPage() {
   const [draft, setDraft] = useState<DraftAssessment>(emptyDraft)
   const [inference, setInference] = useState<EnrichedProduct | null>(null)
   const [enriching, setEnriching] = useState(false)
-  const [suggestBlurb, setSuggestBlurb] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [anim, setAnim] = useState<'in' | 'out'>('in')
@@ -57,10 +65,36 @@ export function EntryPage() {
     [draft.category, draft.productName]
   )
 
+  const examplePrice = useMemo(() => {
+    try {
+      return formatMoney(240, draft.currency || defaultCurrencyFromLocale())
+    } catch {
+      return '€240'
+    }
+  }, [draft.currency])
+
   useEffect(() => () => abortRef.current?.abort(), [])
 
   function update<K extends keyof DraftAssessment>(key: K, value: DraftAssessment[K]) {
     setDraft((d) => ({ ...d, [key]: value }))
+  }
+
+  function applyCategory(category: Category, name = draft.productName) {
+    const suggestion = suggestAssessmentForProduct({
+      category,
+      name: name || category,
+    })
+    setDraft((d) => ({
+      ...d,
+      category,
+      frequency: suggestion.frequency,
+      overlap: suggestion.overlap,
+      reason: suggestion.reason,
+      considered: suggestion.considered,
+      affordability: suggestion.affordability,
+      ownershipYears: suggestion.ownershipYears,
+      importance: suggestion.importance,
+    }))
   }
 
   async function runEnrich(value: string) {
@@ -81,13 +115,10 @@ export function EntryPage() {
       const inf = await enrichProductFromUrl(value, controller.signal)
       if (controller.signal.aborted || !inf) return
       setInference(inf)
-
       const suggestion = suggestAssessmentForProduct({
         category: inf.category,
         name: inf.name,
       })
-      setSuggestBlurb(suggestion.blurb)
-
       setDraft((d) => ({
         ...d,
         url: value,
@@ -108,25 +139,6 @@ export function EntryPage() {
     }
   }
 
-  function onCategoryChange(category: Category) {
-    const suggestion = suggestAssessmentForProduct({
-      category,
-      name: draft.productName || category,
-    })
-    setSuggestBlurb(suggestion.blurb)
-    setDraft((d) => ({
-      ...d,
-      category,
-      frequency: suggestion.frequency,
-      overlap: suggestion.overlap,
-      reason: suggestion.reason,
-      considered: suggestion.considered,
-      affordability: suggestion.affordability,
-      ownershipYears: suggestion.ownershipYears,
-      importance: suggestion.importance,
-    }))
-  }
-
   function goAsk(e: FormEvent) {
     e.preventDefault()
     setError('')
@@ -136,26 +148,40 @@ export function EntryPage() {
     }
     const price = Number(draft.price)
     if (!Number.isFinite(price) || price < 0) {
-      setError('Enter the price (we fill it when the page exposes it).')
+      setError('Add the price to continue.')
       return
     }
-    setQIndex(0)
+    // Skip category step if we already inferred with confidence
+    const startAt =
+      inference && inference.confidence !== 'low' && inference.category === draft.category
+        ? 1
+        : 0
+    setQIndex(startAt)
     setAnim('in')
     setStep('ask')
   }
 
-  function pickAnswer(key: QKey, value: string) {
-    update(key, value as never)
+  function advanceFrom(index: number) {
     setAnim('out')
     window.setTimeout(() => {
-      if (qIndex >= Q_ORDER.length - 1) {
+      if (index >= ASK_STEPS.length - 1) {
         setStep('meta')
         setAnim('in')
         return
       }
-      setQIndex((i) => i + 1)
+      setQIndex(index + 1)
       setAnim('in')
     }, 220)
+  }
+
+  function pickCategory(category: Category) {
+    applyCategory(category)
+    advanceFrom(qIndex)
+  }
+
+  function pickAnswer(key: QKey, value: string) {
+    update(key, value as never)
+    advanceFrom(qIndex)
   }
 
   async function submitMeta(e: FormEvent) {
@@ -208,29 +234,31 @@ export function EntryPage() {
     }
   }
 
-  const qKey = Q_ORDER[qIndex]!
-  const qBlock = questions[qKey]
+  const askStep = ASK_STEPS[qIndex]!
 
   return (
     <div className="page entry-page site-grid">
       <header className="page-intro site-intro">
         <p className="eyebrow">Vulcet experiment</p>
         <h1>HOLD</h1>
-        <p className="lede">
-          Paste a link. We pull the product name, price, and category — then one clear question at a
-          time.
-        </p>
+        <p className="lede hero-line">Before you buy it, hold it.</p>
+        <p className="lede">See how useful it really is — then decide.</p>
+        <div className="live-example" aria-hidden="true">
+          <span>{examplePrice}</span>
+          <span className="live-arrow">→</span>
+          <span>HOLD 7 DAYS</span>
+        </div>
       </header>
 
       {step === 'product' ? (
-        <form className="glass-panel stack-form site-card" onSubmit={goAsk}>
+        <form className="product-panel stack-form site-card" onSubmit={goAsk}>
           <div className="card-head">
-            <h2 className="section-title">Product</h2>
+            <h2 className="section-title">What are you about to buy?</h2>
             {enriching ? <span className="pulse-dot">Reading…</span> : null}
           </div>
 
           <label className="url-field">
-            <span>Paste product link</span>
+            <span>Product link</span>
             <input
               type="url"
               value={draft.url}
@@ -244,7 +272,7 @@ export function EntryPage() {
                 const text = e.clipboardData.getData('text').trim()
                 if (looksLikeUrl(text)) requestAnimationFrame(() => void runEnrich(text))
               }}
-              placeholder="https://…"
+              placeholder="Paste a product URL (optional)"
               autoFocus
             />
           </label>
@@ -253,43 +281,27 @@ export function EntryPage() {
             <div className="infer-card">
               <div className="infer-top">
                 <span className="infer-store">{inference.storeLabel}</span>
-                <span className="infer-conf">{inference.confidence}</span>
+                {inference.price != null ? (
+                  <span className="infer-conf">
+                    {inference.price} {inference.currency || draft.currency}
+                  </span>
+                ) : (
+                  <span className="infer-conf">price?</span>
+                )}
               </div>
               <p className="infer-name">{inference.name}</p>
-              <p className="infer-meta">
-                {inference.price != null
-                  ? `${inference.price} ${inference.currency || draft.currency}`
-                  : 'Price missing — type it below'}
-              </p>
             </div>
           ) : null}
 
           <label>
-            <span>Product name</span>
+            <span>Name</span>
             <input
               value={draft.productName}
               onChange={(e) => update('productName', e.target.value)}
+              placeholder="Product name"
               required
             />
           </label>
-
-          <div>
-            <span className="field-label">Category</span>
-            <div className="chip-grid" role="listbox" aria-label="Category">
-              {CATEGORY_OPTIONS.map((o) => (
-                <button
-                  key={o.value}
-                  type="button"
-                  role="option"
-                  aria-selected={draft.category === o.value}
-                  className={`chip${draft.category === o.value ? ' is-on' : ''}`}
-                  onClick={() => onCategoryChange(o.value)}
-                >
-                  {o.label}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div className="row-2">
             <label>
@@ -298,6 +310,7 @@ export function EntryPage() {
                 inputMode="decimal"
                 value={draft.price}
                 onChange={(e) => update('price', e.target.value)}
+                placeholder="0"
                 required
               />
             </label>
@@ -317,41 +330,58 @@ export function EntryPage() {
           </div>
 
           {error ? <p className="form-error">{error}</p> : null}
-          <button type="submit" className="btn btn-solid btn-animated">
-            Start questions
+          <button type="submit" className="btn btn-solid btn-animated btn-cta">
+            Should I buy this? <span aria-hidden="true">→</span>
           </button>
         </form>
       ) : null}
 
       {step === 'ask' ? (
-        <div className="glass-panel site-card ask-stage">
+        <div className="product-panel site-card ask-stage">
           <div className="ask-progress">
             <div
               className="ask-progress-bar"
-              style={{ width: `${((qIndex + 1) / Q_ORDER.length) * 100}%` }}
+              style={{ width: `${((qIndex + 1) / ASK_STEPS.length) * 100}%` }}
             />
           </div>
           <p className="ask-count">
-            {qIndex + 1} / {Q_ORDER.length}
+            {qIndex + 1} / {ASK_STEPS.length}
           </p>
-          {suggestBlurb && qIndex === 0 ? (
-            <p className="suggest-blurb">{suggestBlurb}</p>
-          ) : null}
 
-          <div className={`ask-card ask-${anim}`} key={qKey}>
-            <h2 className="ask-legend">{qBlock.legend}</h2>
-            <div className="ask-options">
-              {qBlock.options.map((o) => (
-                <button
-                  key={o.value}
-                  type="button"
-                  className={`ask-option${draft[qKey] === o.value ? ' is-on' : ''}`}
-                  onClick={() => pickAnswer(qKey, o.value)}
-                >
-                  {o.label}
-                </button>
-              ))}
-            </div>
+          <div className={`ask-card ask-${anim}`} key={`${askStep.kind}-${qIndex}`}>
+            {askStep.kind === 'category' ? (
+              <>
+                <h2 className="ask-legend">What kind of purchase is this?</h2>
+                <div className="ask-options ask-options-grid">
+                  {CATEGORY_OPTIONS.map((o) => (
+                    <button
+                      key={o.value}
+                      type="button"
+                      className={`ask-option${draft.category === o.value ? ' is-on' : ''}`}
+                      onClick={() => pickCategory(o.value)}
+                    >
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="ask-legend">{questions[askStep.key].legend}</h2>
+                <div className="ask-options">
+                  {questions[askStep.key].options.map((o) => (
+                    <button
+                      key={o.value}
+                      type="button"
+                      className={`ask-option${draft[askStep.key] === o.value ? ' is-on' : ''}`}
+                      onClick={() => pickAnswer(askStep.key, o.value)}
+                    >
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           <button
@@ -374,7 +404,7 @@ export function EntryPage() {
       ) : null}
 
       {step === 'meta' ? (
-        <form className="glass-panel stack-form site-card" onSubmit={submitMeta}>
+        <form className="product-panel stack-form site-card" onSubmit={submitMeta}>
           <button type="button" className="text-back" onClick={() => setStep('ask')}>
             ← Questions
           </button>

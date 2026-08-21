@@ -147,6 +147,25 @@ export async function sumMoneyNotSpent(): Promise<{
   return tallyMoneyNotSpent(holds)
 }
 
+export async function deleteHold(id: string): Promise<void> {
+  const db = await getDb()
+  await db.delete('holds', id)
+}
+
+/** Delete product + related assessments + holds */
+export async function deleteProductCascade(productId: string): Promise<void> {
+  const db = await getDb()
+  const assessments = await db.getAllFromIndex('assessments', 'by-product', productId)
+  const holds = await db.getAllFromIndex('holds', 'by-product', productId)
+  const tx = db.transaction(['products', 'assessments', 'holds'], 'readwrite')
+  await Promise.all([
+    ...assessments.map((a) => tx.objectStore('assessments').delete(a.id)),
+    ...holds.map((h) => tx.objectStore('holds').delete(h.id)),
+    tx.objectStore('products').delete(productId),
+    tx.done,
+  ])
+}
+
 /** Mark active holds past endsAt as ended — does NOT award money-not-spent */
 export async function syncExpiredHolds(now = Date.now()): Promise<number> {
   const holds = await listHolds()
@@ -163,3 +182,4 @@ export async function syncExpiredHolds(now = Date.now()): Promise<number> {
   }
   return n
 }
+

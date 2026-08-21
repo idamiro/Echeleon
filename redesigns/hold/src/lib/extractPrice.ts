@@ -106,3 +106,36 @@ export function extractBestPrice(
 
   return { price: top.price, currency: top.currency }
 }
+
+/** Pull price from HTML meta / JSON-LD when markdown scrape misses */
+export function extractPriceFromHtmlMeta(html: string): {
+  price: number
+  currency: string | null
+} | null {
+  const amount =
+    html.match(/property=["']og:price:amount["'][^>]*content=["']([^"']+)["']/i)?.[1] ||
+    html.match(/content=["']([^"']+)["'][^>]*property=["']og:price:amount["']/i)?.[1] ||
+    html.match(/itemprop=["']price["'][^>]*content=["']([^"']+)["']/i)?.[1] ||
+    html.match(/content=["']([^"']+)["'][^>]*itemprop=["']price["']/i)?.[1] ||
+    html.match(/"price"\s*:\s*"?(?:USD|EUR|GBP|TRY|\$|€)?\s*([0-9]+(?:[.,][0-9]{2})?)"?/i)?.[1]
+
+  const curRaw =
+    html.match(/property=["']og:price:currency["'][^>]*content=["']([^"']+)["']/i)?.[1] ||
+    html.match(/content=["']([^"']+)["'][^>]*property=["']og:price:currency["']/i)?.[1] ||
+    html.match(/itemprop=["']priceCurrency["'][^>]*content=["']([^"']+)["']/i)?.[1] ||
+    html.match(/"priceCurrency"\s*:\s*"([A-Z]{3})"/i)?.[1]
+
+  if (!amount) {
+    // fallback: run text extractor on stripped HTML text
+    const text = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<[^>]+>/g, ' ')
+    return extractBestPrice(text.slice(0, 80000), curRaw || null)
+  }
+
+  const price = parseAmount(amount)
+  if (price == null || price < 1) return null
+  const currency =
+    curRaw && /^[A-Za-z]{3}$/.test(curRaw)
+      ? curRaw.toUpperCase()
+      : currencyFrom(amount, 'USD')
+  return { price, currency }
+}
