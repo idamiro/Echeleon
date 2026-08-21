@@ -189,7 +189,7 @@ export function RevisitPage() {
           <p className="muted">
             Keeps your original assessment and scores. Choose a new waiting period.
           </p>
-          <div className="score-grid compact read-grid">
+          <div className="score-grid compact">
             {buildTheRead({
               utility: assessment.result.utility,
               need: assessment.result.need,

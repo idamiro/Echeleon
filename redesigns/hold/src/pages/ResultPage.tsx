@@ -45,7 +45,7 @@ function recommendationHero(
 function buildWhyHold(
   sense: SignalItem[],
   pause: SignalItem[],
-  limit = 4
+  limit = 3
 ): { marker: '+' | '−'; text: string; id: string }[] {
   const combined = [
     ...sense.map((s) => ({ ...s, marker: '+' as const })),
@@ -124,7 +124,7 @@ export function ResultPage() {
     return buildWhyHold(
       assessment.result.whyItMakesSense,
       assessment.result.whatGivesPause,
-      4
+      3
     )
   }, [assessment])
 
@@ -158,31 +158,29 @@ export function ResultPage() {
 
   return (
     <div className="page result-page">
-      <article className="result-stack">
-        <section className="result-hero-card result-order-hero" aria-labelledby="result-rec-heading">
+      <article className="result-desk">
+        <header className="result-top">
           <p className="result-kicker">Assessment result</p>
-          <div className="result-hero-product">
-            <h1 className="result-product-name">{product.name}</h1>
-            <p className="result-product-meta">
-              <span>{formatMoney(product.price, product.currency)}</span>
-              <span className="result-meta-dot" aria-hidden="true">
-                ·
-              </span>
-              <span>{cat}</span>
-            </p>
-          </div>
+          <p className="result-product-line">
+            <strong>{product.name}</strong>
+            <span>
+              {formatMoney(product.price, product.currency)} · {cat}
+            </span>
+          </p>
+        </header>
 
+        <section className="result-answer" aria-labelledby="result-rec-heading">
           <h2 id="result-rec-heading" className="visually-hidden">
             Recommendation
           </h2>
-          <div className="result-rec-display">
+          <p className="result-rec-line">
             <span className="result-rec-primary">{hero.primary}</span>
             {hero.secondary ? (
               <span className="result-rec-secondary">{hero.secondary}</span>
             ) : null}
-          </div>
+          </p>
           <p className="result-rec-blurb">{hero.blurb}</p>
-          <span className="result-confidence-badge">
+          <p className="result-confidence">
             {r.confidence} confidence
             <span
               className="result-confidence-tip"
@@ -192,10 +190,49 @@ export function ResultPage() {
             >
               i
             </span>
-          </span>
+          </p>
         </section>
 
-        <section className="result-actions result-order-actions" aria-label="Decision actions">
+        <section className="result-read" aria-labelledby="signals-heading">
+          <h2 id="signals-heading" className="result-section-label">
+            The read
+          </h2>
+          <div className="read-grid" role="list">
+            {theRead.map((s) => (
+              <div key={s.key} className={`read-cell tone-${s.tone}`} role="listitem">
+                <span className="read-name">{s.name}</span>
+                <span className="read-level">{s.level}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {whyHold.length > 0 ? (
+          <section className="result-why" aria-labelledby="why-heading">
+            <h2 id="why-heading" className="result-section-label">
+              {isHoldRec ? 'Why hold?' : 'Why this?'}
+            </h2>
+            <ul className="result-why-list">
+              {whyHold.map((item) => (
+                <li key={item.id}>
+                  <span className="result-why-marker" aria-hidden="true">
+                    {item.marker}
+                  </span>
+                  <span>{item.text}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {r.costPerUse != null ? (
+          <p className="result-cpu">
+            <span>Estimated cost per use</span>
+            <strong>{formatMoney(r.costPerUse, product.currency)}</strong>
+          </p>
+        ) : null}
+
+        <section className="result-actions" aria-label="Decision actions">
           {isHoldRec ? (
             <>
               <button
@@ -206,33 +243,31 @@ export function ResultPage() {
               >
                 {busy ? 'Starting…' : holdCtaLabel(holdDays)}
               </button>
-              <div className="result-period">
-                <button
-                  type="button"
-                  className="result-period-toggle"
-                  onClick={() => setShowPeriodPicker((v) => !v)}
-                  aria-expanded={showPeriodPicker}
-                >
-                  Change waiting period
-                </button>
-                {showPeriodPicker ? (
-                  <div className="result-period-options" role="group" aria-label="Waiting period">
-                    {HOLD_DAY_OPTIONS.map((o) => (
-                      <button
-                        key={o.value}
-                        type="button"
-                        className={`result-period-option${holdDays === o.value ? ' is-on' : ''}`}
-                        onClick={() => {
-                          setHoldDays(o.value)
-                          setShowPeriodPicker(false)
-                        }}
-                      >
-                        {o.label}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
+              <button
+                type="button"
+                className="result-period-toggle"
+                onClick={() => setShowPeriodPicker((v) => !v)}
+                aria-expanded={showPeriodPicker}
+              >
+                Change waiting period
+              </button>
+              {showPeriodPicker ? (
+                <div className="result-period-options" role="group" aria-label="Waiting period">
+                  {HOLD_DAY_OPTIONS.map((o) => (
+                    <button
+                      key={o.value}
+                      type="button"
+                      className={`result-period-option${holdDays === o.value ? ' is-on' : ''}`}
+                      onClick={() => {
+                        setHoldDays(o.value)
+                        setShowPeriodPicker(false)
+                      }}
+                    >
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </>
           ) : (
             <>
@@ -243,40 +278,38 @@ export function ResultPage() {
               >
                 {r.recommendation === 'CONSIDER_LETTING_IT_GO' ? 'Let it go' : 'Buy anyway'}
               </button>
-              <div className="result-period">
-                <button
-                  type="button"
-                  className="result-period-toggle"
-                  onClick={() => setShowPeriodPicker((v) => !v)}
-                  aria-expanded={showPeriodPicker}
-                >
-                  Hold anyway — change waiting period
-                </button>
-                {showPeriodPicker ? (
-                  <>
-                    <div className="result-period-options" role="group" aria-label="Waiting period">
-                      {HOLD_DAY_OPTIONS.map((o) => (
-                        <button
-                          key={o.value}
-                          type="button"
-                          className={`result-period-option${holdDays === o.value ? ' is-on' : ''}`}
-                          onClick={() => setHoldDays(o.value)}
-                        >
-                          {o.label}
-                        </button>
-                      ))}
-                    </div>
-                    <button
-                      type="button"
-                      className="btn btn-ghost result-cta"
-                      disabled={busy}
-                      onClick={() => void startHold()}
-                    >
-                      {busy ? 'Starting…' : holdCtaLabel(holdDays)}
-                    </button>
-                  </>
-                ) : null}
-              </div>
+              <button
+                type="button"
+                className="result-period-toggle"
+                onClick={() => setShowPeriodPicker((v) => !v)}
+                aria-expanded={showPeriodPicker}
+              >
+                Hold anyway
+              </button>
+              {showPeriodPicker ? (
+                <>
+                  <div className="result-period-options" role="group" aria-label="Waiting period">
+                    {HOLD_DAY_OPTIONS.map((o) => (
+                      <button
+                        key={o.value}
+                        type="button"
+                        className={`result-period-option${holdDays === o.value ? ' is-on' : ''}`}
+                        onClick={() => setHoldDays(o.value)}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-ghost result-cta"
+                    disabled={busy}
+                    onClick={() => void startHold()}
+                  >
+                    {busy ? 'Starting…' : holdCtaLabel(holdDays)}
+                  </button>
+                </>
+              ) : null}
             </>
           )}
 
@@ -294,52 +327,6 @@ export function ResultPage() {
           </div>
           {error ? <p className="form-error">{error}</p> : null}
         </section>
-
-        <section className="result-panel result-order-read" aria-labelledby="signals-heading">
-          <header className="result-panel-head">
-            <h2 id="signals-heading">The read</h2>
-          </header>
-          <ul className="read-list">
-            {theRead.map((s) => (
-              <li key={s.key} className={`read-row tone-${s.tone}`}>
-                <span className="read-name">{s.name}</span>
-                <span className="read-level">{s.level}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {whyHold.length > 0 ? (
-          <section className="result-panel result-order-why" aria-labelledby="why-heading">
-            <header className="result-panel-head">
-              <h2 id="why-heading">{isHoldRec ? 'Why hold?' : 'Why this?'}</h2>
-            </header>
-            <ul className="result-why-list">
-              {whyHold.map((item) => (
-                <li key={item.id} className={item.marker === '+' ? 'is-sense' : 'is-pause'}>
-                  <span className="result-why-marker" aria-hidden="true">
-                    {item.marker}
-                  </span>
-                  <span>{item.text}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-
-        {r.costPerUse != null ? (
-          <section
-            className="result-panel result-panel-compact result-order-cpu"
-            aria-label="Estimated cost per use"
-          >
-            <div className="result-cpu-row">
-              <span className="result-section-label">Estimated cost per use</span>
-              <span className="result-cpu-value">
-                {formatMoney(r.costPerUse, product.currency)}
-              </span>
-            </div>
-          </section>
-        ) : null}
       </article>
 
       <AuthModal
