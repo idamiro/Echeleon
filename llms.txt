@@ -1,6 +1,6 @@
 # Vulcet
 
-> Independent web design studio for business websites, website redesigns and custom digital products.
+> Independent design studio focused on digital products, websites, brand experiences and redesign work.
 
 - Site: https://vulcet.com/
 - Contact: studio@vulcet.com
@@ -15,10 +15,11 @@
 
 ## Services
 
-- Business Website Design & Development — from $2,800 — https://vulcet.com/services/business-websites/
-- Growth Website Design — from $5,200 — https://vulcet.com/services/growth-websites/
-- Custom Web Apps & Digital Products — custom quote — https://vulcet.com/services/custom-digital-products/
-- Website Maintenance & Care — from $180 / month — https://vulcet.com/services/website-care/
+- Brand Strategy — https://vulcet.com/services/business-websites/
+- Visual Identity — https://vulcet.com/services/growth-websites/
+- Product Design (UI/UX) — https://vulcet.com/services/custom-digital-products/
+- Web Development — https://vulcet.com/services/website-care/
+- Services overview — https://vulcet.com/services/
 
 ## Selected work
 

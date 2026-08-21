@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
+# Public sitemap of canonical indexable pages
 Sitemap: https://vulcet.com/sitemap.xml
