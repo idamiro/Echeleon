@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { createProductAndAssessment } from '../data/actions'
 import type { DraftAssessment } from '../data/types'
 import { COMMON_CURRENCIES, defaultCurrencyFromLocale, formatMoney } from '../lib/currency'
-import { enrichProductFromUrl, type EnrichedProduct } from '../lib/enrichProduct'
+import { enrichFromUrlLocal, enrichProductFromUrl, type EnrichedProduct } from '../lib/enrichProduct'
 import { buildQuestionsForProduct, CATEGORY_OPTIONS } from '../lib/options'
 import { looksLikeUrl } from '../lib/productFromUrl'
 import { suggestAssessmentForProduct } from '../lib/suggestAssessment'
@@ -106,33 +106,60 @@ export function EntryPage() {
       return
     }
 
+    // New link → wipe prior answers so old selections never stick
+    const blankAnswers = {
+      frequency: '' as const,
+      overlap: '' as const,
+      reason: '' as const,
+      considered: '' as const,
+      affordability: '' as const,
+      ownershipYears: '2',
+      importance: 3,
+    }
+
+    const local = enrichFromUrlLocal(value)
+    setStep('product')
+    setQIndex(0)
+    setError('')
+
+    if (local) {
+      setInference(local)
+      setDraft((d) => ({
+        ...d,
+        ...blankAnswers,
+        url: value,
+        productName: local.name,
+        category: local.category,
+        price: local.price != null ? String(local.price) : '',
+        currency: local.currency || d.currency,
+      }))
+    } else {
+      setInference(null)
+      setDraft((d) => ({
+        ...d,
+        ...blankAnswers,
+        url: value,
+        productName: '',
+        price: '',
+      }))
+    }
+
     const controller = new AbortController()
     abortRef.current = controller
     setEnriching(true)
-    setDraft((d) => ({ ...d, url: value }))
 
     try {
       const inf = await enrichProductFromUrl(value, controller.signal)
       if (controller.signal.aborted || !inf) return
       setInference(inf)
-      const suggestion = suggestAssessmentForProduct({
-        category: inf.category,
-        name: inf.name,
-      })
       setDraft((d) => ({
         ...d,
+        ...blankAnswers,
         url: value,
         productName: inf.name,
         category: inf.category,
-        price: inf.price != null ? String(inf.price) : d.price,
+        price: inf.price != null ? String(inf.price) : '',
         currency: inf.currency || d.currency,
-        frequency: suggestion.frequency,
-        overlap: suggestion.overlap,
-        reason: suggestion.reason,
-        considered: suggestion.considered,
-        affordability: suggestion.affordability,
-        ownershipYears: suggestion.ownershipYears,
-        importance: suggestion.importance,
       }))
     } finally {
       if (!controller.signal.aborted) setEnriching(false)
@@ -151,7 +178,15 @@ export function EntryPage() {
       setError('Add the price to continue.')
       return
     }
-    // Skip category step if we already inferred with confidence
+    // Fresh question pass — never carry stale selections into the UI
+    setDraft((d) => ({
+      ...d,
+      frequency: '',
+      overlap: '',
+      reason: '',
+      considered: '',
+      affordability: '',
+    }))
     const startAt =
       inference && inference.confidence !== 'low' && inference.category === draft.category
         ? 1
@@ -176,6 +211,16 @@ export function EntryPage() {
 
   function pickCategory(category: Category) {
     applyCategory(category)
+    // applyCategory sets suggestion defaults — clear those so options aren't pre-selected
+    setDraft((d) => ({
+      ...d,
+      category,
+      frequency: '',
+      overlap: '',
+      reason: '',
+      considered: '',
+      affordability: '',
+    }))
     advanceFrom(qIndex)
   }
 

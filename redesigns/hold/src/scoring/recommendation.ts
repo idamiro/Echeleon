@@ -22,12 +22,12 @@ export interface RecResult {
 }
 
 const LABELS: Record<Recommendation, string> = {
-  BUYING_NOW_SEEMS_REASONABLE: 'BUYING NOW SEEMS REASONABLE',
-  HOLD_24_HOURS: 'HOLD FOR 24 HOURS',
-  HOLD_3_DAYS: 'HOLD FOR 3 DAYS',
-  HOLD_7_DAYS: 'HOLD FOR 7 DAYS',
-  HOLD_30_DAYS: 'HOLD FOR 30 DAYS',
-  CONSIDER_LETTING_IT_GO: 'CONSIDER LETTING IT GO',
+  BUYING_NOW_SEEMS_REASONABLE: 'Buying now seems reasonable',
+  HOLD_24_HOURS: 'Hold for 24 hours',
+  HOLD_3_DAYS: 'Hold for 3 days',
+  HOLD_7_DAYS: 'Hold for 7 days',
+  HOLD_30_DAYS: 'Hold for 30 days',
+  CONSIDER_LETTING_IT_GO: 'Consider letting it go',
 };
 
 /**

@@ -10,6 +10,37 @@ import type { AssessmentRecord, ProductRecord } from '../data/types'
 import { formatMoney } from '../lib/currency'
 import { HOLD_DAY_OPTIONS } from '../lib/options'
 
+function scoreHint(label: string, n: number): string {
+  if (label === 'Utility') {
+    if (n >= 70) return 'Fits how you actually live'
+    if (n >= 45) return 'Useful, but not a lock'
+    return 'Use case still looks soft'
+  }
+  if (label === 'Need') {
+    if (n >= 70) return 'There’s a real gap to fill'
+    if (n >= 45) return 'Need is mixed'
+    return 'More want than need'
+  }
+  if (label === 'Value') {
+    if (n >= 70) return 'Price matches expected use'
+    if (n >= 45) return 'Value is okay, not obvious'
+    return 'Steep for how you’d use it'
+  }
+  return ''
+}
+
+function impulseHint(level: string): string {
+  if (level === 'HIGH') return 'Several haste signals lined up'
+  if (level === 'MEDIUM') return 'A little cooling-off helps'
+  return 'Timing looks considered'
+}
+
+function impulseMeter(level: string): number {
+  if (level === 'HIGH') return 88
+  if (level === 'MEDIUM') return 55
+  return 22
+}
+
 export function ResultPage() {
   const { productId = '', assessmentId = '' } = useParams()
   const navigate = useNavigate()
@@ -89,104 +120,141 @@ export function ResultPage() {
   }
 
   const r = assessment.result
+  const verdictTone =
+    r.recommendation === 'BUYING_NOW_SEEMS_REASONABLE'
+      ? 'go'
+      : r.recommendation === 'CONSIDER_LETTING_IT_GO'
+        ? 'stop'
+        : 'wait'
+
+  const actionCopy =
+    verdictTone === 'go'
+      ? 'If you still want a pause, lock a short hold. Otherwise you’re clear.'
+      : verdictTone === 'stop'
+        ? 'You can still lock a HOLD if you want space before letting it go.'
+        : 'Lock the waiting period. Come back with a clearer head.'
 
   return (
     <div className="page result-page">
-      <header className="page-intro">
-        <p className="eyebrow">{product.category}</p>
-        <h1>{product.name}</h1>
-        <p className="lede">
-          {formatMoney(product.price, product.currency)}
-          {r.costPerUse != null
-            ? ` · ~${formatMoney(r.costPerUse, product.currency)} / use`
-            : ''}
-        </p>
-      </header>
+      <div className="result-layout">
+        <div className="result-main">
+          <header className="result-hero">
+            <p className="result-kicker">Assessment</p>
+            <div className="product-line">
+              <strong>{product.name}</strong>
+              <span className="price">{formatMoney(product.price, product.currency)}</span>
+            </div>
+            <div className="product-meta">
+              <span className="chip-quiet">{product.category}</span>
+              {r.costPerUse != null ? (
+                <span className="chip-quiet">
+                  ~{formatMoney(r.costPerUse, product.currency)} / use
+                </span>
+              ) : null}
+            </div>
+          </header>
 
-      <section className="glass-panel" aria-labelledby="scores-heading">
-        <h2 id="scores-heading" className="section-title">
-          Independent scores
-        </h2>
-        <p className="muted">
-          No single overall purchase score — the recommendation reads these together.
-        </p>
-        <div className="score-grid">
-          <ScoreBlock label="Utility" value={r.utility} />
-          <ScoreBlock label="Need" value={r.need} />
-          <ScoreBlock label="Value" value={r.value} />
-          <ScoreBlock label="Impulse risk" value={r.impulseRisk} />
-        </div>
-        <div className="meta-row">
-          <span>
-            Confidence <strong>{r.confidence}</strong>
-          </span>
-          <span className="muted">Signal consistency, not fortune-telling</span>
-        </div>
-        {r.contradictions.length > 0 ? (
-          <ul className="contradiction-list">
-            {r.contradictions.map((c) => (
-              <li key={c}>{c}</li>
-            ))}
-          </ul>
-        ) : null}
-      </section>
+          <section className={`verdict-card verdict-${verdictTone}`}>
+            <p className="verdict-label">Your answer</p>
+            <h2 className="verdict-title">{r.recommendationLabel}</h2>
+            <p className="verdict-copy">{r.recommendationBlurb}</p>
+            {r.contradictions.length > 0 ? (
+              <div className="verdict-flags">
+                {r.contradictions.slice(0, 2).map((c) => (
+                  <p key={c}>{c}</p>
+                ))}
+              </div>
+            ) : null}
+          </section>
 
-      <section className="signal-split">
-        <div className="glass-panel signal-panel">
-          <h2 className="section-title">Why it makes sense</h2>
-          <ol>
-            {r.whyItMakesSense.map((s) => (
-              <li key={s.id}>{s.text}</li>
-            ))}
-          </ol>
-        </div>
-        <div className="glass-panel signal-panel">
-          <h2 className="section-title">What gives us pause</h2>
-          <ol>
-            {r.whatGivesPause.map((s) => (
-              <li key={s.id}>{s.text}</li>
-            ))}
-          </ol>
-        </div>
-      </section>
+          <section className="result-scores-wrap" aria-labelledby="scores-heading">
+            <div className="result-scores-head">
+              <h2 id="scores-heading">Four signals</h2>
+              <p className="result-scores-note">Independent reads — not one fake overall score</p>
+            </div>
+            <div className="score-grid score-grid-result">
+              <ScoreBlock label="Utility" value={r.utility} hint={scoreHint('Utility', r.utility)} />
+              <ScoreBlock label="Need" value={r.need} hint={scoreHint('Need', r.need)} />
+              <ScoreBlock label="Value" value={r.value} hint={scoreHint('Value', r.value)} />
+              <ScoreBlock
+                label="Impulse risk"
+                value={r.impulseRisk}
+                meter={impulseMeter(r.impulseRisk)}
+                hint={impulseHint(r.impulseRisk)}
+              />
+            </div>
+          </section>
 
-      <section className="glass-panel recommend-panel">
-        <p className="eyebrow">Recommendation</p>
-        <h2 className="rec-label">{r.recommendationLabel}</h2>
-        <p>{r.recommendationBlurb}</p>
-
-        <div className="hold-picker">
-          <label>
-            <span>Waiting period</span>
-            <select
-              value={holdDays}
-              onChange={(e) => setHoldDays(Number(e.target.value))}
-            >
-              {HOLD_DAY_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <HoldPressButton
-            label={
-              r.recommendation === 'BUYING_NOW_SEEMS_REASONABLE' ||
-              r.recommendation === 'CONSIDER_LETTING_IT_GO'
-                ? 'Hold to lock anyway'
-                : 'Hold to lock HOLD'
-            }
-            disabled={busy}
-            onComplete={startHold}
-          />
+          <section className="signal-split result-signals">
+            <div className="signal-card signal-sense">
+              <h2>Why it makes sense</h2>
+              <ul>
+                {r.whyItMakesSense.map((s) => (
+                  <li key={s.id}>{s.text}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="signal-card signal-pause">
+              <h2>What gives pause</h2>
+              <ul>
+                {r.whatGivesPause.map((s) => (
+                  <li key={s.id}>{s.text}</li>
+                ))}
+              </ul>
+            </div>
+          </section>
         </div>
 
-        <p className="fine-print">
-          Press and hold the button to lock the waiting period. First HOLD needs an account — then
-          we email you.
-        </p>
-        {error ? <p className="form-error">{error}</p> : null}
-      </section>
+        <aside className="result-side">
+          <div className="confidence-panel">
+            <div className="confidence-row">
+              <span>Confidence</span>
+              <strong>{r.confidence}</strong>
+            </div>
+            <div className="confidence-track" aria-hidden="true">
+              <div
+                className="confidence-fill"
+                style={{
+                  width:
+                    r.confidence === 'HIGH' ? '88%' : r.confidence === 'MEDIUM' ? '58%' : '28%',
+                }}
+              />
+            </div>
+            <p className="confidence-note">
+              Based on how consistent your answers were with each other.
+            </p>
+          </div>
+
+          <section className="result-action">
+            <h2>Lock a waiting period</h2>
+            <p className="result-action-copy">{actionCopy}</p>
+            <div className="hold-picker">
+              <label>
+                <span>Waiting period</span>
+                <select
+                  value={holdDays}
+                  onChange={(e) => setHoldDays(Number(e.target.value))}
+                >
+                  {HOLD_DAY_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <HoldPressButton
+                label="Hold to lock HOLD"
+                disabled={busy}
+                onComplete={startHold}
+              />
+            </div>
+            <p className="fine-print">
+              Press and hold to start the countdown. Account is only required when you lock a HOLD.
+            </p>
+            {error ? <p className="form-error">{error}</p> : null}
+          </section>
+        </aside>
+      </div>
 
       <AuthModal
         open={authOpen}
