@@ -12,6 +12,7 @@ import {
   OVERLAP_OPTIONS,
   REASON_OPTIONS,
 } from '../lib/options'
+import { buildTheRead } from '../lib/readLabels'
 import type { AssessmentInput } from '../scoring/types'
 
 type Mode = 'decide' | 'hold_again' | 'something_changed'
@@ -189,22 +190,17 @@ export function RevisitPage() {
             Keeps your original assessment and scores. Choose a new waiting period.
           </p>
           <div className="score-grid compact">
-            <div className="score-block">
-              <span className="score-label">Utility</span>
-              <span className="score-value">{assessment.result.utility}</span>
-            </div>
-            <div className="score-block">
-              <span className="score-label">Need</span>
-              <span className="score-value">{assessment.result.need}</span>
-            </div>
-            <div className="score-block">
-              <span className="score-label">Value</span>
-              <span className="score-value">{assessment.result.value}</span>
-            </div>
-            <div className="score-block">
-              <span className="score-label">Impulse</span>
-              <span className="score-value">{assessment.result.impulseRisk}</span>
-            </div>
+            {buildTheRead({
+              utility: assessment.result.utility,
+              need: assessment.result.need,
+              value: assessment.result.value,
+              impulseRisk: assessment.result.impulseRisk,
+            }).map((s) => (
+              <div key={s.key} className={`score-block tone-${s.tone}`}>
+                <span className="score-label">{s.name}</span>
+                <span className="score-value">{s.level}</span>
+              </div>
+            ))}
           </div>
           <label>
             <span>New waiting period</span>

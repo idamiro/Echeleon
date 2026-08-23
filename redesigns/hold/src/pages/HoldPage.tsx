@@ -4,6 +4,7 @@ import * as db from '../data/db'
 import type { AssessmentRecord, HoldRecord, ProductRecord } from '../data/types'
 import { formatMoney } from '../lib/currency'
 import { formatRelativeRemaining } from '../lib/format'
+import { buildTheRead } from '../lib/readLabels'
 
 export function HoldPage() {
   const { holdId = '' } = useParams()
@@ -82,9 +83,15 @@ export function HoldPage() {
         </p>
         {assessment ? (
           <p className="muted">
-            Scores retained — Utility {assessment.result.utility} · Need{' '}
-            {assessment.result.need} · Value {assessment.result.value} · Impulse{' '}
-            {assessment.result.impulseRisk}
+            The read retained —{' '}
+            {buildTheRead({
+              utility: assessment.result.utility,
+              need: assessment.result.need,
+              value: assessment.result.value,
+              impulseRisk: assessment.result.impulseRisk,
+            })
+              .map((s) => `${s.name} ${s.level}`)
+              .join(' · ')}
           </p>
         ) : null}
       </section>

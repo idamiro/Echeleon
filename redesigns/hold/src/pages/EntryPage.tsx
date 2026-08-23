@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createProductAndAssessment } from '../data/actions'
 import type { DraftAssessment } from '../data/types'
-import { COMMON_CURRENCIES, defaultCurrencyFromLocale, formatMoney } from '../lib/currency'
+import { COMMON_CURRENCIES, defaultCurrencyFromLocale } from '../lib/currency'
 import { enrichFromUrlLocal, enrichProductFromUrl, type EnrichedProduct } from '../lib/enrichProduct'
 import { buildQuestionsForProduct, CATEGORY_OPTIONS } from '../lib/options'
 import { looksLikeUrl } from '../lib/productFromUrl'
@@ -64,14 +64,6 @@ export function EntryPage() {
       }),
     [draft.category, draft.productName]
   )
-
-  const examplePrice = useMemo(() => {
-    try {
-      return formatMoney(240, draft.currency || defaultCurrencyFromLocale())
-    } catch {
-      return '€240'
-    }
-  }, [draft.currency])
 
   useEffect(() => () => abortRef.current?.abort(), [])
 
@@ -287,12 +279,6 @@ export function EntryPage() {
         <p className="eyebrow">Vulcet experiment</p>
         <h1>HOLD</h1>
         <p className="lede hero-line">Before you buy it, hold it.</p>
-        <p className="lede">See how useful it really is — then decide.</p>
-        <div className="live-example" aria-hidden="true">
-          <span>{examplePrice}</span>
-          <span className="live-arrow">→</span>
-          <span>HOLD 7 DAYS</span>
-        </div>
       </header>
 
       {step === 'product' ? (

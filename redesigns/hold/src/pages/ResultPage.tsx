@@ -1,44 +1,64 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AuthModal } from '../components/AuthModal'
-import { HoldPressButton } from '../components/HoldPressButton'
-import { ScoreBlock } from '../components/ScoreBlock'
 import { createHold } from '../data/actions'
 import * as auth from '../data/auth'
 import * as db from '../data/db'
 import type { AssessmentRecord, ProductRecord } from '../data/types'
 import { formatMoney } from '../lib/currency'
-import { HOLD_DAY_OPTIONS } from '../lib/options'
+import { CATEGORY_OPTIONS, HOLD_DAY_OPTIONS } from '../lib/options'
+import { buildTheRead } from '../lib/readLabels'
+import type { Recommendation, SignalItem } from '../scoring/types'
 
-function scoreHint(label: string, n: number): string {
-  if (label === 'Utility') {
-    if (n >= 70) return 'Fits how you actually live'
-    if (n >= 45) return 'Useful, but not a lock'
-    return 'Use case still looks soft'
-  }
-  if (label === 'Need') {
-    if (n >= 70) return 'There’s a real gap to fill'
-    if (n >= 45) return 'Need is mixed'
-    return 'More want than need'
-  }
-  if (label === 'Value') {
-    if (n >= 70) return 'Price matches expected use'
-    if (n >= 45) return 'Value is okay, not obvious'
-    return 'Steep for how you’d use it'
-  }
-  return ''
+function categoryLabel(value: string): string {
+  return CATEGORY_OPTIONS.find((o) => o.value === value)?.label ?? value
 }
 
-function impulseHint(level: string): string {
-  if (level === 'HIGH') return 'Several haste signals lined up'
-  if (level === 'MEDIUM') return 'A little cooling-off helps'
-  return 'Timing looks considered'
+function holdPeriodParts(days: number): { amount: string; unit: string } {
+  if (days === 1) return { amount: '24', unit: 'HOURS' }
+  return { amount: String(days), unit: 'DAYS' }
 }
 
-function impulseMeter(level: string): number {
-  if (level === 'HIGH') return 88
-  if (level === 'MEDIUM') return 55
-  return 22
+function holdCtaLabel(days: number): string {
+  if (days === 1) return 'HOLD FOR 24 HOURS'
+  return `HOLD FOR ${days} DAYS`
+}
+
+function recommendationHero(
+  recommendation: Recommendation,
+  holdDays: number,
+  blurb: string
+): {
+  primary: string
+  secondary: { amount: string; unit: string } | null
+  blurb: string
+} {
+  if (recommendation === 'BUYING_NOW_SEEMS_REASONABLE') {
+    return { primary: 'BUY', secondary: { amount: '', unit: 'NOW' }, blurb }
+  }
+  if (recommendation === 'CONSIDER_LETTING_IT_GO') {
+    return { primary: 'LET IT GO', secondary: null, blurb }
+  }
+  return {
+    primary: 'HOLD',
+    secondary: holdPeriodParts(holdDays),
+    blurb,
+  }
+}
+
+function buildWhyHold(
+  sense: SignalItem[],
+  pause: SignalItem[],
+  limit = 3
+): { marker: '+' | '−'; text: string; id: string }[] {
+  const combined = [
+    ...sense.map((s) => ({ ...s, marker: '+' as const })),
+    ...pause.map((s) => ({ ...s, marker: '−' as const })),
+  ]
+  return combined
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, limit)
+    .map((s) => ({ marker: s.marker, text: s.text, id: s.id }))
 }
 
 export function ResultPage() {
@@ -48,6 +68,7 @@ export function ResultPage() {
   const [assessment, setAssessment] = useState<AssessmentRecord | null>(null)
   const [authOpen, setAuthOpen] = useState(false)
   const [holdDays, setHoldDays] = useState<number | null>(null)
+  const [showPeriodPicker, setShowPeriodPicker] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -102,6 +123,15 @@ export function ResultPage() {
     }
   }, [product, assessment, holdDays, navigate])
 
+  const whyHold = useMemo(() => {
+    if (!assessment) return []
+    return buildWhyHold(
+      assessment.result.whyItMakesSense,
+      assessment.result.whatGivesPause,
+      3
+    )
+  }, [assessment])
+
   if (error && !product) {
     return (
       <div className="page">
@@ -120,141 +150,193 @@ export function ResultPage() {
   }
 
   const r = assessment.result
-  const verdictTone =
-    r.recommendation === 'BUYING_NOW_SEEMS_REASONABLE'
-      ? 'go'
-      : r.recommendation === 'CONSIDER_LETTING_IT_GO'
-        ? 'stop'
-        : 'wait'
-
-  const actionCopy =
-    verdictTone === 'go'
-      ? 'If you still want a pause, lock a short hold. Otherwise you’re clear.'
-      : verdictTone === 'stop'
-        ? 'You can still lock a HOLD if you want space before letting it go.'
-        : 'Lock the waiting period. Come back with a clearer head.'
+  const hero = recommendationHero(r.recommendation, holdDays, r.recommendationBlurb)
+  const theRead = buildTheRead({
+    utility: r.utility,
+    need: r.need,
+    value: r.value,
+    impulseRisk: r.impulseRisk,
+  })
+  const isHoldRec = r.recommendation.startsWith('HOLD_')
+  const cat = categoryLabel(product.category)
 
   return (
     <div className="page result-page">
-      <div className="result-layout">
-        <div className="result-main">
-          <header className="result-hero">
-            <p className="result-kicker">Assessment</p>
-            <div className="product-line">
-              <strong>{product.name}</strong>
-              <span className="price">{formatMoney(product.price, product.currency)}</span>
-            </div>
-            <div className="product-meta">
-              <span className="chip-quiet">{product.category}</span>
-              {r.costPerUse != null ? (
-                <span className="chip-quiet">
-                  ~{formatMoney(r.costPerUse, product.currency)} / use
-                </span>
-              ) : null}
-            </div>
-          </header>
+      <article className="result-desk">
+        <header className="result-top">
+          <p className="result-kicker">Assessment result</p>
+          <p className="result-product-line">
+            <strong>{product.name}</strong>
+            <span>
+              {formatMoney(product.price, product.currency)} · {cat}
+            </span>
+          </p>
+        </header>
 
-          <section className={`verdict-card verdict-${verdictTone}`}>
-            <p className="verdict-label">Your answer</p>
-            <h2 className="verdict-title">{r.recommendationLabel}</h2>
-            <p className="verdict-copy">{r.recommendationBlurb}</p>
-            {r.contradictions.length > 0 ? (
-              <div className="verdict-flags">
-                {r.contradictions.slice(0, 2).map((c) => (
-                  <p key={c}>{c}</p>
-                ))}
-              </div>
+        <section className="result-answer" aria-labelledby="result-rec-heading">
+          <h2 id="result-rec-heading" className="visually-hidden">
+            Recommendation
+          </h2>
+          <p className="result-rec-line">
+            <span className="result-rec-primary">{hero.primary}</span>
+            {hero.secondary ? (
+              <span className="result-rec-secondary">
+                {hero.secondary.amount ? (
+                  <span className="result-rec-amount">{hero.secondary.amount}</span>
+                ) : null}
+                <span className="result-rec-unit">{hero.secondary.unit}</span>
+              </span>
             ) : null}
-          </section>
+          </p>
+          <p className="result-rec-blurb">{hero.blurb}</p>
+          <p className="result-confidence">
+            {r.confidence} confidence
+            <span
+              className="result-confidence-tip"
+              title="Based on how consistent your answers were."
+              tabIndex={0}
+              aria-label="Based on how consistent your answers were."
+            >
+              i
+            </span>
+          </p>
+        </section>
 
-          <section className="result-scores-wrap" aria-labelledby="scores-heading">
-            <div className="result-scores-head">
-              <h2 id="scores-heading">Four signals</h2>
-              <p className="result-scores-note">Independent reads — not one fake overall score</p>
-            </div>
-            <div className="score-grid score-grid-result">
-              <ScoreBlock label="Utility" value={r.utility} hint={scoreHint('Utility', r.utility)} />
-              <ScoreBlock label="Need" value={r.need} hint={scoreHint('Need', r.need)} />
-              <ScoreBlock label="Value" value={r.value} hint={scoreHint('Value', r.value)} />
-              <ScoreBlock
-                label="Impulse risk"
-                value={r.impulseRisk}
-                meter={impulseMeter(r.impulseRisk)}
-                hint={impulseHint(r.impulseRisk)}
-              />
-            </div>
-          </section>
-
-          <section className="signal-split result-signals">
-            <div className="signal-card signal-sense">
-              <h2>Why it makes sense</h2>
-              <ul>
-                {r.whyItMakesSense.map((s) => (
-                  <li key={s.id}>{s.text}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="signal-card signal-pause">
-              <h2>What gives pause</h2>
-              <ul>
-                {r.whatGivesPause.map((s) => (
-                  <li key={s.id}>{s.text}</li>
-                ))}
-              </ul>
-            </div>
-          </section>
-        </div>
-
-        <aside className="result-side">
-          <div className="confidence-panel">
-            <div className="confidence-row">
-              <span>Confidence</span>
-              <strong>{r.confidence}</strong>
-            </div>
-            <div className="confidence-track" aria-hidden="true">
-              <div
-                className="confidence-fill"
-                style={{
-                  width:
-                    r.confidence === 'HIGH' ? '88%' : r.confidence === 'MEDIUM' ? '58%' : '28%',
-                }}
-              />
-            </div>
-            <p className="confidence-note">
-              Based on how consistent your answers were with each other.
-            </p>
+        <section className="result-read" aria-labelledby="signals-heading">
+          <h2 id="signals-heading" className="result-section-label">
+            The read
+          </h2>
+          <div className="read-grid" role="list">
+            {theRead.map((s) => (
+              <div key={s.key} className={`read-cell tone-${s.tone}`} role="listitem">
+                <span className="read-name">{s.name}</span>
+                <span className="read-level">{s.level}</span>
+              </div>
+            ))}
           </div>
+        </section>
 
-          <section className="result-action">
-            <h2>Lock a waiting period</h2>
-            <p className="result-action-copy">{actionCopy}</p>
-            <div className="hold-picker">
-              <label>
-                <span>Waiting period</span>
-                <select
-                  value={holdDays}
-                  onChange={(e) => setHoldDays(Number(e.target.value))}
-                >
-                  {HOLD_DAY_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <HoldPressButton
-                label="Hold to lock HOLD"
-                disabled={busy}
-                onComplete={startHold}
-              />
-            </div>
-            <p className="fine-print">
-              Press and hold to start the countdown. Account is only required when you lock a HOLD.
-            </p>
-            {error ? <p className="form-error">{error}</p> : null}
+        {whyHold.length > 0 ? (
+          <section className="result-why" aria-labelledby="why-heading">
+            <h2 id="why-heading" className="result-section-label">
+              {isHoldRec ? 'Why hold?' : 'Why this?'}
+            </h2>
+            <ul className="result-why-list">
+              {whyHold.map((item) => (
+                <li key={item.id}>
+                  <span className="result-why-marker" aria-hidden="true">
+                    {item.marker}
+                  </span>
+                  <span>{item.text}</span>
+                </li>
+              ))}
+            </ul>
           </section>
-        </aside>
-      </div>
+        ) : null}
+
+        {r.costPerUse != null ? (
+          <p className="result-cpu">
+            <span>Estimated cost per use</span>
+            <strong>{formatMoney(r.costPerUse, product.currency)}</strong>
+          </p>
+        ) : null}
+
+        <section className="result-actions" aria-label="Decision actions">
+          {isHoldRec ? (
+            <>
+              <button
+                type="button"
+                className="btn btn-solid result-cta"
+                disabled={busy}
+                onClick={() => void startHold()}
+              >
+                {busy ? 'Starting…' : holdCtaLabel(holdDays)}
+              </button>
+              <button
+                type="button"
+                className="result-period-toggle"
+                onClick={() => setShowPeriodPicker((v) => !v)}
+                aria-expanded={showPeriodPicker}
+              >
+                Change waiting period
+              </button>
+              {showPeriodPicker ? (
+                <div className="result-period-options" role="group" aria-label="Waiting period">
+                  {HOLD_DAY_OPTIONS.map((o) => (
+                    <button
+                      key={o.value}
+                      type="button"
+                      className={`result-period-option${holdDays === o.value ? ' is-on' : ''}`}
+                      onClick={() => {
+                        setHoldDays(o.value)
+                        setShowPeriodPicker(false)
+                      }}
+                    >
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="btn btn-solid result-cta"
+                onClick={() => navigate('/')}
+              >
+                {r.recommendation === 'CONSIDER_LETTING_IT_GO' ? 'Let it go' : 'Buy anyway'}
+              </button>
+              <button
+                type="button"
+                className="result-period-toggle"
+                onClick={() => setShowPeriodPicker((v) => !v)}
+                aria-expanded={showPeriodPicker}
+              >
+                Hold anyway
+              </button>
+              {showPeriodPicker ? (
+                <>
+                  <div className="result-period-options" role="group" aria-label="Waiting period">
+                    {HOLD_DAY_OPTIONS.map((o) => (
+                      <button
+                        key={o.value}
+                        type="button"
+                        className={`result-period-option${holdDays === o.value ? ' is-on' : ''}`}
+                        onClick={() => setHoldDays(o.value)}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-ghost result-cta"
+                    disabled={busy}
+                    onClick={() => void startHold()}
+                  >
+                    {busy ? 'Starting…' : holdCtaLabel(holdDays)}
+                  </button>
+                </>
+              ) : null}
+            </>
+          )}
+
+          <div className="result-secondary">
+            {r.recommendation !== 'BUYING_NOW_SEEMS_REASONABLE' ? (
+              <button type="button" className="result-secondary-btn" onClick={() => navigate('/')}>
+                Buy anyway
+              </button>
+            ) : null}
+            {r.recommendation !== 'CONSIDER_LETTING_IT_GO' ? (
+              <button type="button" className="result-secondary-btn" onClick={() => navigate('/')}>
+                Let it go
+              </button>
+            ) : null}
+          </div>
+          {error ? <p className="form-error">{error}</p> : null}
+        </section>
+      </article>
 
       <AuthModal
         open={authOpen}

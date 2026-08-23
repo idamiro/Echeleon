@@ -4668,3 +4668,16 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   background-image: none !important;
   opacity: 0 !important;
 }
+
+/* Hero polish — keep kinetic module vivid */
+.hero .hero-lens {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.hero .hero-lens::before,
+.hero .hero-lens::after,
+.hero .hero-lens i,
+.hero .hero-lens span {
+  opacity: 1;
+}
