@@ -4669,30 +4669,15 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   opacity: 0 !important;
 }
 
-/* Hero clarity pass — softer decoration, readable hierarchy */
-.hero-lens--soft {
-  opacity: 0.42 !important;
-  filter: saturate(0.65);
-  pointer-events: none;
+/* Hero polish — keep kinetic module vivid */
+.hero .hero-lens {
+  opacity: 1 !important;
+  filter: none !important;
 }
 
-.hero-support {
-  animation: rise 420ms 200ms var(--ease-standard) both;
-}
-
-@media (max-width: 899px) {
-  .hero-lens--soft {
-    opacity: 0.22 !important;
-  }
-}
-
-@media (max-width: 599px) {
-  .hero-lens--soft {
-    display: none !important;
-  }
-
-  .hero-support > p {
-    font-size: 17px;
-    line-height: 1.5;
-  }
+.hero .hero-lens::before,
+.hero .hero-lens::after,
+.hero .hero-lens i,
+.hero .hero-lens span {
+  opacity: 1;
 }
