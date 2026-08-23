@@ -1117,6 +1117,53 @@ input[type='range'] {
   margin-bottom: 0.35rem !important;
 }
 
+.hold-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hold-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.hold-step span {
+  display: inline-grid;
+  place-items: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.hold-step.is-current {
+  color: var(--ink);
+}
+
+.hold-step.is-current span {
+  background: var(--solid);
+  color: var(--solid-ink);
+  border-color: transparent;
+}
+
+.field-hint {
+  margin: -0.35rem 0 0.15rem;
+  font-size: 0.82rem;
+  color: var(--ink-dim);
+  line-height: 1.45;
+}
+
 .product-panel {
   background:
     linear-gradient(165deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.03));

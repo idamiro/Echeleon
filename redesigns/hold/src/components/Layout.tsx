@@ -14,8 +14,8 @@ export function Layout() {
             </NavLink>
             <NavLink to="/dashboard">Holds</NavLink>
           </nav>
-          <a className="header-ext" href="https://vulcet.com/">
-            Vulcet <span aria-hidden="true">↗</span>
+          <a className="header-ext" href="https://vulcet.com/redesigns/">
+            Experiments <span aria-hidden="true">↗</span>
           </a>
         </header>
         <main className="app-main">

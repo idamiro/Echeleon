@@ -276,17 +276,23 @@ export function EntryPage() {
   return (
     <div className="page entry-page site-grid">
       <header className="page-intro site-intro">
-        <p className="eyebrow">Vulcet experiment</p>
+        <p className="eyebrow">Vulcet experiment · Step 1 of 3</p>
         <h1>HOLD</h1>
-        <p className="lede hero-line">Before you buy it, hold it.</p>
+        <p className="lede hero-line">Paste what you want to buy. We score it. You wait — then decide.</p>
+        <ol className="hold-steps" aria-label="How HOLD works">
+          <li className="hold-step is-current"><span>1</span> Add product</li>
+          <li className="hold-step"><span>2</span> Answer 5 questions</li>
+          <li className="hold-step"><span>3</span> Get your read</li>
+        </ol>
       </header>
 
       {step === 'product' ? (
         <form className="product-panel stack-form site-card" onSubmit={goAsk}>
           <div className="card-head">
             <h2 className="section-title">What are you about to buy?</h2>
-            {enriching ? <span className="pulse-dot">Reading…</span> : null}
+            {enriching ? <span className="pulse-dot">Reading link…</span> : null}
           </div>
+          <p className="field-hint">Paste a product URL or type the name and price below.</p>
 
           <label className="url-field">
             <span>Product link</span>
@@ -362,7 +368,7 @@ export function EntryPage() {
 
           {error ? <p className="form-error">{error}</p> : null}
           <button type="submit" className="btn btn-solid btn-animated btn-cta">
-            Should I buy this? <span aria-hidden="true">→</span>
+            Continue — answer 5 questions <span aria-hidden="true">→</span>
           </button>
         </form>
       ) : null}
