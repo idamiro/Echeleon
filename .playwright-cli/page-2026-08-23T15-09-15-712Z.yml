@@ -1,0 +1,239 @@
+- generic [active] [ref=f6e1]:
+  - link "Skip to content" [ref=f6e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=f6e3]:
+    - generic [ref=f6e4]:
+      - link "Vulcet home" [ref=f6e5] [cursor=pointer]:
+        - /url: ../
+        - img "Vulcet" [ref=f6e6]
+      - navigation "Primary navigation" [ref=f6e7]:
+        - link "Work" [ref=f6e8] [cursor=pointer]:
+          - /url: ../work/
+        - link "Experiments" [ref=f6e9] [cursor=pointer]:
+          - /url: ../redesigns/
+        - link "Services" [ref=f6e10] [cursor=pointer]:
+          - /url: ./
+        - link "Studio" [ref=f6e11] [cursor=pointer]:
+          - /url: ../studio/
+        - link "Blog" [ref=f6e12] [cursor=pointer]:
+          - /url: ../blog/
+        - link "Contact" [ref=f6e13] [cursor=pointer]:
+          - /url: ../contact/
+      - link "Start a project" [ref=f6e14] [cursor=pointer]:
+        - /url: ../contact/
+        - text: Start a project
+        - generic [ref=f6e15]: ↗
+  - main [ref=f6e16]:
+    - generic [ref=f6e17]:
+      - generic:
+        - emphasis
+      - generic [ref=f6e18]:
+        - generic [ref=f6e19]:
+          - generic [ref=f6e20]: "01"
+          - generic [ref=f6e21]: Services
+        - heading [level=1] [ref=f6e22]:
+          - text: From a clear direction to a brand people can
+          - emphasis [ref=f6e23]: use.
+        - paragraph [ref=f6e25]: Vulcet connects brand thinking, visual systems, product experience and web development. Start with one discipline or bring them together in one direct process.
+        - list "Vulcet capabilities" [ref=f6e26]:
+          - listitem [ref=f6e27]: Strategy
+          - listitem [ref=f6e28]: Identity
+          - listitem [ref=f6e29]: Product
+          - listitem [ref=f6e30]: Development
+    - region [ref=f6e31]:
+      - generic [ref=f6e32]:
+        - generic [ref=f6e33]:
+          - generic [ref=f6e34]:
+            - generic [ref=f6e35]: "02"
+            - generic [ref=f6e36]: Disciplines
+          - heading "Four connected ways to build what comes next." [level=2] [ref=f6e37]
+          - paragraph [ref=f6e38]: Each engagement begins with the business problem, not a predetermined package. The scope and timeline are confirmed after an initial project review.
+        - generic [ref=f6e39]:
+          - article [ref=f6e40]:
+            - generic [ref=f6e41]:
+              - generic [ref=f6e42]: "01"
+              - generic [ref=f6e43]: Direction before execution
+            - heading "Brand Strategy" [level=3] [ref=f6e44]: BrandStrategy
+            - paragraph [ref=f6e45]: A clear position, message and decision framework for a brand that needs to move with purpose.
+            - generic [ref=f6e46]:
+              - generic [ref=f6e47]: Typical timeline
+              - strong [ref=f6e48]: From 4 weeks
+            - generic [ref=f6e49]:
+              - generic [ref=f6e50]: Core scope
+              - list [ref=f6e51]:
+                - listitem [ref=f6e52]: Discovery workshop
+                - listitem [ref=f6e53]: Market and audience research
+                - listitem [ref=f6e54]: Brand positioning
+                - listitem [ref=f6e55]: Tone of voice
+            - link "View service" [ref=f6e56] [cursor=pointer]:
+              - /url: ./business-websites/
+              - text: View service
+              - generic [ref=f6e57]: ↗
+          - article [ref=f6e58]:
+            - generic [ref=f6e59]:
+              - generic [ref=f6e60]: "02"
+              - generic [ref=f6e61]: A recognisable visual system
+            - heading "Visual Identity" [level=3] [ref=f6e62]: VisualIdentity
+            - paragraph [ref=f6e63]: A coherent identity that turns the strategy into a distinctive and practical visual language.
+            - generic [ref=f6e64]:
+              - generic [ref=f6e65]: Typical timeline
+              - strong [ref=f6e66]: From 4 weeks
+            - generic [ref=f6e67]:
+              - generic [ref=f6e68]: Core scope
+              - list [ref=f6e69]:
+                - listitem [ref=f6e70]: Creative direction
+                - listitem [ref=f6e71]: Key visual
+                - listitem [ref=f6e72]: Identity guidelines
+                - listitem [ref=f6e73]: Motion design system
+            - link "View service" [ref=f6e74] [cursor=pointer]:
+              - /url: ./growth-websites/
+              - text: View service
+              - generic [ref=f6e75]: ↗
+          - article [ref=f6e76]:
+            - generic [ref=f6e77]:
+              - generic [ref=f6e78]: "03"
+              - generic [ref=f6e79]: Useful digital experiences
+            - heading "Product Design" [level=3] [ref=f6e80]: ProductDesign
+            - paragraph [ref=f6e81]: Websites and digital products shaped around real user journeys, clear interfaces and purposeful interaction.
+            - generic [ref=f6e82]:
+              - generic [ref=f6e83]: Typical timeline
+              - strong [ref=f6e84]: From 4 weeks
+            - generic [ref=f6e85]:
+              - generic [ref=f6e86]: Core scope
+              - list [ref=f6e87]:
+                - listitem [ref=f6e88]: Prototyping and UX
+                - listitem [ref=f6e89]: User journeys
+                - listitem [ref=f6e90]: Interface design system
+                - listitem [ref=f6e91]: Motion and microinteractions
+            - link "View service" [ref=f6e92] [cursor=pointer]:
+              - /url: ./custom-digital-products/
+              - text: View service
+              - generic [ref=f6e93]: ↗
+          - article [ref=f6e94]:
+            - generic [ref=f6e95]:
+              - generic [ref=f6e96]: "04"
+              - generic [ref=f6e97]: Design carried into code
+            - heading "Web Development" [level=3] [ref=f6e98]: WebDevelopment
+            - paragraph [ref=f6e99]: Responsive implementation that preserves the design, supports the business and remains manageable after launch.
+            - generic [ref=f6e100]:
+              - generic [ref=f6e101]: Typical timeline
+              - strong [ref=f6e102]: From 4 weeks
+            - generic [ref=f6e103]:
+              - generic [ref=f6e104]: Core scope
+              - list [ref=f6e105]:
+                - listitem [ref=f6e106]: Frontend development
+                - listitem [ref=f6e107]: Motion and interaction
+                - listitem [ref=f6e108]: Technical SEO and integrations
+                - listitem [ref=f6e109]: Launch and maintenance
+            - link "View service" [ref=f6e110] [cursor=pointer]:
+              - /url: ./website-care/
+              - text: View service
+              - generic [ref=f6e111]: ↗
+    - generic [ref=f6e113]:
+      - generic [ref=f6e114]:
+        - generic [ref=f6e115]: "03"
+        - generic [ref=f6e116]: Before the proposal
+      - heading "Start with the need, not the label." [level=2] [ref=f6e117]: Start with the need,not the label.
+      - generic [ref=f6e118]:
+        - heading [level=3] [ref=f6e120]:
+          - button "I only have an idea. Is that enough to begin?" [ref=f6e121] [cursor=pointer]
+        - heading [level=3] [ref=f6e127]:
+          - button "Can strategy, identity, product design and development be combined?" [ref=f6e128] [cursor=pointer]
+        - heading [level=3] [ref=f6e134]:
+          - button "Which service should we start with?" [ref=f6e135] [cursor=pointer]
+        - heading [level=3] [ref=f6e141]:
+          - button "How is the final scope decided?" [ref=f6e142] [cursor=pointer]
+    - region [ref=f6e147]:
+      - generic [ref=f6e149]:
+        - generic [ref=f6e150]:
+          - generic [ref=f6e151]: "03"
+          - generic [ref=f6e152]: In practice
+        - heading "Real projects that use this process." [level=2] [ref=f6e153]
+        - paragraph [ref=f6e154]: See how Vulcet applies structure, interface and development on live client work.
+        - paragraph [ref=f6e155]:
+          - link "FounderClub case study" [ref=f6e156] [cursor=pointer]:
+            - /url: ../work/founderclub/
+            - text: FounderClub case study
+            - generic [ref=f6e157]: ↗
+          - link "Anadolu Qida case study" [ref=f6e158] [cursor=pointer]:
+            - /url: ../work/anadolu-qida/
+            - text: Anadolu Qida case study
+            - generic [ref=f6e159]: ↗
+          - link "All selected work" [ref=f6e160] [cursor=pointer]:
+            - /url: ../work/
+            - text: All selected work
+            - generic [ref=f6e161]: ↗
+  - contentinfo [ref=f6e162]:
+    - generic [ref=f6e163]:
+      - generic [ref=f6e164]:
+        - link "Vulcet home" [ref=f6e165] [cursor=pointer]:
+          - /url: ../
+          - img "Vulcet" [ref=f6e166]
+        - paragraph [ref=f6e167]: Strategy, design and development for businesses ready to move forward.
+        - list [ref=f6e168]:
+          - listitem [ref=f6e169]:
+            - link "Vulcet on Instagram" [ref=f6e170] [cursor=pointer]:
+              - /url: https://www.instagram.com/thevulcet/
+          - listitem [ref=f6e175]:
+            - link "Vulcet on X" [ref=f6e176] [cursor=pointer]:
+              - /url: https://x.com/thevulcet
+          - listitem [ref=f6e179]:
+            - link "Vulcet on Dribbble" [ref=f6e180] [cursor=pointer]:
+              - /url: https://dribbble.com/thevulcet
+          - listitem [ref=f6e184]:
+            - link "Vulcet on LinkedIn" [ref=f6e185] [cursor=pointer]:
+              - /url: https://www.linkedin.com/company/vulcet/
+      - navigation "Footer navigation" [ref=f6e190]:
+        - generic [ref=f6e191]:
+          - generic [ref=f6e192]: Navigate
+          - link "Home" [ref=f6e193] [cursor=pointer]:
+            - /url: ../
+          - link "Work" [ref=f6e194] [cursor=pointer]:
+            - /url: ../work/
+          - link "Experiments" [ref=f6e195] [cursor=pointer]:
+            - /url: ../redesigns/
+          - link "Services" [ref=f6e196] [cursor=pointer]:
+            - /url: ../services/
+          - link "Studio" [ref=f6e197] [cursor=pointer]:
+            - /url: ../studio/
+          - link "Blog" [ref=f6e198] [cursor=pointer]:
+            - /url: ../blog/
+          - link "Contact" [ref=f6e199] [cursor=pointer]:
+            - /url: ../contact/
+        - generic [ref=f6e200]:
+          - generic [ref=f6e201]: Services
+          - link "Brand Strategy" [ref=f6e202] [cursor=pointer]:
+            - /url: ../services/business-websites/
+          - link "Visual Identity" [ref=f6e203] [cursor=pointer]:
+            - /url: ../services/growth-websites/
+          - link "Product Design" [ref=f6e204] [cursor=pointer]:
+            - /url: ../services/custom-digital-products/
+          - link "Web Development" [ref=f6e205] [cursor=pointer]:
+            - /url: ../services/website-care/
+        - generic [ref=f6e206]:
+          - generic [ref=f6e207]: More
+          - link "Privacy" [ref=f6e208] [cursor=pointer]:
+            - /url: ../privacy/
+          - link "Site map" [ref=f6e209] [cursor=pointer]:
+            - /url: ../site-map/
+          - button "Cookie settings" [ref=f6e210] [cursor=pointer]
+      - generic [ref=f6e211]:
+        - generic [ref=f6e212]: Contact
+        - link "studio@vulcet.com" [ref=f6e213] [cursor=pointer]:
+          - /url: mailto:studio@vulcet.com
+        - paragraph [ref=f6e214]: Working internationally
+      - generic [ref=f6e215]:
+        - generic [ref=f6e216]: © 2026 Vulcet
+        - generic [ref=f6e217]: Independent digital studio
+        - generic [ref=f6e218]: Working internationally
+  - complementary [ref=f6e219]:
+    - generic [ref=f6e220]: Privacy choice
+    - heading "Help improve the website?" [level=2] [ref=f6e221]
+    - paragraph [ref=f6e222]:
+      - text: Vulcet uses Google Analytics only with your permission. Necessary site functions remain available either way. Read the
+      - link "privacy notice" [ref=f6e223] [cursor=pointer]:
+        - /url: ../privacy/
+      - text: .
+    - generic [ref=f6e224]:
+      - button "Decline analytics" [ref=f6e225] [cursor=pointer]
+      - button "Allow analytics" [ref=f6e226] [cursor=pointer]

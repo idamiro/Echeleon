@@ -1,0 +1,173 @@
+- generic [active] [ref=f5e1]:
+  - link "Skip to content" [ref=f5e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=f5e3]:
+    - generic [ref=f5e4]:
+      - link "Vulcet home" [ref=f5e5] [cursor=pointer]:
+        - /url: ../
+        - img "Vulcet" [ref=f5e6]
+      - navigation "Primary navigation" [ref=f5e7]:
+        - link "Work" [ref=f5e8] [cursor=pointer]:
+          - /url: ../work/
+        - link "Experiments" [ref=f5e9] [cursor=pointer]:
+          - /url: ./
+        - link "Services" [ref=f5e10] [cursor=pointer]:
+          - /url: ../services/
+        - link "Studio" [ref=f5e11] [cursor=pointer]:
+          - /url: ../studio/
+        - link "Blog" [ref=f5e12] [cursor=pointer]:
+          - /url: ../blog/
+        - link "Contact" [ref=f5e13] [cursor=pointer]:
+          - /url: ../contact/
+      - link "Start a project" [ref=f5e14] [cursor=pointer]:
+        - /url: ../contact/
+        - text: Start a project
+        - generic [ref=f5e15]: ↗
+  - main [ref=f5e16]:
+    - generic [ref=f5e18]:
+      - generic [ref=f5e19]:
+        - generic [ref=f5e20]: "01"
+        - generic [ref=f5e21]: Studio experiments
+      - heading [level=1] [ref=f5e22]:
+        - text: Original product studies, built as
+        - emphasis [ref=f5e23]: experiments.
+    - region "Studio experiments" [ref=f5e24]:
+      - generic [ref=f5e25]:
+        - article [ref=f5e26]:
+          - generic [ref=f5e27]:
+            - paragraph [ref=f5e28]:
+              - generic [ref=f5e29]: "01"
+              - generic [ref=f5e30]: Concept experiment
+            - heading [level=2] [ref=f5e31]:
+              - link "Kinetic Clarity" [ref=f5e32] [cursor=pointer]:
+                - /url: ./kinetic-clarity/
+            - paragraph [ref=f5e33]: An unofficial Nike product page study — one floating card, audience catalogs, and colorways that reshape the canvas.
+            - link "Open experiment" [ref=f5e34] [cursor=pointer]:
+              - /url: ./kinetic-clarity/
+              - text: Open experiment
+              - generic [ref=f5e35]: ↗
+          - link "Kinetic Clarity experiment" [ref=f5e36] [cursor=pointer]:
+            - /url: ./kinetic-clarity/
+            - img "Kinetic Clarity Nike product page experiment." [ref=f5e37]
+        - article [ref=f5e38]:
+          - generic [ref=f5e39]:
+            - paragraph [ref=f5e40]:
+              - generic [ref=f5e41]: "02"
+              - generic [ref=f5e42]: Concept experiment
+            - heading [level=2] [ref=f5e43]:
+              - link "Kinetic Surface" [ref=f5e44] [cursor=pointer]:
+                - /url: ./playstation/
+            - paragraph [ref=f5e45]: An unofficial PlayStation homepage study — hardware, games and PlayStation Plus read from one dark glass surface.
+            - link "Open experiment" [ref=f5e46] [cursor=pointer]:
+              - /url: ./playstation/
+              - text: Open experiment
+              - generic [ref=f5e47]: ↗
+          - link "Kinetic Surface experiment" [ref=f5e48] [cursor=pointer]:
+            - /url: ./playstation/
+            - img "Kinetic Surface PlayStation homepage experiment." [ref=f5e49]
+        - article [ref=f5e50]:
+          - generic [ref=f5e51]:
+            - paragraph [ref=f5e52]:
+              - generic [ref=f5e53]: "03"
+              - generic [ref=f5e54]: Interactive tool
+            - heading [level=2] [ref=f5e55]:
+              - link "Case Studio" [ref=f5e56] [cursor=pointer]:
+                - /url: ./case-studio/
+            - paragraph [ref=f5e57]: Design a custom phone case with artwork and inspect it on a realistic 3D iPhone.
+            - link "Open experiment" [ref=f5e58] [cursor=pointer]:
+              - /url: ./case-studio/
+              - text: Open experiment
+              - generic [ref=f5e59]: ↗
+          - link "Case Studio experiment" [ref=f5e60] [cursor=pointer]:
+            - /url: ./case-studio/
+            - generic [ref=f5e61]: Case Studio
+        - article [ref=f5e62]:
+          - generic [ref=f5e63]:
+            - paragraph [ref=f5e64]:
+              - generic [ref=f5e65]: "04"
+              - generic [ref=f5e66]: Product experiment
+            - heading [level=2] [ref=f5e67]:
+              - link "HOLD" [ref=f5e68] [cursor=pointer]:
+                - /url: ./hold/
+            - paragraph [ref=f5e69]: Cool a purchase decision — paste a product link, answer five questions, then wait on purpose.
+            - link "Try HOLD" [ref=f5e70] [cursor=pointer]:
+              - /url: ./hold/
+              - text: Try HOLD
+              - generic [ref=f5e71]: ↗
+          - link "HOLD experiment" [ref=f5e72] [cursor=pointer]:
+            - /url: ./hold/
+            - generic [ref=f5e73]: HOLD
+  - contentinfo [ref=f5e74]:
+    - generic [ref=f5e75]:
+      - generic [ref=f5e76]:
+        - link "Vulcet home" [ref=f5e77] [cursor=pointer]:
+          - /url: ../
+          - img "Vulcet" [ref=f5e78]
+        - paragraph [ref=f5e79]: Strategy, design and development for businesses ready to move forward.
+        - list [ref=f5e80]:
+          - listitem [ref=f5e81]:
+            - link "Vulcet on Instagram" [ref=f5e82] [cursor=pointer]:
+              - /url: https://www.instagram.com/thevulcet/
+          - listitem [ref=f5e87]:
+            - link "Vulcet on X" [ref=f5e88] [cursor=pointer]:
+              - /url: https://x.com/thevulcet
+          - listitem [ref=f5e91]:
+            - link "Vulcet on Dribbble" [ref=f5e92] [cursor=pointer]:
+              - /url: https://dribbble.com/thevulcet
+          - listitem [ref=f5e96]:
+            - link "Vulcet on LinkedIn" [ref=f5e97] [cursor=pointer]:
+              - /url: https://www.linkedin.com/company/vulcet/
+      - navigation "Footer navigation" [ref=f5e102]:
+        - generic [ref=f5e103]:
+          - generic [ref=f5e104]: Navigate
+          - link "Home" [ref=f5e105] [cursor=pointer]:
+            - /url: ../
+          - link "Work" [ref=f5e106] [cursor=pointer]:
+            - /url: ../work/
+          - link "Experiments" [ref=f5e107] [cursor=pointer]:
+            - /url: ../redesigns/
+          - link "Services" [ref=f5e108] [cursor=pointer]:
+            - /url: ../services/
+          - link "Studio" [ref=f5e109] [cursor=pointer]:
+            - /url: ../studio/
+          - link "Blog" [ref=f5e110] [cursor=pointer]:
+            - /url: ../blog/
+          - link "Contact" [ref=f5e111] [cursor=pointer]:
+            - /url: ../contact/
+        - generic [ref=f5e112]:
+          - generic [ref=f5e113]: Services
+          - link "Brand Strategy" [ref=f5e114] [cursor=pointer]:
+            - /url: ../services/business-websites/
+          - link "Visual Identity" [ref=f5e115] [cursor=pointer]:
+            - /url: ../services/growth-websites/
+          - link "Product Design" [ref=f5e116] [cursor=pointer]:
+            - /url: ../services/custom-digital-products/
+          - link "Web Development" [ref=f5e117] [cursor=pointer]:
+            - /url: ../services/website-care/
+        - generic [ref=f5e118]:
+          - generic [ref=f5e119]: More
+          - link "Privacy" [ref=f5e120] [cursor=pointer]:
+            - /url: ../privacy/
+          - link "Site map" [ref=f5e121] [cursor=pointer]:
+            - /url: ../site-map/
+          - button "Cookie settings" [ref=f5e122] [cursor=pointer]
+      - generic [ref=f5e123]:
+        - generic [ref=f5e124]: Contact
+        - link "studio@vulcet.com" [ref=f5e125] [cursor=pointer]:
+          - /url: mailto:studio@vulcet.com
+        - paragraph [ref=f5e126]: Working internationally
+      - generic [ref=f5e127]:
+        - generic [ref=f5e128]: © 2026 Vulcet
+        - generic [ref=f5e129]: Independent digital studio
+        - generic [ref=f5e130]: Working internationally
+  - complementary [ref=f5e131]:
+    - generic [ref=f5e132]: Privacy choice
+    - heading "Help improve the website?" [level=2] [ref=f5e133]
+    - paragraph [ref=f5e134]:
+      - text: Vulcet uses Google Analytics only with your permission. Necessary site functions remain available either way. Read the
+      - link "privacy notice" [ref=f5e135] [cursor=pointer]:
+        - /url: ../privacy/
+      - text: .
+    - generic [ref=f5e136]:
+      - button "Decline analytics" [ref=f5e137] [cursor=pointer]
+      - button "Allow analytics" [ref=f5e138] [cursor=pointer]

@@ -116,7 +116,38 @@ const revealObserver = new IntersectionObserver(entries => {
     }
   });
 }, { rootMargin: '0px 0px -10%', threshold: .08 });
-revealItems.forEach(item => reduceMotion ? item.classList.add('is-visible') : revealObserver.observe(item));
+
+function revealIfInView(item) {
+  const rect = item.getBoundingClientRect();
+  if (rect.top < innerHeight * 0.95 && rect.bottom > innerHeight * 0.05) {
+    item.classList.add('is-visible');
+    revealObserver.unobserve(item);
+    return true;
+  }
+  return false;
+}
+
+const alwaysShowMotion = document.body.matches('.editorial-page, .v-services-page');
+
+revealItems.forEach(item => {
+  if (reduceMotion || alwaysShowMotion) {
+    item.classList.add('is-visible');
+    return;
+  }
+  if (!revealIfInView(item)) revealObserver.observe(item);
+});
+
+addEventListener('load', () => {
+  revealItems.forEach(item => {
+    if (!item.classList.contains('is-visible')) revealIfInView(item);
+  });
+}, { once: true });
+
+addEventListener('scroll', () => {
+  revealItems.forEach(item => {
+    if (!item.classList.contains('is-visible')) revealIfInView(item);
+  });
+}, { passive: true });
 
 if (!reduceMotion && 'IntersectionObserver' in window) {
   const animatedRegions = document.querySelectorAll('.hero-lens, .project-canvas, .closing-field, .footer-signal, .v-hero-system, .contact-signal, .page-hero-signal');

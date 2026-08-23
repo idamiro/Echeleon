@@ -910,6 +910,11 @@
   padding: 0 0 96px;
 }
 
+.portfolio-row {
+  opacity: 1;
+  visibility: visible;
+}
+
 .portfolio-index-list {
   display: flex;
   flex-direction: column;
