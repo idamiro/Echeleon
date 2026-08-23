@@ -6,11 +6,12 @@
 
 .case-page .page-hero {
   min-height: auto;
-  padding-bottom: 56px;
+  padding: clamp(56px, 8vw, 88px) 0 clamp(40px, 5vw, 56px);
+  overflow: visible;
 }
 
 .case-page .page-hero h1 {
-  margin-top: 88px;
+  margin-top: clamp(48px, 7vw, 96px);
 }
 
 .case-page .page-hero-copy {
@@ -130,8 +131,12 @@
   margin: 0;
   color: var(--graphite);
   font-size: 17px;
-  line-height: 1.65;
+  line-height: 1.7;
   max-width: 28rem;
+}
+
+.case-chapter__text + .case-chapter__text {
+  margin-top: 1.25em;
 }
 
 .case-chapter__text a {
@@ -158,25 +163,37 @@
 
 /* —— Photo galleries —— */
 .case-gallery {
-  margin: clamp(32px, 4vw, 56px) 0;
+  margin: clamp(48px, 6vw, 80px) 0;
+  padding: clamp(40px, 5vw, 64px) 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
 }
 
 .case-gallery__intro {
-  margin: 0 0 24px;
-  max-width: 32rem;
+  margin: 0 0 clamp(28px, 3vw, 40px);
+  max-width: 34rem;
   color: var(--graphite);
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: clamp(15px, 1.6vw, 17px);
+  line-height: 1.6;
 }
 
 .case-gallery__grid {
   display: grid;
-  gap: 20px;
+  gap: clamp(20px, 2.5vw, 28px);
 }
 
 /* Landscape event / news grid (FounderClub) */
 .case-gallery--landscape {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.case-gallery--landscape figure:first-child {
+  grid-column: 1 / -1;
+}
+
+.case-gallery--landscape figure:first-child img {
+  aspect-ratio: 21 / 9;
+  object-position: center 35%;
 }
 
 .case-gallery--landscape figure {
@@ -199,6 +216,10 @@
   object-position: top center;
   display: block;
   max-height: none;
+}
+
+.case-gallery--landscape figure:nth-child(4) img {
+  object-position: center 22%;
 }
 
 /* Product portraits (Anadolu) */
