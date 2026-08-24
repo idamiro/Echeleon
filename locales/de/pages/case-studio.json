@@ -1,8 +1,8 @@
 {
   "28": "28",
   "Case Studio — 3D Phone Case Designer | Vulcet": "Case Studio — 3D-Designer für Smartphone-Hüllen | Vulcet",
-  "Case Studio — design a custom phone case with artwork, text and a live realistic 3D preview. Unofficial Vulcet experiment.": "Case Studio — gestalten Sie eine individuelle Smartphone-Hülle mit Motiv, Text und realistischer 3D-Live-Vorschau. Inoffizielles Vulcet Experiment.",
-  "Design a custom phone case with a live realistic 3D preview.": "Gestalten Sie eine individuelle Smartphone-Hülle mit realistischer 3D-Live-Vorschau.",
+  "Case Studio — design a custom phone case with artwork, text and a live realistic 3D preview. Unofficial Vulcet experiment.": "Case Studio — gestalten Sie eine individuelle Smartphone-Hülle mit Motiv, Text und realistischer 3D-Vorschau. Ein inoffizielles Vulcet Experiment.",
+  "Design a custom phone case with a live realistic 3D preview.": "Gestalten Sie eine eigene Smartphone-Hülle und prüfen Sie sie direkt in 3D.",
   "Case name": "Name der Hülle",
   "Undo": "Rückgängig",
   "Redo": "Wiederholen",
@@ -68,5 +68,5 @@
   "100%": "100%",
   "Rotation": "Drehung",
   "0°": "0°",
-  "Place by clicking case": "Per Klick auf die Hülle platzieren"
+  "Place by clicking case": "Zum Platzieren auf die Hülle klicken"
 }

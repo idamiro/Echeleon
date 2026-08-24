@@ -1,10 +1,10 @@
 {
   "Page not found - Vulcet": "Nie znaleziono strony — Vulcet",
   "Vulcet": "Vulcet",
-  "This page has moved <em>elsewhere.</em>": "Ta strona przeniosła się <em>gdzie indziej.</em>",
-  "This page has moved": "Ta strona przeniosła się",
-  "elsewhere.": "gdzie indziej.",
-  "The address may be outdated or the page may no longer exist.": "Adres może być nieaktualny albo strona już nie istnieje.",
+  "This page has moved <em>elsewhere.</em>": "Tej strony już <em>tutaj nie ma.</em>",
+  "This page has moved": "Tej strony już",
+  "elsewhere.": "tutaj nie ma.",
+  "The address may be outdated or the page may no longer exist.": "Adres jest nieaktualny albo strona została usunięta.",
   "Return home ↗": "Wróć na stronę główną ↗",
-  "Strategy, design and engineering": "Strategia, projektowanie i technologia"
+  "Strategy, design and engineering": "Strategia, design i technologia"
 }

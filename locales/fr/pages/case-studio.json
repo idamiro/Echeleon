@@ -1,8 +1,8 @@
 {
   "28": "28",
   "Case Studio — 3D Phone Case Designer | Vulcet": "Case Studio — créateur de coque 3D | Vulcet",
-  "Case Studio — design a custom phone case with artwork, text and a live realistic 3D preview. Unofficial Vulcet experiment.": "Case Studio — créez une coque personnalisée avec image, texte et aperçu 3D réaliste en direct. Une expérience Vulcet non officielle.",
-  "Design a custom phone case with a live realistic 3D preview.": "Créez une coque personnalisée avec un aperçu 3D réaliste en direct.",
+  "Case Studio — design a custom phone case with artwork, text and a live realistic 3D preview. Unofficial Vulcet experiment.": "Case Studio — créez une coque avec votre visuel et votre texte, puis observez-la en 3D. Une expérience Vulcet non officielle.",
+  "Design a custom phone case with a live realistic 3D preview.": "Créez votre coque et visualisez-la immédiatement en 3D.",
   "Case name": "Nom de la coque",
   "Undo": "Annuler",
   "Redo": "Rétablir",
@@ -68,5 +68,5 @@
   "100%": "100%",
   "Rotation": "Rotation",
   "0°": "0°",
-  "Place by clicking case": "Placer en cliquant sur la coque"
+  "Place by clicking case": "Cliquer sur la coque pour placer l’élément"
 }

@@ -1,8 +1,8 @@
 {
   "28": "28",
   "Case Studio — 3D Phone Case Designer | Vulcet": "Case Studio — projektant etui 3D | Vulcet",
-  "Case Studio — design a custom phone case with artwork, text and a live realistic 3D preview. Unofficial Vulcet experiment.": "Case Studio — zaprojektuj własne etui z grafiką, tekstem i realistycznym podglądem 3D na żywo. Nieoficjalny eksperyment Vulcet.",
-  "Design a custom phone case with a live realistic 3D preview.": "Zaprojektuj własne etui z realistycznym podglądem 3D na żywo.",
+  "Case Studio — design a custom phone case with artwork, text and a live realistic 3D preview. Unofficial Vulcet experiment.": "Case Studio — zaprojektuj etui z własną grafiką i tekstem, korzystając z realistycznego podglądu 3D. Nieoficjalny eksperyment Vulcet.",
+  "Design a custom phone case with a live realistic 3D preview.": "Zaprojektuj własne etui i zobacz je od razu w realistycznym podglądzie 3D.",
   "Case name": "Nazwa etui",
   "Undo": "Cofnij",
   "Redo": "Ponów",
@@ -17,7 +17,7 @@
   "Beige": "Beżowy",
   "Dark green": "Ciemnozielony",
   "Dark brown": "Ciemnobrązowy",
-  "Soft touch": "Miękkie w dotyku",
+  "Soft touch": "Miękkie wykończenie",
   "Matte": "Matowe",
   "Glossy": "Błyszczące",
   "Grain": "Ziarno",
@@ -68,5 +68,5 @@
   "100%": "100%",
   "Rotation": "Obrót",
   "0°": "0°",
-  "Place by clicking case": "Umieść, klikając etui"
+  "Place by clicking case": "Kliknij etui, aby umieścić element"
 }
