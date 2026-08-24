@@ -14,8 +14,7 @@
   let activeStep = 1;
 
   const requestedService = new URLSearchParams(window.location.search).get('service');
-  const runtime = window.__VULCET_I18N__?.contact || {};
-  const serviceLabels = runtime.serviceLabels || {
+  const serviceLabels = {
     'business-website': 'Brand Strategy',
     'growth-website': 'Visual Identity',
     'custom-product': 'Product Design',
@@ -80,7 +79,7 @@
 
     submitButton.disabled = true;
     submitButton.setAttribute('aria-busy', 'true');
-    status.textContent = runtime.sending || 'Sending your project brief…';
+    status.textContent = 'Sending your project brief…';
 
     try {
       const response = await fetch(form.action, {
@@ -100,7 +99,7 @@
       if (typeof window.gtag === 'function') window.gtag('event', 'generate_lead', { form_name: 'project_brief' });
     } catch (error) {
       status.setAttribute('role', 'alert');
-      status.textContent = runtime.error || 'The brief could not be sent. Please try again or email studio@vulcet.com.';
+      status.textContent = 'The brief could not be sent. Please try again or email studio@vulcet.com.';
       submitButton.disabled = false;
       submitButton.removeAttribute('aria-busy');
     }

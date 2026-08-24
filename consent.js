@@ -1,7 +1,6 @@
 (() => {
   const storageKey = 'vulcet-analytics-consent';
   const relativeRoot = document.documentElement.dataset.root || './';
-  const i18n = window.__VULCET_I18N__?.consent || {};
   const savedChoice = localStorage.getItem(storageKey);
 
   const updateConsent = (choice) => {
@@ -19,24 +18,17 @@
     updateConsent(savedChoice);
   }
 
-  const eyebrow = i18n.eyebrow || 'Privacy choice';
-  const title = i18n.title || 'Help improve the website?';
-  const bodyTemplate = i18n.body || 'Vulcet uses Google Analytics only with your permission. Necessary site functions remain available either way. Read the <a href="__PRIVACY__">privacy notice</a>.';
-  const decline = i18n.decline || 'Decline analytics';
-  const allow = i18n.allow || 'Allow analytics';
-  const body = bodyTemplate.replace('__PRIVACY__', `${relativeRoot}privacy/`);
-
   const panel = document.createElement('aside');
   panel.className = 'consent-panel';
   panel.setAttribute('aria-labelledby', 'consent-title');
   panel.hidden = Boolean(savedChoice);
   panel.innerHTML = `
-    <span>${eyebrow}</span>
-    <h2 id="consent-title">${title}</h2>
-    <p>${body}</p>
+    <span>Privacy choice</span>
+    <h2 id="consent-title">Help improve the website?</h2>
+    <p>Vulcet uses Google Analytics only with your permission. Necessary site functions remain available either way. Read the <a href="${relativeRoot}privacy/">privacy notice</a>.</p>
     <div class="consent-actions">
-      <button type="button" data-consent="denied">${decline}</button>
-      <button type="button" data-consent="granted">${allow}</button>
+      <button type="button" data-consent="denied">Decline analytics</button>
+      <button type="button" data-consent="granted">Allow analytics</button>
     </div>
   `;
 

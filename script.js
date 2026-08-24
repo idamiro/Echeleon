@@ -23,8 +23,7 @@ function setMenu(open) {
   mobileNav.inert = !open;
   mobileNav.classList.toggle('mobile-nav--open', open);
   menuButton.querySelector('.menu-icon').classList.toggle('menu-icon--open', open);
-  const i18n = window.__VULCET_I18N__ || {};
-  menuButton.querySelector('.sr-only').textContent = open ? (i18n.closeMenu || 'Close menu') : (i18n.openMenu || 'Open menu');
+  menuButton.querySelector('.sr-only').textContent = open ? 'Close menu' : 'Open menu';
   if (open) {
     menuScrollY = window.scrollY;
     document.documentElement.classList.add('nav-open');
@@ -237,10 +236,3 @@ addEventListener('scroll', () => {
   if (!scrollFrame) scrollFrame = requestAnimationFrame(updateScrollMotion);
 }, { passive: true });
 updateScrollMotion();
-
-
-document.querySelectorAll('.lang-switch a[data-lang]').forEach((link) => {
-  link.addEventListener('click', () => {
-    try { localStorage.setItem('vulcet-lang', link.dataset.lang); } catch (_) {}
-  });
-});
