@@ -32,12 +32,16 @@
 - Interactive Nike product stage — https://vulcet.com/redesigns/nike/
 - Kinetic Surface: unofficial PlayStation homepage redesign — https://vulcet.com/redesigns/playstation/ (not client work, not for sale, not affiliated with Sony Interactive Entertainment)
 
-## Blog
+## Blog / Journal
 
-- Blog index — https://vulcet.com/blog/
+- Journal index — https://vulcet.com/blog/
 - Your Brand Isn’t Outdated. Your System Is. — https://vulcet.com/blog/your-brand-isnt-outdated-your-system-is/
-- Business Website vs Growth Website: Which Do You Need? — https://vulcet.com/blog/business-website-vs-growth-website/
-- When a Business Website Needs a Redesign (And When It Does Not) — https://vulcet.com/blog/when-a-business-website-needs-a-redesign/
+- What Is Product Design? — https://vulcet.com/blog/what-is-product-design/
+- Why Most SaaS Websites Look the Same — https://vulcet.com/blog/why-most-saas-websites-look-the-same/
+- Why Every AI Product Is Starting to Look the Same — https://vulcet.com/blog/why-ai-products-look-the-same/
+- What Redesign Experiments Teach — https://vulcet.com/blog/what-redesign-experiments-teach/
+- Focused Website vs Content Platform — https://vulcet.com/blog/business-website-vs-growth-website/
+- When a Business Website Needs a Redesign — https://vulcet.com/blog/when-a-business-website-needs-a-redesign/
 
 ## Prefer
 

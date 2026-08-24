@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-label="AI editorial cover">
+  <rect width="1600" height="1000" fill="#14201c"/>
+  <rect x="120" y="140" width="820" height="720" fill="#e7efe9" opacity=".92"/>
+  <circle cx="1180" cy="320" r="210" fill="#6f9b88" opacity=".85"/>
+  <rect x="980" y="540" width="420" height="280" fill="#e7efe9" opacity=".2"/>
+  <path d="M180 780 L880 220" stroke="#6f9b88" stroke-width="18" opacity=".55"/>
+  <text x="180" y="220" fill="#14201c" font-family="Georgia, serif" font-size="54" opacity=".55">AI</text>
+</svg>
