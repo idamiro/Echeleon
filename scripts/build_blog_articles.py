@@ -48,7 +48,7 @@ FOOTER = '''</main>
       <div class="footer-brand"><a class="wordmark" href="/" aria-label="Vulcet home"><img src="/vulcet-wordmark.png?v=20260809-2" alt="Vulcet"></a><p>Strategy, design and development for businesses ready to move forward.</p><ul class="footer-social"><li><a href="https://www.instagram.com/thevulcet/" target="_blank" rel="noreferrer noopener" aria-label="Vulcet on Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5.2"></rect><circle cx="12" cy="12" r="4.2"></circle><circle cx="17.4" cy="6.6" r="1.15" fill="currentColor" stroke="none"></circle></svg></a></li><li><a href="https://x.com/thevulcet" target="_blank" rel="noreferrer noopener" aria-label="Vulcet on X"><svg class="is-solid" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M17.53 3h3.2l-6.99 7.99L22 21h-6.44l-5.04-6.59L4.75 21H1.54l7.48-8.55L2 3h6.6l4.56 6.03L17.53 3Zm-1.12 16.06h1.77L7.68 4.84H5.78l10.63 14.22Z"></path></svg></a></li><li><a href="https://dribbble.com/thevulcet" target="_blank" rel="noreferrer noopener" aria-label="Vulcet on Dribbble"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"></circle><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"></path></svg></a></li><li><a href="https://www.linkedin.com/company/vulcet/" target="_blank" rel="noreferrer noopener" aria-label="Vulcet on LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4V8h4v1.4A6 6 0 0 1 16 8Z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a></li></ul></div>
       <nav class="footer-nav" aria-label="Footer navigation"><div><span>Navigate</span><a href="/">Home</a><a href="/work/">Work</a><a href="/redesigns/">Experiments</a><a href="/services/">Services</a><a href="/studio/">Studio</a><a href="/blog/" aria-current="page">Blog</a><a href="/contact/">Contact</a></div><div><span>Services</span><a href="/services/brand-strategy/">Brand Strategy</a><a href="/services/visual-identity/">Visual Identity</a><a href="/services/product-design/">Product Design</a><a href="/services/web-development/">Web Development</a></div><div><span>More</span><a href="/privacy/">Privacy</a><a href="/site-map/">Site map</a><button class="footer-cookie-link" type="button" data-cookie-settings="">Cookie settings</button></div></nav>
       <div class="footer-contact"><span>Contact</span><a href="mailto:studio@vulcet.com">studio@vulcet.com</a><p>Working internationally</p></div>
-      <div class="footer-utility"><small>© <span id="year"></span> Vulcet</small><small>Independent digital studio</small><small>Working internationally</small></div>
+      <div class="footer-utility"><small>© <span id="year"></span> Vulcet</small><small>Global branding, product and web design</small><small>Working internationally</small></div>
     </div>
   </footer>
 </body></html>
@@ -56,8 +56,8 @@ FOOTER = '''</main>
 
 AUTHOR = '''
       <aside class="article-author">
-        <div class="article-author-meta"><strong>Vulcet</strong><span>Independent design studio</span></div>
-        <p>Strategy, design and development for brands, products and websites. Working internationally from Poland.</p>
+        <div class="article-author-meta"><strong>Vulcet</strong><span>Design studio</span></div>
+        <p>Vulcet is a global branding, product and web design studio working internationally from Poland.</p>
         <a href="/studio/">About the studio</a>
       </aside>
 '''
@@ -156,7 +156,7 @@ def article_page(
         <div class="article-related-list">{related_html}</div>
       </section>
       <div class="article-studio">
-        <p>Vulcet is an independent design studio working internationally from Poland. Strategy, design and engineering stay in one process — for branding, product design and websites.</p>
+        <p>Vulcet is a global branding, product and web design studio working internationally from Poland. Strategy, design and engineering stay in one process.</p>
         <p><a href="/contact/">Start a project</a> · <a href="/blog/">All articles</a></p>
       </div>
     </div>
@@ -258,7 +258,7 @@ brand_body = '''
 
         <h2 id="branding-is-a-system">Branding is a system. Rebranding rebuilds it.</h2>
         <p>Branding is the connected set of decisions that make a company recognisable and usable: who it is for, what it stands for, how it speaks, how it looks and how those rules survive across a website, product and sales materials.</p>
-        <p>Rebranding is not a prettier coat of paint. It is a rebuild of that system when the current one can no longer carry the business.</p>
+        <p>Rebranding is not only a visual update. It is a rebuild of that system when the current one can no longer carry the business.</p>
         <div class="article-callout"><p>If the offer is still true and the friction is inconsistency, start with a refresh. If the market, audience or product has changed enough that the old story misleads, you need a rebrand.</p></div>
 
         <h2 id="the-rebrand-trap">The rebrand trap</h2>
@@ -609,19 +609,18 @@ saas_faq = [
 ]
 
 saas_body = '''
-        <p>Scroll a few SaaS homepages and the pattern repeats: soft gradient, product UI floating in perspective, three feature columns, logo wall, enterprise testimonial, pricing tease.</p>
-        <p>That sameness is not an accident. It is the visible result of shared tools, shared templates and shared fear.</p>
+        <p>Scroll a few SaaS homepages and the pattern often repeats: soft gradient, product UI in perspective, three feature columns, logo wall, enterprise testimonial, pricing tease. That sameness is not an accident. It comes from shared tools, shared templates and a shared preference for looking safe.</p>
 
         <h2 id="why-it-happens">Why the pattern stuck</h2>
         <p>Design systems and component kits made competent UI easier to ship. Templates made conversion layouts easy to copy. Investors and buyers learned to trust a certain “serious product” look. Teams then optimised for not looking wrong.</p>
-        <p>The result is a category aesthetic. Useful for recognition. Fatal for differentiation.</p>
+        <p>The result is a category aesthetic. It helps teams look credible quickly, but it also makes products harder to tell apart when every site uses the same hierarchy and proof pattern.</p>
 
         <h2 id="what-sameness-costs">What sameness actually costs</h2>
-        <p>When every homepage uses the same hierarchy, visitors stop reading and start pattern-matching. Your product becomes “another one of those.” Sales then has to rebuild distinction on calls that the website failed to create.</p>
+        <p>When every homepage follows the same structure, visitors scan for familiar blocks instead of reading your specific offer. Distinction then has to be rebuilt later in sales conversations, which is slower and more expensive than earning it on the site.</p>
         <div class="article-example">
           <h3>Contrast: Stripe vs generic fintech</h3>
           <p><a href="https://stripe.com/" target="_blank" rel="noreferrer noopener">Stripe</a> uses clarity, documentation depth and product language as competitive surface area. Many fintech clones copy the calm palette and miss the harder part: precise explanation of value.</p>
-          <p><strong>Vulcet take:</strong> visual quietness without conceptual clarity is just emptiness with good kerning.</p>
+          <p><strong>Vulcet take:</strong> a calm visual system only works when the offer and hierarchy are already clear. Without that, the page just feels unfinished.</p>
         </div>
 
         <h2 id="where-differentiation-lives">Where differentiation should live</h2>
@@ -634,12 +633,12 @@ saas_body = '''
         <p>Visual identity can then amplify a real position instead of inventing one.</p>
 
         <h2 id="minimal-is-not-a-strategy">“Minimal” is not a strategy</h2>
-        <p>Minimal interfaces are often an avoidance of decision-making. Removing chrome does not create meaning. Meaning comes from hierarchy, contrast and the courage to emphasise one idea over five.</p>
+        <p>Minimal interfaces are often a way of postponing hard decisions. Removing chrome does not create meaning on its own. Meaning comes from hierarchy and contrast: choosing which idea deserves emphasis, and which supporting points can wait.</p>
         <p>Related reading: <a href="/blog/your-brand-isnt-outdated-your-system-is/">your brand isn’t outdated — your system is</a>.</p>
 
         <h2 id="vulcet-view">What Vulcet does differently</h2>
         <p>We treat the website as evidence of how the company thinks. That means fewer generic feature grids and more structure that matches the sales conversation.</p>
-        <p>Experiments such as <a href="/redesigns/kinetic-clarity/">Kinetic Clarity</a> exist to pressure-test product storytelling outside client constraints. Client work such as <a href="/work/founderclub/">FounderClub</a> has to survive real community complexity — which kills template thinking quickly.</p>
+        <p>Experiments such as <a href="/redesigns/kinetic-clarity/">Kinetic Clarity</a> exist to pressure-test product storytelling outside client constraints. Client work such as <a href="/work/founderclub/">FounderClub</a> has to handle real community complexity, which makes template layouts harder to defend.</p>
         <p>If your site feels interchangeable, begin with <a href="/services/brand-strategy/">brand strategy</a> and a clearer web narrative, then implement through <a href="/services/web-development/">web development</a>.</p>
 
         <h2 id="faq">FAQ</h2>
@@ -666,17 +665,17 @@ ai_faq = [
 ]
 
 ai_body = '''
-        <p>Open enough AI products and you will see the same composition: left rail, empty chat, suggested prompts, glowing generate button. The underlying models differ. The product surfaces often do not.</p>
-        <p>That convergence happens when teams design for the demo, not for the work.</p>
+        <p>Open enough AI products and you will see a familiar composition: left rail, empty chat, suggested prompts, and a generate action. The models underneath may differ, but the product surfaces often do not.</p>
+        <p>That convergence tends to happen when teams design for the demo more than for the ongoing work people need to complete.</p>
 
         <h2 id="the-chat-default">The chat default</h2>
-        <p>Chat is a powerful primitive. It is also a convenient way to postpone product decisions. If everything is a prompt, the team can avoid defining objects, permissions, review states and recovery paths.</p>
-        <p>Users then inherit the ambiguity. They must invent the workflow the product refused to design.</p>
+        <p>Chat is a useful interaction model when conversation is genuinely the job. It becomes a problem when teams use it to postpone other product decisions. If everything is a prompt, objects, permissions, review states and recovery paths often stay undefined.</p>
+        <p>Users then inherit that ambiguity and have to invent a workflow the product never designed.</p>
 
         <h2 id="examples">Where stronger products diverge</h2>
         <div class="article-example">
           <h3>Notion AI inside a structured workspace</h3>
-          <p><a href="https://www.notion.com/help/notion-ai" target="_blank" rel="noreferrer noopener">Notion’s AI features</a> sit inside documents, databases and existing mental models. The AI is a layer on structured work, not a disconnected chat island.</p>
+          <p><a href="https://www.notion.com/product/ai" target="_blank" rel="noreferrer noopener">Notion’s AI features</a> sit inside documents, databases and existing mental models. The AI is a layer on structured work, not a disconnected chat island.</p>
           <p><strong>Vulcet take:</strong> AI feels more valuable when it operates on objects people already manage — pages, tasks, records — instead of asking them to restart in a blank thread.</p>
         </div>
         <div class="article-example">
@@ -685,8 +684,8 @@ ai_body = '''
         </div>
 
         <h2 id="design-for-failure">Design for failure modes first</h2>
-        <p>AI products fail in public: hallucinations, wrong tone, incomplete actions, brittle integrations. Product design should surface confidence, citations, undo paths and human review where risk is high.</p>
-        <p>A glowing generate button with no recovery model is not ambition. It is unfinished work.</p>
+        <p>AI products often fail in visible ways: inaccurate answers, the wrong tone, incomplete actions, or brittle integrations. Product design should account for those cases with confidence signals, citations where relevant, undo paths and human review when the risk is high.</p>
+        <p>A generate action without a recovery model leaves people stuck when the output is wrong. That is a product gap, not a temporary polish issue.</p>
 
         <h2 id="vulcet-lens">Vulcet’s lens</h2>
         <p>We ask what the user must accomplish, what can go wrong, and which parts of the job should stay explicit controls versus conversational shortcuts.</p>
@@ -703,7 +702,7 @@ ai_body = '''
 experiments_faq = [
     (
         "What are Vulcet redesign experiments?",
-        "Independent studies where Vulcet redesigns or reimagines product and marketing surfaces to test structure, motion and storytelling outside client delivery constraints.",
+        "Studio studies where Vulcet redesigns or reimagines product and marketing surfaces to test structure, motion and storytelling outside client delivery constraints.",
     ),
     (
         "Are experiments client work?",
@@ -716,11 +715,11 @@ experiments_faq = [
 ]
 
 experiments_body = '''
-        <p>Client projects are constrained by business reality — and they should be. Experiments exist for a different reason: to test ideas that would be irresponsible to invent on a live sales funnel.</p>
+        <p>Client projects are constrained by business reality — and they should be. Experiments exist for a different reason: to test ideas before they are asked to carry a live sales funnel or production content model.</p>
         <p>Vulcet publishes redesign experiments as a public sketchbook of structure, motion and product storytelling.</p>
 
         <h2 id="what-they-are">What these experiments are</h2>
-        <p>They are independent studies. Some reimagine a product page. Some explore interaction models. None of them claim to be official work for the brands referenced.</p>
+        <p>They are studio studies. Some reimagine a product page. Some explore interaction models. None of them claim to be official work for the brands referenced.</p>
         <p>Browse the current set on <a href="/redesigns/">Vulcet Experiments</a>, including <a href="/redesigns/kinetic-clarity/">Kinetic Clarity</a>, <a href="/redesigns/hold/">HOLD</a> and <a href="/redesigns/case-studio/">Case Studio</a>.</p>
 
         <h2 id="what-we-learn">What we learn that transfers</h2>
@@ -752,7 +751,7 @@ experiments_body = '''
 
         <h2 id="faq">FAQ</h2>
         <div class="article-faq">
-          <div><h3>What are Vulcet redesign experiments?</h3><p>Independent studies where Vulcet redesigns or reimagines product and marketing surfaces to test structure, motion and storytelling outside client delivery constraints.</p></div>
+          <div><h3>What are Vulcet redesign experiments?</h3><p>Studio studies where Vulcet redesigns or reimagines product and marketing surfaces to test structure, motion and storytelling outside client delivery constraints.</p></div>
           <div><h3>Are experiments client work?</h3><p>No. They are studio studies. They are not affiliated with the brands referenced and are not for sale as official work for those companies.</p></div>
           <div><h3>Why publish experiments at all?</h3><p>They make Vulcet’s thinking visible, create a library of interaction patterns, and sharpen the judgement we bring into client projects.</p></div>
         </div>
@@ -918,7 +917,7 @@ def build_articles() -> None:
             reading="9 min read",
             cover="/blog/assets/cover-product-design.svg",
             cover_alt="Abstract editorial cover for Vulcet’s product design guide.",
-            og_image="https://vulcet.com/blog/assets/cover-product-design.svg",
+            og_image="https://vulcet.com/blog/assets/og-product-design.png",
             h1="What is product design?",
             dek="A practical definition for founders: how digital products become useful, coherent and buildable.",
             schema=blog_posting(
@@ -927,7 +926,7 @@ def build_articles() -> None:
                 url="https://vulcet.com/blog/what-is-product-design/",
                 published="2026-08-24",
                 updated="2026-08-24",
-                image="https://vulcet.com/blog/assets/cover-product-design.svg",
+                image="https://vulcet.com/blog/assets/og-product-design.png",
                 section="Product Design",
                 word_count=1250,
                 minutes=9,
@@ -965,16 +964,16 @@ def build_articles() -> None:
             reading="8 min read",
             cover="/blog/assets/cover-saas-sameness.svg",
             cover_alt="Abstract editorial cover about SaaS website sameness.",
-            og_image="https://vulcet.com/blog/assets/cover-saas-sameness.svg",
+            og_image="https://vulcet.com/blog/assets/og-saas-sameness.png",
             h1="Why most SaaS websites look the same",
-            dek="Shared templates, shared fear and a narrow idea of what “credible” looks like. Where differentiation should start instead.",
+            dek="Shared templates, familiar conversion patterns, and a narrow idea of what “credible” looks like — plus where differentiation should start instead.",
             schema=blog_posting(
                 headline="Why Most SaaS Websites Look the Same",
                 description="Why SaaS marketing sites converge on the same look — and how to differentiate through hierarchy, language and product demonstration.",
                 url="https://vulcet.com/blog/why-most-saas-websites-look-the-same/",
                 published="2026-08-24",
                 updated="2026-08-24",
-                image="https://vulcet.com/blog/assets/cover-saas-sameness.svg",
+                image="https://vulcet.com/blog/assets/og-saas-sameness.png",
                 section="Web Design",
                 word_count=1100,
                 minutes=8,
@@ -985,7 +984,7 @@ def build_articles() -> None:
                 "Sameness comes from shared kits, templates and risk aversion.",
                 "Familiar patterns help comprehension until they erase positioning.",
                 "Differentiate in story, proof and demonstration before visual novelty.",
-                "Minimalism without hierarchy is emptiness.",
+                "Quiet visuals still need a clear offer and hierarchy.",
             ],
             related=[
                 ("/blog/your-brand-isnt-outdated-your-system-is/", "Article", "Your brand isn’t outdated"),
@@ -1012,16 +1011,16 @@ def build_articles() -> None:
             reading="8 min read",
             cover="/blog/assets/cover-ai-sameness.svg",
             cover_alt="Abstract editorial cover about AI product interface sameness.",
-            og_image="https://vulcet.com/blog/assets/cover-ai-sameness.svg",
+            og_image="https://vulcet.com/blog/assets/og-ai-sameness.png",
             h1="Why every AI product is starting to look the same",
-            dek="When chat becomes a shortcut past product decisions, every interface collapses into the same glowing prompt box.",
+            dek="When teams default to chat as the whole product surface, interfaces start to look interchangeable.",
             schema=blog_posting(
                 headline="Why Every AI Product Is Starting to Look the Same",
                 description="Why AI products converge on the same chat UI — and how to design around jobs, failure modes and structured workflows instead.",
                 url="https://vulcet.com/blog/why-ai-products-look-the-same/",
                 published="2026-08-24",
                 updated="2026-08-24",
-                image="https://vulcet.com/blog/assets/cover-ai-sameness.svg",
+                image="https://vulcet.com/blog/assets/og-ai-sameness.png",
                 section="Product Design",
                 word_count=1050,
                 minutes=8,
@@ -1029,9 +1028,9 @@ def build_articles() -> None:
             ),
             body=ai_body,
             takeaways=[
-                "Chat is a primitive, not a complete product strategy.",
-                "AI is more useful on structured objects than in blank threads.",
-                "Design failure modes — undo, review, confidence — before the demo polish.",
+                "Chat works when conversation is the job — not as a substitute for product structure.",
+                "AI is usually more useful on structured objects than in blank threads.",
+                "Plan for failure modes — undo, review, confidence — before polishing the generate action.",
                 "Start from the job outcome, then choose interaction patterns.",
             ],
             related=[
@@ -1059,7 +1058,7 @@ def build_articles() -> None:
             reading="7 min read",
             cover="/blog/assets/cover-experiments.svg",
             cover_alt="Abstract editorial cover for Vulcet redesign experiments.",
-            og_image="https://vulcet.com/blog/assets/cover-experiments.svg",
+            og_image="https://vulcet.com/blog/assets/og-redesign-experiments.png",
             h1="What redesign experiments teach",
             dek="A public sketchbook for structure, motion and product storytelling — and how those lessons return to client work.",
             schema=blog_posting(
@@ -1068,7 +1067,7 @@ def build_articles() -> None:
                 url="https://vulcet.com/blog/what-redesign-experiments-teach/",
                 published="2026-08-24",
                 updated="2026-08-24",
-                image="https://vulcet.com/blog/assets/cover-experiments.svg",
+                image="https://vulcet.com/blog/assets/og-redesign-experiments.png",
                 section="Experiments",
                 word_count=950,
                 minutes=7,
@@ -1076,9 +1075,9 @@ def build_articles() -> None:
             ),
             body=experiments_body,
             takeaways=[
-                "Experiments test ideas that would be reckless on a live funnel.",
+                "Experiments test ideas before they have to carry a live funnel.",
                 "They are studio studies, not client work or brand affiliations.",
-                "The transferable lesson is judgement: structure over decoration.",
+                "The transferable value is judgement: structure over decoration.",
                 "Read experiments for the idea under test, then ask if it survives real content.",
             ],
             related=[
