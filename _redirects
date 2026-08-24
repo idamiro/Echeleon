@@ -1,0 +1,9 @@
+# Permanent redirects for renamed service URLs
+/services/business-websites /services/brand-strategy/ 301
+/services/business-websites/ /services/brand-strategy/ 301
+/services/growth-websites /services/visual-identity/ 301
+/services/growth-websites/ /services/visual-identity/ 301
+/services/custom-digital-products /services/product-design/ 301
+/services/custom-digital-products/ /services/product-design/ 301
+/services/website-care /services/web-development/ 301
+/services/website-care/ /services/web-development/ 301

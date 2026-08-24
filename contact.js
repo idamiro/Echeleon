@@ -15,6 +15,10 @@
 
   const requestedService = new URLSearchParams(window.location.search).get('service');
   const serviceLabels = {
+    'brand-strategy': 'Brand Strategy',
+    'visual-identity': 'Visual Identity',
+    'product-design': 'Product Design',
+    'web-development': 'Web Development',
     'business-website': 'Brand Strategy',
     'growth-website': 'Visual Identity',
     'custom-product': 'Product Design',

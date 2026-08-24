@@ -98,7 +98,7 @@ Best when you need a focused, credible presence: clear offer, custom UI, respons
 
 Good fit for professional services, consultants, launches and clean replacements.
 
-Details: [Business website design & development](https://vulcet.com/services/business-websites/)
+Details: [Business website design & development](https://vulcet.com/services/brand-strategy/)
 
 ### Growth website
 
@@ -106,13 +106,13 @@ Best when the business needs depth: stronger positioning, richer architecture, m
 
 Good fit for international companies and teams publishing projects, news or case studies.
 
-Details: [Growth website design](https://vulcet.com/services/growth-websites/)
+Details: [Growth website design](https://vulcet.com/services/visual-identity/)
 
 ### Website care
 
 Best after launch, when you need ongoing fixes, content support and technical upkeep so the site does not quietly decay.
 
-Details: [Website care](https://vulcet.com/services/website-care/)
+Details: [Website care](https://vulcet.com/services/web-development/)
 
 The right scope is the smallest one that solves the real constraint. Bigger is not automatically better.
 

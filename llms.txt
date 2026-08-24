@@ -15,10 +15,10 @@
 
 ## Services
 
-- Brand Strategy — https://vulcet.com/services/business-websites/
-- Visual Identity — https://vulcet.com/services/growth-websites/
-- Product Design (UI/UX) — https://vulcet.com/services/custom-digital-products/
-- Web Development — https://vulcet.com/services/website-care/
+- Brand Strategy — https://vulcet.com/services/brand-strategy/
+- Visual Identity — https://vulcet.com/services/visual-identity/
+- Product Design (UI/UX) — https://vulcet.com/services/product-design/
+- Web Development — https://vulcet.com/services/web-development/
 - Services overview — https://vulcet.com/services/
 
 ## Selected work
