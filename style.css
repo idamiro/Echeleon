@@ -4140,10 +4140,12 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 }
 
 .hero h1 {
-  max-width: min(100%, 920px) !important;
-  font-size: clamp(40px, 6.2vw, 84px) !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.04em !important;
+  grid-column: 1 / 11 !important;
+  max-width: min(100%, 980px) !important;
+  font-size: clamp(32px, 4.2vw, 56px) !important;
+  line-height: 1.18 !important;
+  letter-spacing: -0.025em !important;
+  font-weight: 650 !important;
 }
 
 .hero h1 span {
@@ -4348,9 +4350,9 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
 
   .hero h1 {
     max-width: 100% !important;
-    font-size: clamp(34px, 10.5vw, 46px) !important;
-    line-height: 1.14 !important;
-    letter-spacing: -0.035em !important;
+    font-size: clamp(28px, 7.8vw, 38px) !important;
+    line-height: 1.22 !important;
+    letter-spacing: -0.02em !important;
     margin-top: 28px !important;
   }
 
