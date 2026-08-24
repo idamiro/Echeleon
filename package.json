@@ -1,0 +1,26 @@
+{
+  "name": "vulcet-site",
+  "version": "1.0.0",
+  "description": "",
+  "main": "consent.js",
+  "scripts": {
+    "i18n:build": "node i18n/build.mjs",
+    "build": "npm run i18n:build",
+    "test": "node i18n/verify.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/idamiro/Echeleon.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/idamiro/Echeleon/issues"
+  },
+  "homepage": "https://github.com/idamiro/Echeleon#readme",
+  "devDependencies": {
+    "cheerio": "^1.0.0"
+  },
+  "type": "module"
+}
