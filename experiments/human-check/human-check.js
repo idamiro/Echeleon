@@ -24,10 +24,14 @@
   const timeEl = document.querySelector('[data-hc-time]');
   const noteEl = document.querySelector('[data-hc-note]');
   const hintEl = document.querySelector('[data-hc-hint]');
+  const evidenceEl = document.querySelector('[data-hc-evidence]');
+  const caveatEl = document.querySelector('[data-hc-caveat]');
   const resultTitleEl = document.querySelector('[data-hc-result-title]');
   const resultRoot = document.querySelector('[data-hc-result-root]');
   const iconEl = document.querySelector('[data-hc-icon]');
   const insightEl = document.querySelector('[data-hc-insight]');
+  const explainEl = document.querySelector('[data-hc-explain]');
+  const recLine = document.querySelector('[data-hc-rec-line]');
   const debugEl = document.querySelector('[data-hc-debug]');
   const debugBody = document.querySelector('[data-hc-debug-body]');
   const board = document.querySelector('[data-hc-board]');
@@ -65,6 +69,12 @@
     insufficient: `<svg viewBox="0 0 48 48" width="48" height="48" fill="none"><circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3.5 4"/><circle cx="24" cy="24" r="3" fill="currentColor"/></svg>`
   };
 
+  const REC_LINES = {
+    intro: 'Human verification interrupts the experience.',
+    challenge: 'What if the interaction became the signal?',
+    result: 'Verification as interaction, not interruption. — Vulcet'
+  };
+
   const showStage = (name) => {
     Object.entries(stages).forEach(([key, el]) => {
       if (!el) return;
@@ -72,6 +82,20 @@
       el.classList.toggle('is-active', active);
       el.hidden = !active;
     });
+    document.documentElement.setAttribute('data-hc-rec-phase', name);
+    if (recording && recLine) {
+      recLine.hidden = false;
+      recLine.textContent = REC_LINES[name] || '';
+      // After a result settles, prefer the closing line
+      if (name === 'result' && classification) {
+        const short = classification.classification === 'natural'
+          ? 'Human enough. One signal — not proof.'
+          : classification.classification === 'suspicious'
+            ? 'Too precise for one signal alone.'
+            : 'Not enough movement to observe.';
+        recLine.textContent = `${short}  ·  Verification as interaction, not interruption.`;
+      }
+    }
   };
 
   const measure = () => {
@@ -142,8 +166,9 @@
     if (debugBody) debugBody.textContent = 'Waiting for interaction…';
 
     const br = boardRect();
-    const startX = br.width * 0.18 - discSize / 2;
-    const startY = br.height * (br.width < 420 ? 0.38 : 0.55) - discSize / 2;
+    // Far enough for a meaningful trajectory; still an easy reach, not a dexterity test.
+    const startX = br.width * 0.12 - discSize / 2;
+    const startY = br.height * (br.width < 420 ? 0.32 : 0.68) - discSize / 2;
     setDiscPosition(startX, startY, 1);
     challengeShownAt = performance.now();
     hintEl.textContent = 'Drag, or use keyboard controls.';
@@ -248,7 +273,6 @@
     const method = m.inputMethod || 'mouse';
     const isTouch = method === 'touch';
     const isKeyboard = method === 'keyboard';
-    const effPct = Math.round(m.efficiency * 100);
 
     const flags = {
       tinyPath: m.pathLength < (isKeyboard ? 36 : 22),
@@ -281,8 +305,10 @@
       flags.thinData = true;
       return finish('insufficient', 18, flags, m, method, {
         title: 'Not enough movement.',
-        note: pickInsufficientNote(m, flags),
-        timeLabel: 'Not enough signal to evaluate',
+        note: 'There wasn’t enough interaction to observe meaningful variation.',
+        evidence: buildEvidence(m, flags, 'insufficient'),
+        timeLabel: '',
+        caveat: 'This isn’t a failed check — just too little motion to read.',
         insight: `Only ${m.sampleCount} motion sample${m.sampleCount === 1 ? '' : 's'} ${m.sampleCount === 1 ? 'was' : 'were'} captured.`
       });
     }
@@ -294,16 +320,20 @@
         flags.thinData = true;
         return finish('insufficient', 24, flags, m, method, {
           title: 'Not enough movement.',
-          note: 'Try a few more arrow-key steps before placing.',
-          timeLabel: 'Not enough signal to evaluate',
+          note: 'There wasn’t enough interaction to observe meaningful variation.',
+          evidence: `${m.sampleCount} keyboard steps · short path`,
+          timeLabel: '',
+          caveat: 'This isn’t a failed check — just too little motion to read.',
           insight: `Only ${m.sampleCount} motion samples were captured.`
         });
       }
       return finish('natural', kbScore, flags, m, method, {
         title: 'Human enough.',
-        note: 'Completed with keyboard controls.',
-        timeLabel: `Verified in ${(m.totalMs / 1000).toFixed(1)} seconds`,
-        insight: `${m.sampleCount} keyboard steps across ${Math.round(m.pathLength)}px.`
+        note: 'Completed through the accessible keyboard path.',
+        evidence: `${m.sampleCount} keyboard steps · accessible alternative`,
+        timeLabel: `Observed in ${(m.totalMs / 1000).toFixed(1)} seconds`,
+        caveat: 'A real system would use its own appropriate signals for non-pointer input — not mouse-like trajectory scoring.',
+        insight: `${m.sampleCount} keyboard steps. Pointer trajectory analysis was not applied.`
       });
     }
 
@@ -384,8 +414,10 @@
     if (kind === 'insufficient') {
       return finish('insufficient', score, flags, m, method, {
         title: 'Not enough movement.',
-        note: pickInsufficientNote(m, flags),
-        timeLabel: 'Not enough signal to evaluate',
+        note: 'There wasn’t enough interaction to observe meaningful variation.',
+        evidence: buildEvidence(m, flags, 'insufficient'),
+        timeLabel: '',
+        caveat: 'This isn’t a failed check — just too little motion to read.',
         insight: `Only ${m.sampleCount} motion samples were captured.`
       });
     }
@@ -394,16 +426,20 @@
       return finish('suspicious', score, flags, m, method, {
         title: 'Suspiciously precise.',
         note: pickSuspiciousNote(m, flags),
-        timeLabel: `Movement analysed in ${(m.totalMs / 1000).toFixed(1)} seconds`,
-        insight: `${effPct}% path efficiency with ${m.corrections === 0 ? 'almost no' : m.corrections} correction${m.corrections === 1 ? '' : 's'}.`
+        evidence: buildEvidence(m, flags, 'suspicious'),
+        timeLabel: `Observed in ${(m.totalMs / 1000).toFixed(1)} seconds`,
+        caveat: 'That does not make you a bot. It shows why a single interaction signal could never be enough for real verification.',
+        insight: pickSuspiciousInsight(m, flags)
       });
     }
 
     return finish('natural', score, flags, m, method, {
       title: 'Human enough.',
       note: pickNaturalNote(m, flags),
-      timeLabel: `Verified in ${(m.totalMs / 1000).toFixed(1)} seconds`,
-      insight: pickNaturalInsight(m)
+      evidence: buildEvidence(m, flags, 'natural'),
+      timeLabel: `Observed in ${(m.totalMs / 1000).toFixed(1)} seconds`,
+      caveat: 'One interaction signal — not proof of identity.',
+      insight: pickNaturalInsight(m, flags)
     });
   };
 
@@ -419,45 +455,62 @@
 
   const pickNaturalNote = (m, flags) => {
     if (m.corrections >= 2 && flags.variedSpeed) {
-      return 'A little hesitation. A few corrections. Very human.';
+      return 'Your path contained small corrections and natural changes in speed.';
     }
-    if (m.corrections >= 1 || flags.someCurve) {
-      return 'Your movement had natural variation.';
+    if (m.corrections >= 1) {
+      return 'Your path contained small corrections — the kind of variation that shows up in natural movement.';
+    }
+    if (flags.someCurve && flags.variedSpeed) {
+      return 'The path wasn’t perfectly straight, and the speed shifted as you moved.';
     }
     if (flags.hesitation) {
-      return 'There was a natural pause before you started.';
+      return 'There was a natural pause before the movement started.';
     }
-    if (m.efficiency < 0.9) {
-      return 'The path moved with natural variation.';
+    if (flags.someCurve) {
+      return 'Your path moved with natural variation rather than a perfect line.';
     }
-    return 'The motion settled with quiet precision.';
+    return 'The motion settled with quiet, human pacing.';
   };
 
   const pickSuspiciousNote = (m, flags) => {
     if (flags.instantDrag || flags.nearPerfect) {
-      return 'That movement was unusually direct.';
+      return 'Your path was unusually direct, with almost no directional correction.';
     }
     if (flags.zeroCorrections && flags.highEfficiency) {
-      return 'Almost no variation in the path.';
+      return 'Almost no variation appeared in the path or timing.';
     }
-    return 'A little too perfect for this experiment.';
+    return 'The movement was a little too perfect for this experiment.';
   };
 
-  const pickInsufficientNote = (m) => {
-    if (m.durationMs < 50) return 'That was too short to say much.';
-    if (m.sampleCount < 5) return 'There wasn’t enough interaction to read the motion.';
-    return 'Try a more natural drag.';
+  const buildEvidence = (m, flags, kind) => {
+    const effPct = Math.round(m.efficiency * 100);
+    const parts = [];
+    if (kind === 'insufficient') {
+      parts.push(`${m.sampleCount} sample${m.sampleCount === 1 ? '' : 's'}`);
+      if (m.durationMs < 80) parts.push('very short duration');
+      if (m.pathLength < 40) parts.push('tiny path');
+      return parts.join(' · ');
+    }
+    parts.push(`${m.corrections} correction${m.corrections === 1 ? '' : 's'}`);
+    parts.push(`${effPct}% path efficiency`);
+    if (flags.variedSpeed || m.velocityVariance >= 4000) parts.push('varied speed');
+    else if (flags.veryLowVariance || flags.lowVariance) parts.push('low directional variation');
+    else parts.push(`${(m.durationMs / 1000).toFixed(1)}s drag`);
+    return parts.join(' · ');
   };
 
-  const pickNaturalInsight = (m) => {
+  const pickNaturalInsight = (m, flags) => {
     const bits = [];
-    if (m.corrections > 0) {
-      bits.push(`${m.corrections} direction correction${m.corrections === 1 ? '' : 's'}`);
-    }
-    if (m.velocityVariance >= 4000) bits.push('varied speed');
+    if (m.corrections > 0) bits.push(`${m.corrections} direction correction${m.corrections === 1 ? '' : 's'}`);
+    if (flags.variedSpeed || m.velocityVariance >= 4000) bits.push('varied speed');
     else if (m.efficiency < 0.92) bits.push('a lightly curved path');
     if (!bits.length) bits.push('quiet pacing');
-    return `${bits.join(' and ')}.`;
+    return `${bits.join(' and ')} — visible in the path below.`;
+  };
+
+  const pickSuspiciousInsight = (m, flags) => {
+    const effPct = Math.round(m.efficiency * 100);
+    return `${effPct}% path efficiency with ${m.corrections === 0 ? 'almost no' : m.corrections} correction${m.corrections === 1 ? '' : 's'} — the line below should look unusually clean.`;
   };
 
   const renderDebug = (result) => {
@@ -486,18 +539,30 @@
     resultRoot?.setAttribute('data-hc-result', result.classification);
     if (iconEl) iconEl.innerHTML = ICONS[result.classification] || ICONS.natural;
     if (resultTitleEl) resultTitleEl.textContent = result.title;
-    timeEl.textContent = result.timeLabel;
     noteEl.textContent = result.note;
-    if (insightEl) insightEl.textContent = result.insight;
+    if (evidenceEl) {
+      evidenceEl.textContent = result.evidence || '';
+      evidenceEl.hidden = !result.evidence;
+    }
+    if (timeEl) {
+      timeEl.textContent = result.timeLabel || '';
+      timeEl.hidden = !result.timeLabel;
+    }
+    if (caveatEl) {
+      caveatEl.textContent = result.caveat || '';
+      caveatEl.hidden = !result.caveat;
+    }
+    if (insightEl) insightEl.textContent = result.insight || '';
 
     const seconds = (result.metrics.totalMs / 1000).toFixed(1);
     statEls.duration.textContent = `${seconds}s`;
     statEls.efficiency.textContent = `${Math.round(result.metrics.efficiency * 100)}%`;
     statEls.corrections.textContent = String(result.metrics.corrections);
 
-    // Hide trail CTA only when there is essentially no path to show
     const showTrail = result.metrics.sampleCount >= 2 && result.metrics.pathLength >= 2;
     revealBtn.hidden = !showTrail;
+
+    if (explainEl) explainEl.hidden = false;
 
     renderDebug(result);
   };
@@ -771,5 +836,10 @@
     window.__hcClassifyInteraction = classifyInteraction;
   }
 
+  // Intro ready
   showStage('intro');
+  if (recording && recLine) {
+    recLine.hidden = false;
+    recLine.textContent = REC_LINES.intro;
+  }
 })();

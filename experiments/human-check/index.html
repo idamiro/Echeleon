@@ -12,10 +12,10 @@
     gtag('config', 'G-BD641SSN63', { anonymize_ip: true });
   </script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-BD641SSN63"></script>
-  <meta name="description" content="What if proving you're human actually felt human? A Vulcet interaction experiment exploring a more natural alternative to traditional CAPTCHA challenges.">
+  <meta name="description" content="Can human verification become part of an interaction instead of an interruption? A Vulcet product design experiment exploring natural movement as one possible signal.">
   <link rel="canonical" href="https://vulcet.com/experiments/human-check/">
   <meta property="og:title" content="Human Check — A CAPTCHA UX Experiment by Vulcet">
-  <meta property="og:description" content="What if proving you're human actually felt human? A Vulcet interaction experiment exploring a more natural alternative to traditional CAPTCHA challenges.">
+  <meta property="og:description" content="Can human verification become part of an interaction instead of an interruption? A Vulcet product design experiment.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://vulcet.com/experiments/human-check/">
   <meta property="og:site_name" content="Vulcet">
@@ -23,7 +23,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Human Check — A CAPTCHA UX Experiment by Vulcet">
-  <meta name="twitter:description" content="What if proving you're human actually felt human? A Vulcet interaction experiment.">
+  <meta name="twitter:description" content="Can human verification become part of an interaction instead of an interruption?">
   <meta name="twitter:image" content="https://vulcet.com/experiments/human-check/og.png">
   <meta name="theme-color" content="#f2eee6">
   <title>Human Check — A CAPTCHA UX Experiment by Vulcet</title>
@@ -37,11 +37,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css?v=20260824-hero">
   <link rel="stylesheet" href="/consent.css?v=20260807-1">
-  <link rel="stylesheet" href="/experiments/human-check/human-check.css?v=20260825-classify">
+  <link rel="stylesheet" href="/experiments/human-check/human-check.css?v=20260825-narrative">
   <script src="/script.js?v=20260823-visible" defer></script>
   <script src="/consent.js?v=20260724-18" defer></script>
-  <script src="/experiments/human-check/human-check.js?v=20260825-classify" defer></script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Human Check","url":"https://vulcet.com/experiments/human-check/","description":"A Vulcet interaction experiment exploring a more natural alternative to traditional CAPTCHA challenges.","isPartOf":{"@type":"WebSite","name":"Vulcet","url":"https://vulcet.com/"},"creator":{"@type":"Organization","name":"Vulcet","url":"https://vulcet.com/"}}</script>
+  <script src="/experiments/human-check/human-check.js?v=20260825-narrative" defer></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Human Check","url":"https://vulcet.com/experiments/human-check/","description":"A Vulcet product design experiment asking whether human verification can become part of an interaction instead of an interruption.","isPartOf":{"@type":"WebSite","name":"Vulcet","url":"https://vulcet.com/"},"creator":{"@type":"Organization","name":"Vulcet","url":"https://vulcet.com/"}}</script>
 </head>
 <body class="hc-page">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -78,24 +78,36 @@
       <img src="/vulcet-wordmark.png?v=20260809-2" alt="Vulcet" width="96" height="24">
     </div>
 
-    <!-- Opening -->
+    <p class="hc-rec-line" data-hc-rec-line hidden aria-hidden="true"></p>
+
+    <!-- 1. Problem + question -->
     <section class="hc-stage is-active" data-hc-stage="intro" aria-labelledby="hc-intro-title">
-      <div class="hc-stage-inner">
-        <p class="hc-kicker">Design experiment</p>
+      <div class="hc-stage-inner hc-intro-inner">
+        <p class="hc-kicker">Human Check / Vulcet experiment</p>
         <h1 id="hc-intro-title" class="hc-display">
-          <span>Prove you’re human.</span>
-          <span class="hc-display-sub">Without finding a traffic light.</span>
+          Human verification interrupts the thing you came here to do.
         </h1>
-        <p class="hc-lede">A short interaction instead of a mechanical puzzle.</p>
-        <button class="button button--primary hc-begin" type="button" data-hc-begin>Begin</button>
+        <p class="hc-lede">Image grids. Repeated challenges. A separate task just to continue.</p>
+        <p class="hc-question">What if verification became part of the interaction instead?</p>
+
+        <div class="hc-model" aria-hidden="true">
+          <p class="hc-model-row"><span>Task</span><span class="hc-model-break">→ interruption →</span><span>Task</span></p>
+          <p class="hc-model-vs">vs</p>
+          <p class="hc-model-row hc-model-row--alt"><span>Task + interaction signals</span><span class="hc-model-arrow">→</span><span>Continue</span></p>
+        </div>
+
+        <button class="button button--primary hc-begin" type="button" data-hc-begin>Try the experiment</button>
       </div>
     </section>
 
-    <!-- Challenge -->
+    <!-- 2. Experiment -->
     <section class="hc-stage" data-hc-stage="challenge" aria-labelledby="hc-challenge-title" hidden>
       <div class="hc-stage-inner hc-challenge-wrap">
-        <h2 id="hc-challenge-title" class="hc-challenge-title">Move the circle into the space that feels right.</h2>
-        <p class="hc-sr-only" id="hc-challenge-help">Drag the circle into the target ring, or use keyboard: focus the circle, move with arrow keys, press Enter to confirm.</p>
+        <p class="hc-observe" id="hc-challenge-title">
+          This interaction observes the shape, timing and variation of your movement — locally in your browser.
+        </p>
+        <p class="hc-challenge-action">Move the circle to continue.</p>
+        <p class="hc-sr-only" id="hc-challenge-help">Drag the filled circle into the open ring. There is no puzzle or hidden answer — the movement itself is what is observed. Keyboard: focus the circle, move with arrow keys, press Enter to place.</p>
 
         <div class="hc-board" data-hc-board role="application" aria-describedby="hc-challenge-help">
           <div class="hc-target" data-hc-target aria-hidden="true">
@@ -110,17 +122,20 @@
           ></button>
         </div>
 
+        <p class="hc-privacy-line">Processed locally. Nothing leaves your browser.</p>
         <p class="hc-hint" data-hc-hint aria-live="polite">Drag, or use keyboard controls.</p>
       </div>
     </section>
 
-    <!-- Result -->
+    <!-- 3. Observation -->
     <section class="hc-stage" data-hc-stage="result" aria-labelledby="hc-result-title" hidden>
       <div class="hc-stage-inner hc-result-inner" data-hc-result-root data-hc-result="natural">
         <div class="hc-result-icon" data-hc-icon aria-hidden="true"></div>
         <h2 id="hc-result-title" class="hc-result-title" data-hc-result-title>Human enough.</h2>
-        <p class="hc-result-time" data-hc-time>Verified in — seconds</p>
-        <p class="hc-result-note" data-hc-note>Your movement had natural variation.</p>
+        <p class="hc-result-note" data-hc-note>Your path contained small corrections and natural changes in speed.</p>
+        <p class="hc-evidence" data-hc-evidence></p>
+        <p class="hc-result-time" data-hc-time></p>
+        <p class="hc-caveat" data-hc-caveat>One interaction signal — not proof of identity.</p>
 
         <div class="hc-result-actions">
           <button class="button button--primary" type="button" data-hc-retry>Try again</button>
@@ -129,7 +144,7 @@
 
         <div class="hc-trail-panel" id="hc-trail-panel" data-hc-trail-panel hidden>
           <p class="hc-trail-insight" data-hc-insight></p>
-          <canvas class="hc-trail-canvas" data-hc-trail width="640" height="360" aria-label="Your pointer trajectory"></canvas>
+          <canvas class="hc-trail-canvas" data-hc-trail width="640" height="360" aria-label="Your recorded movement path"></canvas>
           <dl class="hc-trail-stats">
             <div><dt>Duration</dt><dd data-hc-stat="duration">—</dd></div>
             <div><dt>Path efficiency</dt><dd data-hc-stat="efficiency">—</dd></div>
@@ -144,15 +159,37 @@
       <pre data-hc-debug-body></pre>
     </aside>
 
-    <!-- Context -->
-    <section class="hc-context" data-hc-chrome aria-labelledby="hc-context-title">
-      <div class="shell hc-context-grid">
-        <h2 id="hc-context-title">Could proving you’re human feel human?</h2>
-        <p>Traditional CAPTCHA experiences often ask people to behave mechanically — scanning grids, selecting tiles, repeating until the machine is satisfied. This experiment asks whether a short, natural interaction can feel more like a conversation with the interface than a test.</p>
-        <p>It is a <strong>design experiment, not a production security replacement.</strong> No behavioral data leaves the browser.</p>
-        <p class="hc-context-credit">A Vulcet design experiment. <a class="text-link" href="/redesigns/">More experiments <span aria-hidden="true">↗</span></a></p>
-      </div>
-    </section>
+    <!-- 4–6. Explanation + limitation + takeaway (shown after first result) -->
+    <div class="hc-explain" data-hc-explain data-hc-chrome hidden>
+      <section class="hc-explain-block" aria-labelledby="hc-what-title">
+        <div class="shell hc-explain-grid">
+          <h2 id="hc-what-title">What just happened?</h2>
+          <p>You weren’t solving a puzzle. The movement itself was the experiment.</p>
+          <p>The prototype looked at local characteristics of the drag — trajectory shape, timing, speed changes and small directional corrections. No interaction data left your browser.</p>
+        </div>
+      </section>
+
+      <section class="hc-explain-block hc-explain-block--alt" aria-labelledby="hc-point-title">
+        <div class="shell hc-explain-grid">
+          <h2 id="hc-point-title">The point isn’t the circle.</h2>
+          <p>A real verification system could never responsibly decide “human or bot” from one drag. Production verification needs multiple signals, server-side security, abuse prevention, privacy care and accessible alternatives.</p>
+          <p>This prototype isolates one idea: could natural interaction contribute to verification without stopping the experience?</p>
+        </div>
+      </section>
+
+      <section class="hc-explain-block" aria-labelledby="hc-takeaway-title">
+        <div class="shell hc-explain-grid">
+          <h2 id="hc-takeaway-title">Verification should happen around the user — not against them.</h2>
+          <p>This experiment does not propose a finished security system. It asks whether verification can become less disruptive when interaction itself becomes part of the signal.</p>
+          <p class="hc-context-credit">
+            A Vulcet product design experiment.
+            <a class="text-link" href="/redesigns/">Explore more experiments <span aria-hidden="true">↗</span></a>
+            <span class="hc-credit-sep" aria-hidden="true">·</span>
+            <a class="text-link" href="/contact/">Work with Vulcet <span aria-hidden="true">↗</span></a>
+          </p>
+        </div>
+      </section>
+    </div>
   </main>
 
   <footer class="footer" data-hc-chrome>

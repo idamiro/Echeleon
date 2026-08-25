@@ -7,7 +7,7 @@
   --hc-line: rgba(23, 23, 21, 0.14);
   --hc-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --hc-disc: 72px;
-  --hc-target: 128px;
+  --hc-target: 136px;
   background: var(--hc-paper);
   color: var(--hc-ink);
   min-height: 100svh;
@@ -48,6 +48,10 @@
   opacity: 0.85;
 }
 
+.hc-rec-line {
+  display: none;
+}
+
 .hc-stage {
   display: none;
   align-items: center;
@@ -66,8 +70,12 @@
   text-align: center;
 }
 
+.hc-intro-inner {
+  width: min(760px, 100%);
+}
+
 .hc-kicker {
-  margin: 0 0 28px;
+  margin: 0 0 24px;
   font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.14em;
@@ -77,54 +85,101 @@
 
 .hc-display {
   margin: 0;
-  font-size: clamp(40px, 7vw, 72px);
-  line-height: 1.05;
+  font-size: clamp(32px, 5.6vw, 56px);
+  line-height: 1.08;
   font-weight: 560;
-  letter-spacing: -0.04em;
-}
-
-.hc-display span {
-  display: block;
-}
-
-.hc-display-sub {
-  margin-top: 0.18em;
-  font-family: "Instrument Serif", Georgia, serif;
-  font-weight: 400;
-  font-style: italic;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
 }
 
 .hc-lede {
-  margin: 28px auto 0;
-  max-width: 34ch;
+  margin: 22px auto 0;
+  max-width: 38ch;
   color: var(--hc-muted);
   font-size: 17px;
   line-height: 1.5;
 }
 
+.hc-question {
+  margin: 28px auto 0;
+  max-width: 22ch;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.hc-model {
+  margin: 36px auto 0;
+  max-width: 420px;
+  padding: 18px 16px;
+  border-top: 1px solid var(--hc-line);
+  border-bottom: 1px solid var(--hc-line);
+}
+
+.hc-model-row {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--hc-muted);
+}
+
+.hc-model-row--alt {
+  color: var(--hc-ink);
+}
+
+.hc-model-break,
+.hc-model-arrow {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  opacity: 0.7;
+}
+
+.hc-model-vs {
+  margin: 10px 0;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(89, 86, 80, 0.7);
+}
+
 .hc-begin {
-  margin-top: 40px;
-  min-width: 148px;
+  margin-top: 36px;
+  min-width: 168px;
 }
 
 .hc-challenge-wrap {
   width: min(820px, 100%);
 }
 
-.hc-challenge-title {
-  margin: 0 auto 36px;
-  max-width: 22ch;
-  font-size: clamp(22px, 3.2vw, 30px);
-  line-height: 1.25;
+.hc-observe {
+  margin: 0 auto;
+  max-width: 42ch;
+  font-size: clamp(18px, 2.6vw, 22px);
+  line-height: 1.4;
   font-weight: 500;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.02em;
+}
+
+.hc-challenge-action {
+  margin: 14px 0 28px;
+  color: var(--hc-muted);
+  font-size: 15px;
 }
 
 .hc-board {
   position: relative;
   width: min(560px, 100%);
-  aspect-ratio: 1.15 / 1;
+  aspect-ratio: 1.2 / 1;
   margin: 0 auto;
   border: 1px solid var(--hc-line);
   border-radius: 4px;
@@ -139,8 +194,8 @@
 
 .hc-target {
   position: absolute;
-  top: 50%;
-  left: 68%;
+  top: 42%;
+  left: 78%;
   width: var(--hc-target);
   height: var(--hc-target);
   transform: translate(-50%, -50%);
@@ -202,8 +257,15 @@
   z-index: 3;
 }
 
+.hc-privacy-line {
+  margin: 18px 0 0;
+  color: var(--hc-muted);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
 .hc-hint {
-  margin: 22px 0 0;
+  margin: 10px 0 0;
   color: var(--hc-muted);
   font-size: 13px;
   letter-spacing: 0.01em;
@@ -222,23 +284,47 @@
 
 .hc-result-title {
   margin: 0;
-  font-size: clamp(36px, 5.6vw, 64px);
+  font-size: clamp(34px, 5.4vw, 60px);
   line-height: 1.05;
   font-weight: 560;
   letter-spacing: -0.04em;
 }
 
-.hc-result-time {
-  margin: 18px 0 0;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+.hc-result-note {
+  margin: 16px auto 0;
+  max-width: 36ch;
+  color: var(--hc-muted);
+  font-size: 16px;
+  line-height: 1.45;
 }
 
-.hc-result-note {
+.hc-evidence {
+  margin: 16px auto 0;
+  max-width: 40ch;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--hc-ink);
+}
+
+.hc-result-time {
   margin: 10px 0 0;
+  font-size: 13px;
   color: var(--hc-muted);
-  font-size: 15px;
+}
+
+.hc-caveat {
+  margin: 18px auto 0;
+  max-width: 34ch;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--hc-ink);
+}
+
+.hc-result-inner[data-hc-result="suspicious"] .hc-caveat {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-style: italic;
+  font-size: 17px;
 }
 
 .hc-result-actions {
@@ -246,12 +332,12 @@
   flex-wrap: wrap;
   gap: 12px;
   justify-content: center;
-  margin-top: 36px;
+  margin-top: 32px;
 }
 
 .hc-trail-panel {
-  margin-top: 40px;
-  padding-top: 28px;
+  margin-top: 36px;
+  padding-top: 24px;
   border-top: 1px solid var(--hc-line);
   text-align: left;
 }
@@ -299,44 +385,51 @@
   letter-spacing: -0.02em;
 }
 
-.hc-context {
-  padding: 96px 0 120px;
+.hc-explain[hidden] {
+  display: none !important;
+}
+
+.hc-explain-block {
+  padding: 88px 0;
   border-top: 1px solid var(--hc-line);
+}
+
+.hc-explain-block--alt {
   background: #efebe3;
 }
 
-.hc-context-grid {
+.hc-explain-grid {
   max-width: 640px;
 }
 
-.hc-context h2 {
-  margin: 0 0 20px;
-  font-size: clamp(28px, 4vw, 40px);
+.hc-explain-block h2 {
+  margin: 0 0 18px;
+  font-size: clamp(26px, 3.8vw, 38px);
   line-height: 1.12;
   font-weight: 560;
   letter-spacing: -0.03em;
 }
 
-.hc-context p {
+.hc-explain-block p {
   margin: 0;
   color: var(--hc-muted);
   font-size: 16px;
   line-height: 1.6;
 }
 
-.hc-context p + p {
+.hc-explain-block p + p {
   margin-top: 14px;
-}
-
-.hc-context strong {
-  color: var(--hc-ink);
-  font-weight: 600;
 }
 
 .hc-context-credit {
   margin-top: 28px !important;
   color: var(--hc-ink) !important;
   font-size: 14px !important;
+}
+
+.hc-credit-sep {
+  margin: 0 8px;
+  color: var(--hc-muted);
 }
 
 /* Recording mode */
@@ -352,7 +445,7 @@ html.hc-recording .hc-main {
 
 html.hc-recording .hc-stage {
   min-height: 100svh;
-  padding-block: 64px;
+  padding-block: 72px;
 }
 
 html.hc-recording [data-hc-recording-brand] {
@@ -361,6 +454,52 @@ html.hc-recording [data-hc-recording-brand] {
 
 html.hc-recording body {
   padding-top: 0;
+}
+
+html.hc-recording .hc-rec-line {
+  display: block;
+  position: fixed;
+  z-index: 15;
+  left: 50%;
+  bottom: max(28px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(520px, calc(100% - 32px));
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--hc-muted);
+  pointer-events: none;
+}
+
+html.hc-recording[data-hc-rec-phase="intro"] .hc-model,
+html.hc-recording[data-hc-rec-phase="intro"] .hc-lede {
+  /* Keep question + headline; trim diagram for cleaner capture */
+}
+
+html.hc-recording[data-hc-rec-phase="intro"] .hc-model {
+  display: none;
+}
+
+html.hc-recording[data-hc-rec-phase="challenge"] .hc-observe {
+  max-width: 34ch;
+}
+
+html.hc-recording[data-hc-rec-phase="challenge"] .hc-privacy-line,
+html.hc-recording[data-hc-rec-phase="challenge"] .hc-hint {
+  opacity: 0.55;
+}
+
+html.hc-recording[data-hc-rec-phase="result"] .hc-result-actions {
+  opacity: 0.35;
+}
+
+html.hc-recording[data-hc-rec-phase="result"] .hc-rec-line {
+  color: var(--hc-ink);
+  font-family: "Instrument Serif", Georgia, serif;
+  font-style: italic;
+  font-size: 16px;
 }
 
 /* Debug panel — only with ?debug=1 */
@@ -405,28 +544,40 @@ html.hc-recording body {
 @media (max-width: 599px) {
   .hc-page {
     --hc-disc: 64px;
-    --hc-target: 112px;
+    --hc-target: 118px;
   }
 
   .hc-stage {
-    padding: 32px 16px max(56px, env(safe-area-inset-bottom));
+    padding: 28px 16px max(48px, env(safe-area-inset-bottom));
     min-height: calc(100svh - 64px);
+  }
+
+  .hc-display {
+    font-size: clamp(28px, 8.2vw, 36px);
+  }
+
+  .hc-question {
+    max-width: 18ch;
+    font-size: 24px;
+  }
+
+  .hc-model {
+    margin-top: 28px;
+    padding: 14px 8px;
   }
 
   .hc-board {
     width: min(100%, 360px);
-    aspect-ratio: 0.92 / 1;
+    aspect-ratio: 0.9 / 1;
   }
 
-  /* Keep the target in the lower thumb zone on phones */
   .hc-target {
-    top: 62%;
-    left: 70%;
+    top: 58%;
+    left: 72%;
   }
 
-  .hc-challenge-title {
-    margin-bottom: 28px;
-    font-size: 22px;
+  .hc-observe {
+    font-size: 17px;
   }
 
   .hc-result-actions {
@@ -442,8 +593,8 @@ html.hc-recording body {
     gap: 14px;
   }
 
-  .hc-context {
-    padding: 72px 0 96px;
+  .hc-explain-block {
+    padding: 64px 0;
   }
 }
 
