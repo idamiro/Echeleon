@@ -1037,6 +1037,13 @@
     linear-gradient(155deg, #1a1a1a 0%, #050505 100%);
 }
 
+.portfolio-row__media--human {
+  background:
+    radial-gradient(circle at 32% 58%, #171715 0 18px, transparent 19px),
+    radial-gradient(circle at 68% 42%, transparent 34px, rgba(23, 23, 21, 0.55) 35px, rgba(23, 23, 21, 0.55) 36.5px, transparent 37.5px),
+    linear-gradient(180deg, #f7f4ed 0%, #efebe3 100%);
+}
+
 .portfolio-row__placeholder {
   position: absolute;
   inset: 0;
@@ -1052,6 +1059,12 @@
   letter-spacing: 0.32em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.78);
+}
+
+.portfolio-row__placeholder--human {
+  letter-spacing: 0.06em;
+  color: rgba(23, 23, 21, 0.42);
+  font-size: clamp(1.15rem, 3.2vw, 1.7rem);
 }
 
 @media (max-width: 899px) {

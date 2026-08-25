@@ -31,6 +31,8 @@
 - Kinetic Clarity: unofficial Nike product page redesign — https://vulcet.com/redesigns/kinetic-clarity/ (not client work, not for sale, not affiliated with Nike)
 - Interactive Nike product stage — https://vulcet.com/redesigns/nike/
 - Kinetic Surface: unofficial PlayStation homepage redesign — https://vulcet.com/redesigns/playstation/ (not client work, not for sale, not affiliated with Sony Interactive Entertainment)
+- HOLD — purchase decision cooling-off tool — https://vulcet.com/redesigns/hold/
+- Human Check — CAPTCHA UX interaction experiment (design concept, not security) — https://vulcet.com/experiments/human-check/
 
 ## Blog / Journal
 
