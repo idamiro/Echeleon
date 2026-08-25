@@ -440,21 +440,18 @@
     ctx.fill();
   };
 
-  beginBtn?.addEventListener('click', () => {
+  const startChallenge = () => {
     showStage('challenge');
+    // Board must be visible before measuring layout positions.
+    void board.offsetWidth;
+    resetChallenge();
     requestAnimationFrame(() => {
-      resetChallenge();
       disc.focus({ preventScroll: true });
     });
-  });
+  };
 
-  retryBtn?.addEventListener('click', () => {
-    showStage('challenge');
-    requestAnimationFrame(() => {
-      resetChallenge();
-      disc.focus({ preventScroll: true });
-    });
-  });
+  beginBtn?.addEventListener('click', startChallenge);
+  retryBtn?.addEventListener('click', startChallenge);
 
   revealBtn?.addEventListener('click', () => {
     const open = trailPanel.hidden;
