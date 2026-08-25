@@ -37,10 +37,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css?v=20260824-hero">
   <link rel="stylesheet" href="/consent.css?v=20260807-1">
-  <link rel="stylesheet" href="/experiments/human-check/human-check.css?v=20260825-3">
+  <link rel="stylesheet" href="/experiments/human-check/human-check.css?v=20260825-classify">
   <script src="/script.js?v=20260823-visible" defer></script>
   <script src="/consent.js?v=20260724-18" defer></script>
-  <script src="/experiments/human-check/human-check.js?v=20260825-3" defer></script>
+  <script src="/experiments/human-check/human-check.js?v=20260825-classify" defer></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Human Check","url":"https://vulcet.com/experiments/human-check/","description":"A Vulcet interaction experiment exploring a more natural alternative to traditional CAPTCHA challenges.","isPartOf":{"@type":"WebSite","name":"Vulcet","url":"https://vulcet.com/"},"creator":{"@type":"Organization","name":"Vulcet","url":"https://vulcet.com/"}}</script>
 </head>
 <body class="hc-page">
@@ -116,14 +116,9 @@
 
     <!-- Result -->
     <section class="hc-stage" data-hc-stage="result" aria-labelledby="hc-result-title" hidden>
-      <div class="hc-stage-inner hc-result-inner">
-        <div class="hc-check" aria-hidden="true">
-          <svg viewBox="0 0 48 48" width="48" height="48" fill="none">
-            <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M14 24.5l6.2 6.2L34 16.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <h2 id="hc-result-title" class="hc-result-title">Human enough.</h2>
+      <div class="hc-stage-inner hc-result-inner" data-hc-result-root data-hc-result="natural">
+        <div class="hc-result-icon" data-hc-icon aria-hidden="true"></div>
+        <h2 id="hc-result-title" class="hc-result-title" data-hc-result-title>Human enough.</h2>
         <p class="hc-result-time" data-hc-time>Verified in — seconds</p>
         <p class="hc-result-note" data-hc-note>Your movement had natural variation.</p>
 
@@ -133,6 +128,7 @@
         </div>
 
         <div class="hc-trail-panel" id="hc-trail-panel" data-hc-trail-panel hidden>
+          <p class="hc-trail-insight" data-hc-insight></p>
           <canvas class="hc-trail-canvas" data-hc-trail width="640" height="360" aria-label="Your pointer trajectory"></canvas>
           <dl class="hc-trail-stats">
             <div><dt>Duration</dt><dd data-hc-stat="duration">—</dd></div>
@@ -142,6 +138,11 @@
         </div>
       </div>
     </section>
+
+    <aside class="hc-debug" data-hc-debug hidden aria-label="Human Check debug">
+      <p class="hc-debug-title">Debug</p>
+      <pre data-hc-debug-body></pre>
+    </aside>
 
     <!-- Context -->
     <section class="hc-context" data-hc-chrome aria-labelledby="hc-context-title">

@@ -213,7 +213,7 @@
   width: min(560px, 100%);
 }
 
-.hc-check {
+.hc-result-icon {
   display: grid;
   place-items: center;
   margin: 0 auto 22px;
@@ -222,7 +222,7 @@
 
 .hc-result-title {
   margin: 0;
-  font-size: clamp(40px, 6vw, 64px);
+  font-size: clamp(36px, 5.6vw, 64px);
   line-height: 1.05;
   font-weight: 560;
   letter-spacing: -0.04em;
@@ -254,6 +254,13 @@
   padding-top: 28px;
   border-top: 1px solid var(--hc-line);
   text-align: left;
+}
+
+.hc-trail-insight {
+  margin: 0 0 14px;
+  color: var(--hc-muted);
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 .hc-trail-canvas {
@@ -354,6 +361,40 @@ html.hc-recording [data-hc-recording-brand] {
 
 html.hc-recording body {
   padding-top: 0;
+}
+
+/* Debug panel — only with ?debug=1 */
+.hc-debug {
+  position: fixed;
+  z-index: 40;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  width: min(280px, calc(100vw - 24px));
+  padding: 12px 14px;
+  border: 1px solid var(--hc-line);
+  border-radius: 4px;
+  background: rgba(247, 244, 237, 0.96);
+  color: var(--hc-ink);
+  box-shadow: 0 8px 24px rgba(23, 23, 21, 0.08);
+  pointer-events: none;
+}
+
+.hc-debug-title {
+  margin: 0 0 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--hc-muted);
+}
+
+.hc-debug pre {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 @keyframes hc-fade-in {
