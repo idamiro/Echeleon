@@ -93,8 +93,8 @@
 
   const updateTargetProximity = () => {
     const d = dist(discCenter(), targetCenterLocal());
-    const ready = d < targetSize * 0.28;
-    const near = d < targetSize * 0.72;
+    const ready = d < targetSize * 0.34;
+    const near = d < targetSize * 0.78;
     target.classList.toggle('is-near', near && !ready);
     target.classList.toggle('is-ready', ready);
     return ready;
@@ -214,7 +214,9 @@
     if (settled) return;
     settled = true;
     metrics = analyze();
-    const seconds = (metrics.totalMs / 1000).toFixed(1);
+    const elapsedMs = Math.max(metrics.totalMs, performance.now() - challengeShownAt);
+    metrics.totalMs = elapsedMs;
+    const seconds = (elapsedMs / 1000).toFixed(1);
     timeEl.textContent = `Verified in ${seconds} seconds`;
     noteEl.textContent = resultNote(metrics);
     statEls.duration.textContent = `${seconds}s`;
@@ -261,7 +263,11 @@
     keyboardActive = false;
     disc.classList.add('is-dragging');
     disc.setAttribute('aria-grabbed', 'true');
-    disc.setPointerCapture(event.pointerId);
+    try {
+      disc.setPointerCapture(event.pointerId);
+    } catch (_) {
+      /* Synthetic or already-released pointers may throw; drag still works via listeners. */
+    }
     const br = boardRect();
     drag = {
       id: event.pointerId,
@@ -328,13 +334,26 @@
   };
 
   const onKeyDown = (event) => {
-    if (stages.challenge.hidden) return;
+    if (stages.challenge.hidden || settled) return;
     const keys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Enter', 'Escape'];
     if (!keys.includes(event.key)) return;
-    if (document.activeElement !== disc && !keyboardActive) return;
+
+    const fromDisc = event.target === disc || document.activeElement === disc;
+    if (!fromDisc && !keyboardActive) return;
 
     markInteract();
-    const step = event.shiftKey ? 18 : 10;
+    const step = event.shiftKey ? 28 : 16;
+    const isArrow = event.key.startsWith('Arrow');
+
+    // Arrow keys can begin keyboard mode when the disc is focused
+    if (isArrow && !keyboardActive) {
+      keyboardActive = true;
+      disc.classList.add('is-keyboard-active');
+      disc.setAttribute('aria-grabbed', 'true');
+      setDiscPosition(pos.x, pos.y, 1.05);
+      hintEl.textContent = 'Arrow keys to move. Enter to place.';
+      pushSample(boardRect().left + discCenter().x, boardRect().top + discCenter().y);
+    }
 
     if (event.key === ' ' || event.key === 'Enter') {
       event.preventDefault();
@@ -345,7 +364,7 @@
         setDiscPosition(pos.x, pos.y, 1.05);
         hintEl.textContent = 'Arrow keys to move. Enter to place.';
         pushSample(boardRect().left + discCenter().x, boardRect().top + discCenter().y);
-      } else if (event.key === 'Enter' || event.key === ' ') {
+      } else {
         keyboardActive = false;
         disc.classList.remove('is-keyboard-active');
         disc.setAttribute('aria-grabbed', 'false');
@@ -359,6 +378,7 @@
     }
 
     if (event.key === 'Escape') {
+      event.preventDefault();
       keyboardActive = false;
       disc.classList.remove('is-keyboard-active');
       disc.setAttribute('aria-grabbed', 'false');

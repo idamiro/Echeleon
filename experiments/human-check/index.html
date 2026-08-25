@@ -37,10 +37,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css?v=20260824-hero">
   <link rel="stylesheet" href="/consent.css?v=20260807-1">
-  <link rel="stylesheet" href="/experiments/human-check/human-check.css?v=20260825-2">
+  <link rel="stylesheet" href="/experiments/human-check/human-check.css?v=20260825-3">
   <script src="/script.js?v=20260823-visible" defer></script>
   <script src="/consent.js?v=20260724-18" defer></script>
-  <script src="/experiments/human-check/human-check.js?v=20260825-2" defer></script>
+  <script src="/experiments/human-check/human-check.js?v=20260825-3" defer></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Human Check","url":"https://vulcet.com/experiments/human-check/","description":"A Vulcet interaction experiment exploring a more natural alternative to traditional CAPTCHA challenges.","isPartOf":{"@type":"WebSite","name":"Vulcet","url":"https://vulcet.com/"},"creator":{"@type":"Organization","name":"Vulcet","url":"https://vulcet.com/"}}</script>
 </head>
 <body class="hc-page">
@@ -95,7 +95,7 @@
     <section class="hc-stage" data-hc-stage="challenge" aria-labelledby="hc-challenge-title" hidden>
       <div class="hc-stage-inner hc-challenge-wrap">
         <h2 id="hc-challenge-title" class="hc-challenge-title">Move the circle into the space that feels right.</h2>
-        <p class="hc-sr-only" id="hc-challenge-help">Drag the circle into the target ring, or use keyboard: focus the circle, press Space to pick it up, move with arrow keys, press Enter to confirm.</p>
+        <p class="hc-sr-only" id="hc-challenge-help">Drag the circle into the target ring, or use keyboard: focus the circle, move with arrow keys, press Enter to confirm.</p>
 
         <div class="hc-board" data-hc-board role="application" aria-describedby="hc-challenge-help">
           <div class="hc-target" data-hc-target aria-hidden="true">
@@ -106,7 +106,7 @@
             type="button"
             data-hc-disc
             aria-grabbed="false"
-            aria-label="Draggable circle. Press Space to pick up, arrow keys to move, Enter to drop."
+            aria-label="Draggable circle. Use arrow keys to move, Enter or Space to place."
           ></button>
         </div>
 
