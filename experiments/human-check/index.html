@@ -37,10 +37,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css?v=20260824-hero">
   <link rel="stylesheet" href="/consent.css?v=20260807-1">
-  <link rel="stylesheet" href="/experiments/human-check/human-check.css?v=20260825-narrative">
+  <link rel="stylesheet" href="/experiments/human-check/human-check.css?v=20260826-research">
   <script src="/script.js?v=20260823-visible" defer></script>
   <script src="/consent.js?v=20260724-18" defer></script>
-  <script src="/experiments/human-check/human-check.js?v=20260825-narrative" defer></script>
+  <script type="module" src="/experiments/human-check/js/main.js?v=20260826-research"></script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Human Check","url":"https://vulcet.com/experiments/human-check/","description":"A Vulcet product design experiment asking whether human verification can become part of an interaction instead of an interruption.","isPartOf":{"@type":"WebSite","name":"Vulcet","url":"https://vulcet.com/"},"creator":{"@type":"Organization","name":"Vulcet","url":"https://vulcet.com/"}}</script>
 </head>
 <body class="hc-page">
@@ -154,26 +154,24 @@
       </div>
     </section>
 
-    <aside class="hc-debug" data-hc-debug hidden aria-label="Human Check debug">
-      <p class="hc-debug-title">Debug</p>
-      <pre data-hc-debug-body></pre>
-    </aside>
+    <aside class="hc-debug" data-hc-debug hidden aria-label="Human Check debug"></aside>
 
     <!-- 4–6. Explanation + limitation + takeaway (shown after first result) -->
     <div class="hc-explain" data-hc-explain data-hc-chrome hidden>
       <section class="hc-explain-block" aria-labelledby="hc-what-title">
         <div class="shell hc-explain-grid">
           <h2 id="hc-what-title">What just happened?</h2>
-          <p>You weren’t solving a puzzle. The movement itself was the experiment.</p>
-          <p>The prototype looked at local characteristics of the drag — trajectory shape, timing, speed changes and small directional corrections. No interaction data left your browser.</p>
+          <p>You weren’t solving a puzzle. The destination was obvious. The experiment watched <em>how</em> the circle reached the target — trajectory geometry, timing, velocity structure, acceleration, jerk, curvature, and small corrections during target acquisition.</p>
+          <p>All of that was computed locally in your browser. No movement data was sent anywhere.</p>
         </div>
       </section>
 
       <section class="hc-explain-block hc-explain-block--alt" aria-labelledby="hc-point-title">
         <div class="shell hc-explain-grid">
           <h2 id="hc-point-title">The point isn’t the circle.</h2>
-          <p>A real verification system could never responsibly decide “human or bot” from one drag. Production verification needs multiple signals, server-side security, abuse prevention, privacy care and accessible alternatives.</p>
-          <p>This prototype isolates one idea: could natural interaction contribute to verification without stopping the experience?</p>
+          <p>A real verification system could never responsibly decide “human or bot” from one drag. Production verification needs multiple signals, server-side security, anti-replay, privacy care and accessible alternatives.</p>
+          <p>This prototype isolates one research question: how much evidence of human motor behaviour exists in a single intentional movement — and could that evidence emerge from interaction instead of interruption?</p>
+          <p>Keyboard completion uses an accessible alternative path. It is not scored as if it were mouse biometrics. Unusual motor patterns are similarity to a provisional calibration — not proof of personhood.</p>
         </div>
       </section>
 
