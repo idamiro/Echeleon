@@ -19,13 +19,20 @@
  * States:
  *   human_like | synthetic_like | uncertain | insufficient_signal | accessible_completion
  *
- * Behavioral boundary:
- *   Observation ends at pointerup / keyboard confirm.
- *   Automatic target-snap easing and post-release inertia are presentation-only
- *   and are never appended to the biometric trajectory.
+ * Interaction / measurement boundary:
+ *   - Each pointer drag is one behavioral observation.
+ *   - Only a release inside the target acceptance region is classified.
+ *   - Failed releases are discarded as attempts; the circle stays where released.
+ *   - The next drag starts a fresh sample buffer from the current circle center
+ *     (no synthetic jump, no mixing of prior failed strokes).
+ *   - Eligibility is decided at the user-controlled release position, before any snap.
+ *   - Post-release snap to the target center is presentation-only and is never sampled.
+ *   - There is no post-release inertia in Human Check — UI momentum cannot complete
+ *     verification or move the circle between attempts.
  *
  * Keyboard:
  *   Completing via keyboard yields accessible_completion.
+ *   Confirmation eligibility uses the same release-position rule (no animation help).
  *   Pointer trajectory classifier is not applied; humanLikeScore / syntheticRisk are null.
  *   User-facing copy may still say “Human enough.” Debug/research must state the bypass.
  *

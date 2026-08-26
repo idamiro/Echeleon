@@ -11,8 +11,10 @@
  *   → heuristic likelihood model
  *   → state
  *
- * Behavioral observation ends at pointerup / keyboard confirm.
- * Inertia and target-snap animation are presentation-only (never sampled).
+ * Each pointer drag is one behavioral observation.
+ * Only a release inside the target is classified.
+ * Failed releases are discarded; next drag starts a fresh sample buffer.
+ * There is no post-release inertia. Snap after success is presentation-only.
  *
  * Local-only research prototype. Not production bot detection.
  */
@@ -29,6 +31,11 @@ import {
   loadResearchStore
 } from './research.js';
 import { clamp } from './math.js';
+import {
+  isSuccessfulRelease,
+  appendReleaseEndpoint,
+  TARGET_ACCEPTANCE_RATIO
+} from './interaction.js';
 
 const params = new URLSearchParams(window.location.search);
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -85,14 +92,13 @@ function boot() {
   let firstInteractAt = 0;
   /** Live buffer while observationOpen; frozen into userTrajectory at end of user control */
   let samples = [];
-  /** Frozen circle-center trajectory used for analysis (excludes snap/inertia) */
+  /** Frozen circle-center trajectory used for analysis (excludes snap; never includes inertia) */
   let userTrajectory = [];
   /** True only while the user controls the disc (pointer drag or keyboard move) */
   let observationOpen = false;
   let lastExtraction = null;
   let lastResult = null;
   let settled = false;
-  let rafInertia = 0;
   /** @type {'mouse'|'touch'|'pen'|'keyboard'|null} */
   let inputMethod = null;
   let lastHumanTrajectory = null;
@@ -161,13 +167,17 @@ function boot() {
   const discCenter = () => ({ x: pos.x + discSize / 2, y: pos.y + discSize / 2 });
 
   const updateTargetProximity = () => {
+    const ready = isReleaseInsideTarget();
     const d = dist(discCenter(), targetCenterLocal());
-    const ready = d < targetSize * 0.34;
     const near = d < targetSize * 0.78;
     target.classList.toggle('is-near', near && !ready);
     target.classList.toggle('is-ready', ready);
     return ready;
   };
+
+  /** Eligibility from current user-controlled disc center — never after snap. */
+  const isReleaseInsideTarget = () =>
+    isSuccessfulRelease(discCenter(), targetCenterLocal(), targetSize, TARGET_ACCEPTANCE_RATIO);
 
   const resetChallenge = () => {
     measure();
@@ -180,7 +190,6 @@ function boot() {
     lastExtraction = null;
     lastResult = null;
     inputMethod = null;
-    cancelAnimationFrame(rafInertia);
     disc.classList.remove('is-dragging', 'is-keyboard-active');
     disc.setAttribute('aria-grabbed', 'false');
     target.classList.remove('is-near', 'is-ready');
@@ -201,9 +210,19 @@ function boot() {
   };
 
   /**
+   * Start a fresh behavioral attempt without moving the circle.
+   * One pointer drag = one observation; failed attempts are discarded.
+   */
+  const beginBehavioralAttempt = () => {
+    samples = [];
+    userTrajectory = [];
+    observationOpen = true;
+  };
+
+  /**
    * Record board-local disc center after setDiscPosition.
    * Pointer client coords are never the behavioral trajectory.
-   * No-op when observation is closed (snap / inertia / settled).
+   * No-op when observation is closed (snap is presentation-only).
    */
   const recordDiscCenterSample = (t = performance.now(), extra = {}) => {
     if (!observationOpen || settled) return;
@@ -216,8 +235,11 @@ function boot() {
     });
   };
 
-  /** pointerup / keyboard confirm = end of behavioral observation */
-  const closeObservation = () => {
+  /** Finalize release endpoint, then freeze trajectory for analysis. */
+  const finalizeAndCloseObservation = (t = performance.now(), extra = {}) => {
+    if (observationOpen) {
+      appendReleaseEndpoint(samples, discCenter(), t, extra);
+    }
     observationOpen = false;
     userTrajectory = samples.map((s) => ({ ...s }));
   };
@@ -346,9 +368,10 @@ function boot() {
     ctx.stroke();
   };
 
-  const complete = () => {
+  const completeSuccessfulAttempt = () => {
     if (settled) return;
     settled = true;
+    // Classification uses frozen userTrajectory ending at release — not snap endpoint.
     const { extracted, result } = analyzeAndClassify();
     applyResult(result, extracted);
     showStage('result');
@@ -356,19 +379,17 @@ function boot() {
   };
 
   /**
-   * Target snap is UI presentation only.
-   * Behavioral observation must already be closed (closeObservation).
-   * Snap easing must never append samples to userTrajectory.
+   * Visual snap to target center after a successful user release.
+   * Presentation only — never records samples; never re-checks eligibility.
    */
-  const trySettle = () => {
-    if (!updateTargetProximity()) return false;
+  const animateSnapToTarget = (onDone) => {
     const goal = targetCenterLocal();
     const offsetX = goal.x - discSize / 2;
     const offsetY = goal.y - discSize / 2;
     if (reducedMotion) {
       setDiscPosition(offsetX, offsetY, 1);
-      complete();
-      return true;
+      onDone();
+      return;
     }
     const start = { ...pos };
     const from = performance.now();
@@ -376,13 +397,29 @@ function boot() {
     const step = (now) => {
       const t = clamp((now - from) / duration, 0, 1);
       const e = 1 - (1 - t) ** 3;
-      // Visual only — observationOpen is false; recordDiscCenterSample is a no-op
       setDiscPosition(start.x + (offsetX - start.x) * e, start.y + (offsetY - start.y) * e, 1);
       if (t < 1) requestAnimationFrame(step);
-      else complete();
+      else onDone();
     };
     requestAnimationFrame(step);
-    return true;
+  };
+
+  /** Failed release: keep circle where user left it; discard attempt; no classification. */
+  const endUnsuccessfulAttempt = ({ hint } = {}) => {
+    setDiscPosition(pos.x, pos.y, 1);
+    updateTargetProximity();
+    samples = [];
+    userTrajectory = [];
+    observationOpen = false;
+    if (hintEl && hint) hintEl.textContent = hint;
+  };
+
+  /**
+   * Shared success path after eligibility was already decided from the release position.
+   * Must NOT re-evaluate target proximity after animation.
+   */
+  const settleSuccessfulRelease = () => {
+    animateSnapToTarget(() => completeSuccessfulAttempt());
   };
 
   const pointerDown = (event) => {
@@ -398,12 +435,10 @@ function boot() {
     drag = {
       id: event.pointerId,
       offsetX: event.clientX - br.left - pos.x,
-      offsetY: event.clientY - br.top - pos.y,
-      last: { x: event.clientX, y: event.clientY, t: performance.now() },
-      vx: 0,
-      vy: 0
+      offsetY: event.clientY - br.top - pos.y
     };
-    observationOpen = true;
+    // Fresh attempt from current visible position — no jump from a prior discarded drag.
+    beginBehavioralAttempt();
     setDiscPosition(pos.x, pos.y, 1.06);
     recordDiscCenterSample(performance.now(), {
       pointerType: type,
@@ -422,10 +457,6 @@ function boot() {
     const nextX = event.clientX - br.left - drag.offsetX;
     const nextY = event.clientY - br.top - drag.offsetY;
     const now = performance.now();
-    const dt = Math.max(1, now - drag.last.t);
-    drag.vx = (event.clientX - drag.last.x) / dt;
-    drag.vy = (event.clientY - drag.last.y) / dt;
-    drag.last = { x: event.clientX, y: event.clientY, t: now };
     setDiscPosition(nextX, nextY, 1.06);
     recordDiscCenterSample(now, {
       pointerType: event.pointerType,
@@ -440,32 +471,44 @@ function boot() {
 
   const endDrag = (event) => {
     if (!drag || (event && event.pointerId !== drag.id)) return;
-    const releaseVx = drag.vx;
-    const releaseVy = drag.vy;
+    const offsetX = drag.offsetX;
+    const offsetY = drag.offsetY;
     drag = null;
-    // End of user-controlled movement — freeze trajectory before any UI animation
-    closeObservation();
+
+    // Sync disc to pointerup position when coords are available (may differ from last move).
+    if (event && Number.isFinite(event.clientX) && Number.isFinite(event.clientY)) {
+      const br = boardRect();
+      setDiscPosition(event.clientX - br.left - offsetX, event.clientY - br.top - offsetY, 1);
+    }
+
+    const releaseT = (event && typeof event.timeStamp === 'number' && event.timeStamp > 0)
+      ? performance.now()
+      : performance.now();
+    const meta = event
+      ? {
+        pointerType: event.pointerType,
+        pressure: event.pressure,
+        width: event.width,
+        height: event.height,
+        buttons: event.buttons
+      }
+      : {};
+
+    // Eligibility from user-controlled release position — before any snap.
+    const reachedTargetAtRelease = isReleaseInsideTarget();
+    finalizeAndCloseObservation(releaseT, meta);
+
     disc.classList.remove('is-dragging');
     disc.setAttribute('aria-grabbed', 'false');
     document.documentElement.style.overflow = '';
-    if (trySettle()) return;
-    if (reducedMotion) {
-      setDiscPosition(pos.x, pos.y, 1);
-      updateTargetProximity();
+
+    if (!reachedTargetAtRelease) {
+      endUnsuccessfulAttempt({ hint: 'Move the circle into the ring.' });
       return;
     }
-    // Inertia is visual presentation only (observation already closed)
-    let vx = releaseVx * 14;
-    let vy = releaseVy * 14;
-    const tick = () => {
-      vx *= 0.86;
-      vy *= 0.86;
-      setDiscPosition(pos.x + vx, pos.y + vy, 1);
-      updateTargetProximity();
-      if (Math.hypot(vx, vy) > 0.35) rafInertia = requestAnimationFrame(tick);
-      else if (!trySettle()) setDiscPosition(pos.x, pos.y, 1);
-    };
-    rafInertia = requestAnimationFrame(tick);
+
+    // Successful user release: presentation snap only, then classify frozen trajectory.
+    settleSuccessfulRelease();
   };
 
   const onKeyDown = (event) => {
@@ -480,7 +523,7 @@ function boot() {
     const isArrow = event.key.startsWith('Arrow');
     if (isArrow && !keyboardActive) {
       keyboardActive = true;
-      observationOpen = true;
+      beginBehavioralAttempt();
       disc.classList.add('is-keyboard-active');
       disc.setAttribute('aria-grabbed', 'true');
       setDiscPosition(pos.x, pos.y, 1.05);
@@ -491,7 +534,7 @@ function boot() {
       event.preventDefault();
       if (!keyboardActive) {
         keyboardActive = true;
-        observationOpen = true;
+        beginBehavioralAttempt();
         disc.classList.add('is-keyboard-active');
         disc.setAttribute('aria-grabbed', 'true');
         setDiscPosition(pos.x, pos.y, 1.05);
@@ -501,22 +544,22 @@ function boot() {
         keyboardActive = false;
         disc.classList.remove('is-keyboard-active');
         disc.setAttribute('aria-grabbed', 'false');
-        recordDiscCenterSample();
-        closeObservation();
-        if (!trySettle()) {
-          setDiscPosition(pos.x, pos.y, 1);
-          hintEl.textContent = 'Move closer to the ring, then press Enter.';
+        const reachedTargetAtConfirm = isReleaseInsideTarget();
+        finalizeAndCloseObservation(performance.now());
+        if (!reachedTargetAtConfirm) {
+          endUnsuccessfulAttempt({ hint: 'Move the circle into the ring.' });
+          return;
         }
+        settleSuccessfulRelease();
       }
       return;
     }
     if (event.key === 'Escape') {
       event.preventDefault();
       keyboardActive = false;
-      closeObservation();
       disc.classList.remove('is-keyboard-active');
       disc.setAttribute('aria-grabbed', 'false');
-      setDiscPosition(pos.x, pos.y, 1);
+      endUnsuccessfulAttempt();
       return;
     }
     if (!keyboardActive) return;
@@ -665,6 +708,8 @@ function boot() {
     window.__hc = {
       extractFeatures,
       classifier: defaultClassifier,
+      isSuccessfulRelease,
+      TARGET_ACCEPTANCE_RATIO,
       runSyntheticBattery: () => debugEl?.querySelector('[data-hc-run-battery]')?.click(),
       loadResearchStore
     };
