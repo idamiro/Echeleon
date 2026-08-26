@@ -114,6 +114,12 @@ describe('touch synthetic protection', () => {
     );
   });
 
+  it('touch perfect-ease script is not human_like', () => {
+    const traj = generateTouchPerfectEaseScript(start, end);
+    const { result } = classifyTouch(traj.samples);
+    assert.notEqual(result.state, 'human_like');
+  });
+
   it('touch random jitter is not trusted as human_like', () => {
     const traj = generateTouchRandomJitter(start, end);
     const { result } = classifyTouch(traj.samples);
@@ -125,9 +131,9 @@ describe('touch sampling-rate stability', () => {
   it('same physical swipe at ~60/90/120 Hz stays in same coarse class', () => {
     const base = generateTouchNatural(start, end, { variant: 'medium', durationMs: 420, dt: 11 });
     const rates = [
-      resampleDt(base.samples, 1000 / 60),
-      resampleDt(base.samples, 1000 / 90),
-      resampleDt(base.samples, 1000 / 120)
+      resampleDt(base.samples, 1000 / 60, 0.08),
+      resampleDt(base.samples, 1000 / 90, 0.08),
+      resampleDt(base.samples, 1000 / 120, 0.08)
     ];
     const states = rates.map((samples) => classifyTouch(samples).result.state);
     const unique = new Set(states);
@@ -206,13 +212,19 @@ describe('touch battery smoke', () => {
   });
 });
 
-function resampleDt(samples, dt) {
+function resampleDt(samples, dt, jitterFrac = 0) {
   if (samples.length < 2) return samples.slice();
   const t0 = samples[0].t;
   const t1 = samples[samples.length - 1].t;
   const out = [];
   let i = 0;
-  for (let t = t0; t <= t1; t += dt) {
+  let t = t0;
+  let seed = 91;
+  const rand = () => {
+    seed = (seed * 1664525 + 1013904223) % 4294967296;
+    return seed / 4294967296;
+  };
+  while (t <= t1) {
     while (i < samples.length - 2 && samples[i + 1].t < t) i += 1;
     const a = samples[i];
     const b = samples[Math.min(i + 1, samples.length - 1)];
@@ -223,6 +235,8 @@ function resampleDt(samples, dt) {
       y: a.y + (b.y - a.y) * u,
       t
     });
+    const step = dt * (1 + (rand() - 0.5) * 2 * jitterFrac);
+    t += Math.max(1, step);
   }
   return out;
 }

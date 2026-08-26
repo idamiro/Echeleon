@@ -218,6 +218,17 @@ export class HeuristicHumanCheckClassifier {
       }
     }
 
+    // Touch: exact event clock + mechanical ease/line is still scripted
+    if (
+      profile.riskMode === 'touch' &&
+      num(features.sampleIntervalCV) &&
+      features.sampleIntervalCV < 0.04 &&
+      risks.perfectEase >= 0.55 &&
+      risks.overRegularTiming >= 0.55
+    ) {
+      syntheticRisk = Math.max(syntheticRisk, 0.6);
+    }
+
     humanLikeScore = clamp01(humanLikeScore * (1 - 0.72 * syntheticRisk) + 0.05 * (1 - syntheticRisk));
 
     const validFeatureRatio = totalExpectedWeight > 0 ? wSum / totalExpectedWeight : 0;
@@ -363,6 +374,7 @@ export class HeuristicHumanCheckClassifier {
       num(f.sampleIntervalCV) && f.sampleIntervalCV < 0.06;
 
     if (mode === 'touch') {
+      let risksBumpLinear = 0;
       // Straight finger swipe is normal — require constant/near-zero velocity CV
       const linearConstantMotion = clamp01(
         0.25 * upper(f.pathEfficiency, 0.985, 0.998) +
@@ -400,6 +412,16 @@ export class HeuristicHumanCheckClassifier {
         overRegularTiming = Math.min(overRegularTiming, 0.22);
       }
 
+      // Exact constant clock + near-perfect geometry is still scripted on touch
+      const exactClock = num(f.sampleIntervalCV) && f.sampleIntervalCV < 0.04;
+      if (exactClock && f.pathEfficiency >= 0.97) {
+        overRegularTiming = Math.max(overRegularTiming, 0.7);
+        perfectEase = Math.max(perfectEase, 0.65);
+        if (veryFlatSpeed || (num(f.velocityCV) && f.velocityCV < 0.2)) {
+          risksBumpLinear = 0.55;
+        }
+      }
+
       let teleport = 0;
       if (f.sampleCount <= 6 && f.pathLength > 140 && f.pathEfficiency > 0.97) teleport += 0.85;
       if (num(f.maxVelocity) && f.maxVelocity > 8000 && num(f.velocityCV) && f.velocityCV < 0.15) {
@@ -407,7 +429,7 @@ export class HeuristicHumanCheckClassifier {
       }
 
       return {
-        linearConstantMotion: clamp01(linearConstantMotion),
+        linearConstantMotion: clamp01(Math.max(linearConstantMotion, risksBumpLinear || 0)),
         perfectEase: clamp01(perfectEase),
         randomNoise,
         overRegularTiming: clamp01(overRegularTiming),
