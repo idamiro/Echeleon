@@ -29,6 +29,9 @@
  *   - Post-release snap to the target center is presentation-only and is never sampled.
  *   - There is no post-release inertia in Human Check — UI momentum cannot complete
  *     verification or move the circle between attempts.
+ *   - pointercancel and unexpected lostpointercapture cancel the attempt silently:
+ *     they never classify, never snap, and never enter research capture.
+ *   - lostpointercapture after a finished pointerup is a no-op (idempotent).
  *
  * Keyboard:
  *   Completing via keyboard yields accessible_completion.

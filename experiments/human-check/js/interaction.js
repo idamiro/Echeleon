@@ -1,6 +1,7 @@
 /**
- * Pure interaction helpers for Human Check release eligibility.
- * Success depends only on the user-controlled release position — never on UI animation.
+ * Pure interaction helpers for Human Check release eligibility and pointer lifecycle.
+ * Success depends only on an intentional pointerup (or keyboard confirm) —
+ * never on UI animation, pointercancel, or lostpointercapture.
  */
 
 import { hypot } from './math.js';
@@ -45,4 +46,55 @@ export function appendReleaseEndpoint(samples, center, t, extra = {}) {
   }
   samples.push({ x: center.x, y: center.y, t, ...extra });
   return samples;
+}
+
+/**
+ * Resolve what a pointer-end event must do.
+ * Only intentional pointerup may become a valid release / classification path.
+ *
+ * @param {'pointerup'|'pointercancel'|'lostpointercapture'|string} eventType
+ * @param {boolean} hasActiveDrag
+ * @returns {'valid_release'|'cancel'|'noop'}
+ */
+export function resolvePointerEndAction(eventType, hasActiveDrag) {
+  if (eventType === 'pointerup') {
+    return hasActiveDrag ? 'valid_release' : 'noop';
+  }
+  if (eventType === 'pointercancel') {
+    return hasActiveDrag ? 'cancel' : 'noop';
+  }
+  if (eventType === 'lostpointercapture') {
+    // After a normal pointerup, drag is already cleared → no-op (idempotent).
+    // Unexpected capture loss while drag is active → cancel.
+    return hasActiveDrag ? 'cancel' : 'noop';
+  }
+  return 'noop';
+}
+
+/**
+ * Whether this lifecycle action may classify / complete / research-record.
+ * Cancelled attempts never classify — even if geometry is inside the target.
+ *
+ * @param {'valid_release'|'cancel'|'noop'} action
+ * @param {boolean} releaseInsideTarget only meaningful for valid_release
+ */
+export function mayCompleteObservation(action, releaseInsideTarget) {
+  return action === 'valid_release' && releaseInsideTarget === true;
+}
+
+/**
+ * Discarded attempt state after pointercancel / unexpected lostpointercapture.
+ * Pure helper for tests and documentation of cleared fields.
+ */
+export function cancelledAttemptState() {
+  return {
+    drag: null,
+    observationOpen: false,
+    samples: [],
+    userTrajectory: [],
+    shouldClassify: false,
+    shouldComplete: false,
+    shouldRecordResearch: false,
+    shouldSnapToTarget: false
+  };
 }

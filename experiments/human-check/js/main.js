@@ -34,7 +34,10 @@ import { clamp } from './math.js';
 import {
   isSuccessfulRelease,
   appendReleaseEndpoint,
-  TARGET_ACCEPTANCE_RATIO
+  TARGET_ACCEPTANCE_RATIO,
+  resolvePointerEndAction,
+  mayCompleteObservation,
+  cancelledAttemptState
 } from './interaction.js';
 
 const params = new URLSearchParams(window.location.search);
@@ -469,6 +472,10 @@ function boot() {
     event.preventDefault();
   };
 
+  /**
+   * Intentional pointerup only — may succeed or fail based on release position.
+   * pointercancel / lostpointercapture must never call this.
+   */
   const endDrag = (event) => {
     if (!drag || (event && event.pointerId !== drag.id)) return;
     const offsetX = drag.offsetX;
@@ -481,9 +488,7 @@ function boot() {
       setDiscPosition(event.clientX - br.left - offsetX, event.clientY - br.top - offsetY, 1);
     }
 
-    const releaseT = (event && typeof event.timeStamp === 'number' && event.timeStamp > 0)
-      ? performance.now()
-      : performance.now();
+    const releaseT = performance.now();
     const meta = event
       ? {
         pointerType: event.pointerType,
@@ -509,6 +514,43 @@ function boot() {
 
     // Successful user release: presentation snap only, then classify frozen trajectory.
     settleSuccessfulRelease();
+  };
+
+  /**
+   * Browser/platform terminated the pointer sequence — not a valid release.
+   * Never classify, never snap, never research-record. Keep circle where it is.
+   */
+  const cancelDrag = (event) => {
+    if (!drag) return;
+    if (event && event.pointerId != null && event.pointerId !== drag.id) return;
+
+    const pointerId = drag.id;
+    drag = null;
+    observationOpen = false;
+    samples = [];
+    userTrajectory = [];
+
+    disc.classList.remove('is-dragging');
+    disc.setAttribute('aria-grabbed', 'false');
+    document.documentElement.style.overflow = '';
+    setDiscPosition(pos.x, pos.y, 1);
+    updateTargetProximity();
+
+    try {
+      if (pointerId != null && disc.hasPointerCapture?.(pointerId)) {
+        disc.releasePointerCapture(pointerId);
+      }
+    } catch (_) { /* ignore */ }
+  };
+
+  /**
+   * Defensive: unexpected capture loss cancels an active drag.
+   * After a normal pointerup, drag is already null → no-op (no double completion).
+   */
+  const handleLostPointerCapture = (event) => {
+    if (!drag) return;
+    if (event && event.pointerId != null && event.pointerId !== drag.id) return;
+    cancelDrag(event);
   };
 
   const onKeyDown = (event) => {
@@ -692,8 +734,8 @@ function boot() {
   disc.addEventListener('pointerdown', pointerDown, { passive: false });
   disc.addEventListener('pointermove', pointerMove, { passive: false });
   disc.addEventListener('pointerup', endDrag);
-  disc.addEventListener('pointercancel', endDrag);
-  disc.addEventListener('lostpointercapture', endDrag);
+  disc.addEventListener('pointercancel', cancelDrag);
+  disc.addEventListener('lostpointercapture', handleLostPointerCapture);
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('resize', () => {
     if (!stages.challenge.hidden && !settled) {
@@ -710,6 +752,9 @@ function boot() {
       classifier: defaultClassifier,
       isSuccessfulRelease,
       TARGET_ACCEPTANCE_RATIO,
+      resolvePointerEndAction,
+      mayCompleteObservation,
+      cancelledAttemptState,
       runSyntheticBattery: () => debugEl?.querySelector('[data-hc-run-battery]')?.click(),
       loadResearchStore
     };

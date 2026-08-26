@@ -8,7 +8,10 @@ import assert from 'node:assert/strict';
 import {
   isSuccessfulRelease,
   appendReleaseEndpoint,
-  TARGET_ACCEPTANCE_RATIO
+  TARGET_ACCEPTANCE_RATIO,
+  resolvePointerEndAction,
+  mayCompleteObservation,
+  cancelledAttemptState
 } from '../js/interaction.js';
 import { extractFeatures } from '../js/features.js';
 
@@ -171,5 +174,85 @@ describe('snap exclusion from features', () => {
     assert.ok(Math.abs(cleanEnd.y - release.y) < 1);
     assert.notEqual(clean.features.movementTime, dirty.features.movementTime);
     assert.ok(clean.features.sampleCount < dirty.features.sampleCount);
+  });
+});
+
+describe('pointer lifecycle: cancel ≠ release', () => {
+  it('A: pointercancel cannot succeed even when circle is inside target', () => {
+    const inside = { x: targetCenter.x + 5, y: targetCenter.y };
+    assert.equal(isSuccessfulRelease(inside, targetCenter, targetSize), true);
+
+    const action = resolvePointerEndAction('pointercancel', true);
+    assert.equal(action, 'cancel');
+    assert.equal(mayCompleteObservation(action, true), false);
+
+    const cleared = cancelledAttemptState();
+    assert.equal(cleared.shouldClassify, false);
+    assert.equal(cleared.shouldComplete, false);
+    assert.equal(cleared.shouldRecordResearch, false);
+    assert.equal(cleared.shouldSnapToTarget, false);
+    assert.deepEqual(cleared.samples, []);
+    assert.deepEqual(cleared.userTrajectory, []);
+  });
+
+  it('B: lostpointercapture during active drag cancels — no classification', () => {
+    const action = resolvePointerEndAction('lostpointercapture', true);
+    assert.equal(action, 'cancel');
+    assert.equal(mayCompleteObservation(action, true), false);
+    assert.equal(mayCompleteObservation(action, false), false);
+  });
+
+  it('C: lostpointercapture after normal pointerup is a no-op (no duplicate completion)', () => {
+    // Valid release already cleared drag
+    const releaseAction = resolvePointerEndAction('pointerup', true);
+    assert.equal(releaseAction, 'valid_release');
+    assert.equal(mayCompleteObservation(releaseAction, true), true);
+
+    // Subsequent lostpointercapture with drag already null
+    const after = resolvePointerEndAction('lostpointercapture', false);
+    assert.equal(after, 'noop');
+    assert.equal(mayCompleteObservation(after, true), false);
+  });
+
+  it('D: cancel then new drag starts fresh buffer from current center', () => {
+    let samples = [
+      { x: 80, y: 280, t: 1000 },
+      { x: targetCenter.x, y: targetCenter.y, t: 1100 }
+    ];
+    // Cancel discards attempt (even though last point was inside target)
+    const action = resolvePointerEndAction('pointercancel', true);
+    assert.equal(mayCompleteObservation(action, true), false);
+    const cancelled = cancelledAttemptState();
+    samples = cancelled.samples;
+    let userTrajectory = cancelled.userTrajectory;
+    assert.equal(samples.length, 0);
+
+    const currentCenter = { x: targetCenter.x, y: targetCenter.y };
+    samples = [{ x: currentCenter.x, y: currentCenter.y, t: 2000 }];
+    userTrajectory = [];
+    assert.equal(samples[0].x, currentCenter.x);
+    assert.equal(samples[0].y, currentCenter.y);
+    assert.equal(userTrajectory.length, 0);
+  });
+
+  it('E: cancelled attempt cannot enter research capture', () => {
+    const cancel = resolvePointerEndAction('pointercancel', true);
+    const lost = resolvePointerEndAction('lostpointercapture', true);
+    const noop = resolvePointerEndAction('lostpointercapture', false);
+
+    for (const action of [cancel, lost, noop]) {
+      assert.equal(mayCompleteObservation(action, true), false);
+      assert.equal(cancelledAttemptState().shouldRecordResearch, false);
+    }
+
+    // Only intentional successful pointerup may complete (research is gated behind completion)
+    assert.equal(mayCompleteObservation('valid_release', true), true);
+    assert.equal(mayCompleteObservation('valid_release', false), false);
+  });
+
+  it('pointerup outside target is valid_release but does not complete', () => {
+    const action = resolvePointerEndAction('pointerup', true);
+    assert.equal(action, 'valid_release');
+    assert.equal(mayCompleteObservation(action, false), false);
   });
 });
