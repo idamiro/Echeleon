@@ -190,7 +190,13 @@ export function extractFeatures(input) {
     highFrequencyEnergyRatio: residuals.highFrequencyEnergyRatio,
     minimumJerkDeviation: minJerkDev,
 
-    experimentalNeuromotorMetrics: neuromotor.experimentalNeuromotorMetrics
+    experimentalNeuromotorMetrics: neuromotor.experimentalNeuromotorMetrics,
+
+    // Board size for device-independent confidence / diagnostics
+    boardWidth: container.width,
+    boardHeight: container.height,
+    containerWidth: container.width,
+    containerHeight: container.height
   };
 
   return {
@@ -215,11 +221,13 @@ export function extractFeatures(input) {
   };
 }
 
-export function hasInsufficientSignal(features, minimum) {
+export function hasInsufficientSignal(features, minimum, norms = null) {
   const samples = features.sampleCount || 0;
   const path = features.pathLength || 0;
   const dur = features.movementTime || 0;
   const disp = features.displacement || 0;
+  const dist = Math.max(features.startTargetDistance || 0, 1);
+  const pathOverDist = norms?.normalizedPathLength ?? path / dist;
 
   if (samples < 3) return true;
   if (disp < 20 && path < 24) return true;
@@ -228,12 +236,20 @@ export function hasInsufficientSignal(features, minimum) {
   if (path >= Math.max(minimum.pathLengthPx, 100) && samples >= 3) return false;
   if (disp >= Math.max(minimum.displacementPx, 80) && samples >= 3) return false;
 
-  return (
+  const absFail =
     samples < minimum.sampleCount ||
     path < minimum.pathLengthPx ||
     dur < minimum.durationMs ||
-    disp < minimum.displacementPx
-  );
+    disp < minimum.displacementPx;
+
+  // Device-size aware: if absolute path is short but covers the Fitts distance, allow.
+  if (absFail && pathOverDist >= (minimum.minPathOverDistance || 0.7) &&
+    samples >= Math.max(4, (minimum.sampleCount || 8) - 2) &&
+    dur >= (minimum.durationMs || 90) * 0.75) {
+    return false;
+  }
+
+  return absFail;
 }
 
 /** Sparse but long path eligible for structural-only synthetic checks */

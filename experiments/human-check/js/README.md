@@ -13,8 +13,14 @@
  *   → corrections (progress, overshoot, micro-corrections, phases)
  *   → neuromotor proxies (submovements; Sigma-Lognormal not implemented)
  *   → feature validity (null invalid higher-order metrics)
- *   → heuristic likelihood model (humanLikeScore / syntheticRisk — not P(human))
+ *   → heuristic likelihood model (pointer-specific profile: mouse|touch|pen)
  *   → state
+ *
+ * Pointer profiles (PROVISIONAL — NOT EMPIRICALLY CALIBRATED):
+ *   Separate featureWeights, interactionRiskWeights, thresholds, minima, and
+ *   confidence parameters per modality. Touch reduces reliance on event-timing
+ *   regularity and micro-corrections; confidence uses path/distance normalization
+ *   rather than absolute desktop pixel lengths.
  *
  * States:
  *   human_like | synthetic_like | uncertain | insufficient_signal | accessible_completion

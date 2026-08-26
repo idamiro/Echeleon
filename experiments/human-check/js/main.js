@@ -323,12 +323,20 @@ function boot() {
         geometry: {
           fittsID: result.features.fittsID,
           distance: result.features.startTargetDistance,
-          width: result.features.fittsWidth
+          width: result.features.fittsWidth,
+          boardWidth: result.features.boardWidth,
+          boardHeight: result.features.boardHeight,
+          normalizedPathLength: result.diagnostics?.normalizedPathLength,
+          normalizedDisplacement: result.diagnostics?.normalizedDisplacement
         },
         features: result.features,
+        featureScores: result.featureScores,
+        risks: result.risks,
+        diagnostics: result.diagnostics,
         label: inputMethod === 'keyboard' ? 'accessible' : 'human',
         classification: result.state,
         modelType: result.modelType,
+        classifierProfile: result.classifierProfile,
         humanLikeScore: result.humanLikeScore,
         syntheticRisk: result.syntheticRisk,
         confidence: result.confidence

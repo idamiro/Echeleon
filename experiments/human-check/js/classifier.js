@@ -5,11 +5,11 @@
  * Heuristic outputs are NOT calibrated probabilities.
  * Use humanLikeScore / syntheticRisk — never imply P(human) for heuristics.
  *
- * PROVISIONAL calibration — see calibration.js
- * NOT EMPIRICALLY CALIBRATED
+ * Pointer-specific profiles (mouse / touch / pen) live in calibration.js.
+ * PROVISIONAL — NOT EMPIRICALLY CALIBRATED
  */
 
-import { calibration, calibForPointer } from './calibration.js';
+import { calibration, profileForPointer } from './calibration.js';
 import {
   hasInsufficientSignal,
   isSparseStructuralCandidate,
@@ -49,6 +49,9 @@ export class HeuristicHumanCheckClassifier {
       return this.#keyboardResult(features);
     }
 
+    const profile = profileForPointer(features.pointerType);
+    const norms = normalizedGeometry(features);
+
     // Sparse long paths: structural anomaly only — do not invent jerk/entropy human scores
     if (isSparseStructuralCandidate(features) && !features.featureValidity?.fullBehavioral) {
       const structural = this.#structuralAnomaly(features);
@@ -59,8 +62,9 @@ export class HeuristicHumanCheckClassifier {
           confidence: 0.55,
           contributions: structural.contributions,
           risks: structural.risks,
-          featureScores: {}
-        }, features);
+          featureScores: {},
+          diagnostics: baseDiagnostics(profile, features, norms, {}, structural.risks, [])
+        }, features, profile);
       }
       return this.#heuristicResult('insufficient_signal', {
         humanLikeScore: null,
@@ -71,23 +75,30 @@ export class HeuristicHumanCheckClassifier {
           'No strong structural synthetic anomaly detected.'
         ],
         risks: structural.risks,
-        featureScores: {}
-      }, features);
+        featureScores: {},
+        diagnostics: baseDiagnostics(profile, features, norms, {}, structural.risks, [
+          'insufficient samples for full behavioral analysis'
+        ])
+      }, features, profile);
     }
 
-    if (hasInsufficientSignal(features, this.config.minimum)) {
+    if (hasInsufficientSignal(features, profile.minimum, norms)) {
       return this.#heuristicResult('insufficient_signal', {
         humanLikeScore: null,
         syntheticRisk: null,
         confidence: 0.15,
         contributions: ['Too few samples, too short a path, or too brief a movement to evaluate.'],
         risks: {},
-        featureScores: {}
-      }, features);
+        featureScores: {},
+        diagnostics: baseDiagnostics(profile, features, norms, {}, {}, [
+          'insufficient signal for modality profile'
+        ])
+      }, features, profile);
     }
 
     const validity = features.featureValidity || {};
-    const cal = calibForPointer(features.pointerType);
+    const cal = profile.gaussians;
+    const weights = profile.featureWeights;
 
     const rawScores = {
       pathEfficiency: num(features.pathEfficiency)
@@ -150,33 +161,25 @@ export class HeuristicHumanCheckClassifier {
         : null
     };
 
-    const weights = {
-      pathEfficiency: 0.1,
-      velocityCV: 0.14,
-      normalizedPeakTime: 0.1,
-      meanAbsDirectionChange: 0.1,
-      microCorrectionCount: 0.1,
-      lateMicroCorrectionCount: 0.08,
-      sampleIntervalCV: 0.06,
-      meanAxisDeviationNorm: 0.1,
-      submovementCount: 0.1,
-      normalizedJerk: 0.08
-    };
-
-    // Only valid finite feature scores contribute; renormalize weights
     let score = 0;
     let wSum = 0;
     const featureScores = {};
+    const weightedContributions = {};
+    const totalExpectedWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+
     Object.keys(weights).forEach((k) => {
       const validityFn = FEATURE_SCORE_VALIDITY[k];
       const valid = validityFn ? validityFn(validity) : true;
       const s = rawScores[k];
       if (!valid || s == null || !Number.isFinite(s)) {
         featureScores[k] = null;
+        weightedContributions[k] = null;
         return;
       }
       featureScores[k] = s;
-      score += weights[k] * s;
+      const contrib = weights[k] * s;
+      weightedContributions[k] = contrib;
+      score += contrib;
       wSum += weights[k];
     });
 
@@ -187,14 +190,17 @@ export class HeuristicHumanCheckClassifier {
         confidence: 0.2,
         contributions: ['Too few valid behavioral features to score.'],
         risks: {},
-        featureScores
-      }, features);
+        featureScores,
+        diagnostics: baseDiagnostics(profile, features, norms, weightedContributions, {}, [
+          'too few valid features'
+        ])
+      }, features, profile);
     }
 
     let humanLikeScore = clamp01(score / wSum);
 
-    const risks = this.#interactionRisks(features);
-    const w = this.config.interactionWeights;
+    const risks = this.#interactionRisks(features, profile);
+    const w = profile.interactionRiskWeights;
     let syntheticRisk = clamp01(
       risks.linearConstantMotion * w.linearConstantMotion +
       risks.perfectEase * w.perfectEase +
@@ -203,27 +209,52 @@ export class HeuristicHumanCheckClassifier {
       risks.teleport * w.teleport
     );
 
+    // Touch: timing regularity alone must not dominate synthetic risk
+    if (profile.riskMode === 'touch' && risks.overRegularTiming > 0.5) {
+      const other =
+        risks.linearConstantMotion + risks.perfectEase + risks.randomNoise + risks.teleport;
+      if (other < 0.35) {
+        syntheticRisk = clamp01(syntheticRisk * 0.45 + risks.teleport * 0.15);
+      }
+    }
+
     humanLikeScore = clamp01(humanLikeScore * (1 - 0.72 * syntheticRisk) + 0.05 * (1 - syntheticRisk));
 
-    const richness = clamp01(
-      (features.sampleCount - 8) / 40 +
-      (features.movementTime - 90) / 900 +
-      (features.pathLength - 48) / 400
-    );
-    const decisiveness = Math.abs(humanLikeScore - 0.5) * 2;
-    const confidence = clamp01(0.25 + 0.4 * richness + 0.35 * decisiveness);
+    const validFeatureRatio = totalExpectedWeight > 0 ? wSum / totalExpectedWeight : 0;
+    const confidence = computeConfidence(features, norms, profile, humanLikeScore, validFeatureRatio);
 
-    const contributions = this.#explain(features, featureScores, risks, humanLikeScore);
+    const { contributions, topPositive, topNegative, uncertaintyDrivers } = this.#explainDetailed(
+      features,
+      featureScores,
+      weightedContributions,
+      risks,
+      humanLikeScore,
+      profile
+    );
 
     let state = 'uncertain';
-    const { humanLike, syntheticLike } = this.config.thresholds;
-    if (humanLikeScore >= humanLike && syntheticRisk < 0.55) state = 'human_like';
-    else if (humanLikeScore <= syntheticLike || syntheticRisk >= 0.62) state = 'synthetic_like';
-    else state = 'uncertain';
+    const th = profile.thresholds;
+    if (humanLikeScore >= th.humanLike && syntheticRisk < th.syntheticRiskSoft) state = 'human_like';
+    else if (humanLikeScore <= th.syntheticLike || syntheticRisk >= th.syntheticRiskHard) {
+      state = 'synthetic_like';
+    } else state = 'uncertain';
 
-    if (confidence < 0.32) {
-      if (Math.abs(humanLikeScore - 0.5) < 0.18) state = 'uncertain';
+    if (confidence < profile.confidence.minConfidenceForceUncertain) {
+      if (Math.abs(humanLikeScore - 0.5) < profile.confidence.ambiguousBand) {
+        state = 'uncertain';
+      }
     }
+
+    const diagnostics = {
+      ...baseDiagnostics(profile, features, norms, weightedContributions, risks, uncertaintyDrivers),
+      topPositive,
+      topNegative,
+      uncertaintyDrivers,
+      validFeatureRatio,
+      humanLikeScore,
+      syntheticRisk,
+      confidence
+    };
 
     return this.#heuristicResult(state, {
       humanLikeScore,
@@ -231,13 +262,12 @@ export class HeuristicHumanCheckClassifier {
       confidence,
       contributions,
       risks,
-      featureScores
-    }, features);
+      featureScores,
+      weightedContributions,
+      diagnostics
+    }, features, profile);
   }
 
-  /**
-   * Structural checks for sparse trajectories — not full kinematics scoring.
-   */
   #structuralAnomaly(f) {
     const risks = {
       linearConstantMotion: 0,
@@ -279,6 +309,7 @@ export class HeuristicHumanCheckClassifier {
       return {
         state: 'insufficient_signal',
         modelType: 'heuristic',
+        classifierProfile: 'keyboard',
         humanLikeScore: null,
         syntheticRisk: null,
         humanProbability: undefined,
@@ -286,6 +317,7 @@ export class HeuristicHumanCheckClassifier {
         contributions: ['Keyboard path had too little movement to evaluate.'],
         risks: {},
         featureScores: {},
+        diagnostics: null,
         features,
         calibrationVersion: this.config.version
       };
@@ -293,6 +325,7 @@ export class HeuristicHumanCheckClassifier {
     return {
       state: 'accessible_completion',
       modelType: 'heuristic',
+      classifierProfile: 'keyboard',
       humanLikeScore: null,
       syntheticRisk: null,
       humanProbability: undefined,
@@ -303,22 +336,86 @@ export class HeuristicHumanCheckClassifier {
       ],
       risks: {},
       featureScores: {},
+      diagnostics: null,
       features,
       calibrationVersion: this.config.version
     };
   }
 
-  #interactionRisks(f) {
+  /**
+   * Pointer-type-specific interaction risks.
+   * Touch: straight / smooth / regular-timing alone is less suspicious.
+   */
+  #interactionRisks(f, profile) {
+    const mode = profile.riskMode || 'mouse';
     const nearPerfectLine = f.pathEfficiency >= 0.985;
+    const veryStraight = f.pathEfficiency >= 0.97;
     const noCorrections =
       (f.microCorrectionCount == null || f.microCorrectionCount === 0) &&
       (f.lateMicroCorrectionCount == null || f.lateMicroCorrectionCount === 0) &&
       (f.backwardProgressCount == null || f.backwardProgressCount === 0);
     const flatSpeed = num(f.velocityCV) && f.velocityCV < 0.22;
+    const veryFlatSpeed = num(f.velocityCV) && f.velocityCV < 0.12;
     const singleBallistic =
       (f.submovementCount == null || f.submovementCount <= 1) &&
       (f.velocityPeakCount == null || f.velocityPeakCount <= 1);
+    const mechanicalTiming =
+      num(f.sampleIntervalCV) && f.sampleIntervalCV < 0.06;
 
+    if (mode === 'touch') {
+      // Straight finger swipe is normal — require constant/near-zero velocity CV
+      const linearConstantMotion = clamp01(
+        0.25 * upper(f.pathEfficiency, 0.985, 0.998) +
+        0.45 * (num(f.velocityCV) ? upper(1 - Math.min(f.velocityCV, 1), 0.82, 0.97) : 0) +
+        0.15 * (num(f.meanCurvature) ? upper(1 - Math.min(f.meanCurvature * 40, 1), 0.75, 0.95) : 0) +
+        0.15 * (veryFlatSpeed && nearPerfectLine && mechanicalTiming ? 1 : 0)
+      );
+
+      // Smooth ballistic finger motion is normal — need mechanical combo
+      let perfectEase = clamp01(
+        0.15 * upper(f.pathEfficiency, 0.98, 0.998) +
+        0.15 * (num(f.normalizedPeakTime) ? gaussianNear(f.normalizedPeakTime, 0.45, 0.08) : 0) +
+        0.1 * (noCorrections ? 0.35 : 0) +
+        0.25 * (mechanicalTiming ? 1 : 0) +
+        0.2 * (veryFlatSpeed ? 1 : 0) +
+        0.15 * (singleBallistic && nearPerfectLine && mechanicalTiming ? 1 : 0)
+      );
+      if (!(mechanicalTiming && (veryFlatSpeed || nearPerfectLine))) {
+        perfectEase *= 0.35;
+      }
+
+      const randomNoise = clamp01(
+        0.4 * (num(f.directionEntropy) ? upper(f.directionEntropy / 3.2, 0.75, 1) : 0) +
+        0.35 * (num(f.highFrequencyEnergyRatio) ? upper(f.highFrequencyEnergyRatio, 0.55, 0.9) : 0) +
+        0.15 * (num(f.backwardProgressCount) ? upper(1 - Math.min(f.backwardProgressCount / 2, 1), 0.7, 1) : 0) +
+        0.1 * (num(f.lateDecelerationRatio) ? upper(1 - Math.min(f.lateDecelerationRatio, 1), 0.55, 0.9) : 0)
+      );
+
+      // Timing regularity alone is weak for touch
+      let overRegularTiming = clamp01(
+        0.7 * (num(f.sampleIntervalCV) ? upper(1 - Math.min(f.sampleIntervalCV, 1), 0.9, 0.99) : 0) +
+        0.3 * (num(f.timingEntropy) ? upper(1 - Math.min(f.timingEntropy / 3, 1), 0.75, 0.95) : 0)
+      );
+      if (!(veryFlatSpeed && nearPerfectLine)) {
+        overRegularTiming = Math.min(overRegularTiming, 0.22);
+      }
+
+      let teleport = 0;
+      if (f.sampleCount <= 6 && f.pathLength > 140 && f.pathEfficiency > 0.97) teleport += 0.85;
+      if (num(f.maxVelocity) && f.maxVelocity > 8000 && num(f.velocityCV) && f.velocityCV < 0.15) {
+        teleport += 0.4;
+      }
+
+      return {
+        linearConstantMotion: clamp01(linearConstantMotion),
+        perfectEase: clamp01(perfectEase),
+        randomNoise,
+        overRegularTiming: clamp01(overRegularTiming),
+        teleport: clamp01(teleport)
+      };
+    }
+
+    // Mouse / pen (pen uses slightly softer perfect-ease via weights)
     const linearConstantMotion = clamp01(
       0.4 * upper(f.pathEfficiency, 0.965, 0.995) +
       0.35 * (num(f.velocityCV) ? upper(1 - Math.min(f.velocityCV, 1), 0.7, 0.95) : 0) +
@@ -348,7 +445,9 @@ export class HeuristicHumanCheckClassifier {
 
     let teleport = 0;
     if (f.sampleCount <= 6 && f.pathLength > 140 && f.pathEfficiency > 0.97) teleport += 0.85;
-    if (num(f.maxVelocity) && f.maxVelocity > 8000 && num(f.velocityCV) && f.velocityCV < 0.15) teleport += 0.4;
+    if (num(f.maxVelocity) && f.maxVelocity > 8000 && num(f.velocityCV) && f.velocityCV < 0.15) {
+      teleport += 0.4;
+    }
 
     const roboticCorners =
       num(f.directionChangeCount) &&
@@ -362,77 +461,172 @@ export class HeuristicHumanCheckClassifier {
       (f.microCorrectionCount == null || f.microCorrectionCount === 0);
     const piecewiseRobotic = roboticCorners ? 0.85 : 0;
 
+    const penEaseScale = mode === 'pen' ? 0.85 : 1;
+
     return {
-      linearConstantMotion: clamp01(linearConstantMotion + (nearPerfectLine && flatSpeed ? 0.15 : 0)),
-      perfectEase: clamp01(perfectEase + (nearPerfectLine && noCorrections && singleBallistic ? 0.2 : 0)),
+      linearConstantMotion: clamp01(
+        linearConstantMotion + (nearPerfectLine && flatSpeed ? 0.15 : 0)
+      ),
+      perfectEase: clamp01(
+        (perfectEase + (nearPerfectLine && noCorrections && singleBallistic ? 0.2 : 0)) * penEaseScale
+      ),
       randomNoise,
       overRegularTiming,
       teleport: clamp01(teleport + piecewiseRobotic)
     };
   }
 
-  #explain(f, featureScores, risks, humanLikeScore) {
-    const lines = [];
-    const riskEntries = Object.entries(risks).sort((a, b) => b[1] - a[1]);
-    if (humanLikeScore <= 0.45) {
-      riskEntries.slice(0, 3).forEach(([k, v]) => {
-        if (v < 0.35) return;
-        const map = {
-          linearConstantMotion: 'Near-linear path with unusually constant speed',
-          perfectEase: 'Smooth geometric path with little target-acquisition correction',
-          randomNoise: 'Noise pattern that looks added rather than motor-structured',
-          overRegularTiming: 'Unusually regular pointer-event timing',
-          teleport: 'Sparse samples covering a long distance'
-        };
-        lines.push(map[k] || k);
+  #explainDetailed(f, featureScores, weightedContributions, risks, humanLikeScore, profile) {
+    const featureLabels = {
+      velocityCV: 'speed variation',
+      normalizedPeakTime: 'accel/decel structure',
+      microCorrectionCount: 'micro-corrections',
+      lateMicroCorrectionCount: 'late corrections',
+      meanAxisDeviationNorm: 'axis deviation',
+      submovementCount: 'submovements',
+      pathEfficiency: 'path efficiency',
+      meanAbsDirectionChange: 'direction change',
+      sampleIntervalCV: 'timing regularity',
+      normalizedJerk: 'jerk profile'
+    };
+    const riskLabels = {
+      linearConstantMotion: 'straight constant motion',
+      perfectEase: 'perfect ease / no correction',
+      randomNoise: 'random noise pattern',
+      overRegularTiming: 'timing regularity',
+      teleport: 'teleport / sparse long path'
+    };
+
+    const scored = Object.entries(featureScores)
+      .filter(([, v]) => typeof v === 'number')
+      .map(([k, v]) => ({
+        key: k,
+        score: v,
+        weight: profile.featureWeights[k] || 0,
+        weighted: weightedContributions[k] || 0
+      }));
+
+    const topPositive = [...scored]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      .filter((x) => x.score >= 0.45)
+      .map((x) => `${featureLabels[x.key] || x.key} (${x.score.toFixed(2)})`);
+
+    const topNegative = [...scored]
+      .sort((a, b) => a.score - b.score)
+      .slice(0, 3)
+      .filter((x) => x.score < 0.45)
+      .map((x) => `${featureLabels[x.key] || x.key} (${x.score.toFixed(2)})`);
+
+    const uncertaintyDrivers = [];
+    Object.entries(risks)
+      .sort((a, b) => b[1] - a[1])
+      .forEach(([k, v]) => {
+        if (v >= 0.28) uncertaintyDrivers.push(riskLabels[k] || k);
       });
-      if (f.pathEfficiency > 0.98) lines.push('Extremely high path efficiency');
-      if ((f.microCorrectionCount == null || f.microCorrectionCount === 0) &&
-        (f.lateMicroCorrectionCount == null || f.lateMicroCorrectionCount === 0)) {
-        lines.push('No measurable micro-corrections near the target');
-      }
+    scored
+      .filter((x) => x.score < 0.35 && x.weight >= 0.08)
+      .slice(0, 3)
+      .forEach((x) => {
+        const label = featureLabels[x.key] || x.key;
+        if (!uncertaintyDrivers.includes(label)) uncertaintyDrivers.push(label);
+      });
+
+    const contributions = [];
+    if (humanLikeScore <= 0.45) {
+      uncertaintyDrivers.slice(0, 4).forEach((d) => contributions.push(d));
     } else {
-      Object.entries(featureScores)
-        .filter(([, v]) => typeof v === 'number')
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .forEach(([k, v]) => {
-          if (v < 0.45) return;
-          const map = {
-            velocityCV: 'Plausible speed variation across the movement',
-            normalizedPeakTime: 'Acceleration then deceleration structure',
-            microCorrectionCount: 'Small mid-path corrections',
-            lateMicroCorrectionCount: 'Late-stage target acquisition adjustments',
-            meanAxisDeviationNorm: 'Natural deviation from a perfect straight axis',
-            submovementCount: 'Multiple velocity submovements',
-            pathEfficiency: 'Path efficiency in a human-like range',
-            meanAbsDirectionChange: 'Moderate directional variability',
-            sampleIntervalCV: 'Irregular but plausible sample timing',
-            normalizedJerk: 'Jerk profile within a provisional human-like band'
-          };
-          lines.push(map[k] || k);
-        });
+      topPositive.slice(0, 3).forEach((p) => contributions.push(p));
     }
-    if (!lines.length) lines.push('Mixed signals — no single feature dominated.');
-    return lines.slice(0, 4);
+    if (!contributions.length) contributions.push('Mixed signals — no single feature dominated.');
+
+    return {
+      contributions: contributions.slice(0, 4),
+      topPositive,
+      topNegative,
+      uncertaintyDrivers: uncertaintyDrivers.slice(0, 5)
+    };
   }
 
-  #heuristicResult(state, payload, features) {
+  #heuristicResult(state, payload, features, profile) {
     return {
       state,
       modelType: 'heuristic',
+      classifierProfile: profile?.id || features.pointerType || 'mouse',
+      calibrationProvenance: profile?.provenance || this.config.provenance,
       humanLikeScore: payload.humanLikeScore,
       syntheticRisk: payload.syntheticRisk,
-      // Explicitly undefined — heuristic must not claim calibrated probability
       humanProbability: undefined,
       confidence: payload.confidence,
       contributions: payload.contributions,
       risks: payload.risks,
       featureScores: payload.featureScores,
+      weightedContributions: payload.weightedContributions || {},
+      diagnostics: payload.diagnostics || null,
       features,
       calibrationVersion: this.config.version
     };
   }
+}
+
+function normalizedGeometry(f) {
+  const dist = Math.max(f.startTargetDistance || 0, 1);
+  const boardW = f.boardWidth || f.containerWidth || 0;
+  const boardH = f.boardHeight || f.containerHeight || 0;
+  const diagonal = boardW > 0 && boardH > 0 ? Math.hypot(boardW, boardH) : dist * 2;
+  return {
+    normalizedPathLength: (f.pathLength || 0) / dist,
+    normalizedDisplacement: (f.displacement || 0) / dist,
+    pathOverDiagonal: diagonal > 0 ? (f.pathLength || 0) / diagonal : 0,
+    startTargetDistance: dist,
+    boardDiagonal: diagonal
+  };
+}
+
+function computeConfidence(features, norms, profile, humanLikeScore, validFeatureRatio) {
+  const minN = profile.minimum.sampleCount || 8;
+  const sampleQ = clamp01((features.sampleCount - minN) / 24);
+  const durQ = clamp01((features.movementTime - 80) / 520);
+  // Path coverage relative to start→target (device-size independent)
+  const coverage = clamp01((norms.normalizedPathLength - 0.7) / 0.55);
+  const richness = clamp01(
+    0.32 * clamp01(validFeatureRatio) +
+    0.24 * sampleQ +
+    0.22 * durQ +
+    0.22 * coverage
+  );
+  const decisiveness = Math.abs(humanLikeScore - 0.5) * 2;
+  return clamp01(0.28 + 0.4 * richness + 0.32 * decisiveness);
+}
+
+function baseDiagnostics(profile, features, norms, weightedContributions, risks, drivers) {
+  return {
+    classifierProfile: profile.id,
+    calibration: 'provisional',
+    provenance: profile.provenance,
+    pointerType: features.pointerType,
+    sampleCount: features.sampleCount,
+    movementTime: features.movementTime,
+    pathLength: features.pathLength,
+    displacement: features.displacement,
+    startTargetDistance: features.startTargetDistance,
+    normalizedPathLength: norms.normalizedPathLength,
+    normalizedDisplacement: norms.normalizedDisplacement,
+    pathEfficiency: features.pathEfficiency,
+    velocityCV: features.velocityCV,
+    normalizedPeakTime: features.normalizedPeakTime,
+    sampleIntervalCV: features.sampleIntervalCV,
+    timingEntropy: features.timingEntropy,
+    meanAbsDirectionChange: features.meanAbsDirectionChange,
+    microCorrectionCount: features.microCorrectionCount,
+    lateMicroCorrectionCount: features.lateMicroCorrectionCount,
+    meanAxisDeviationNorm: features.meanAxisDeviationNorm,
+    submovementCount: features.submovementCount,
+    normalizedJerk: features.normalizedJerk,
+    risks: { ...risks },
+    weightedContributions: { ...weightedContributions },
+    uncertaintyDrivers: drivers || []
+  };
 }
 
 function num(v) {
@@ -455,10 +649,6 @@ function gaussianNear(x, mu, sigma) {
  * modelType: "trained_logistic"
  */
 export class LogisticRegressionClassifier {
-  /**
-   * @param {{bias:number, weights:Record<string, number>}} model
-   * Coefficients must come from a real training run — do not invent them.
-   */
   constructor(model) {
     this.model = model;
     if (!model || !model.weights) {

@@ -26,9 +26,13 @@ export function saveResearchSample(entry, { includeRaw = false, rawTrajectory = 
     label: entry.label || 'human',
     classification: entry.classification || null,
     modelType: entry.modelType || null,
+    classifierProfile: entry.classifierProfile || null,
     humanLikeScore: entry.humanLikeScore ?? null,
     syntheticRisk: entry.syntheticRisk ?? null,
-    confidence: entry.confidence ?? null
+    confidence: entry.confidence ?? null,
+    featureScores: entry.featureScores || null,
+    risks: entry.risks || null,
+    diagnostics: entry.diagnostics || null
   };
   store.samples.push(sample);
   localStorage.setItem(KEY, JSON.stringify(store));

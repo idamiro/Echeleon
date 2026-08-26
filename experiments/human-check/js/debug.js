@@ -7,6 +7,9 @@ export function renderDebugPanel(root, payload) {
   if (!root) return;
   const { result, series, geometryMeta, battery } = payload;
   const f = result.features;
+  const d = result.diagnostics || {};
+  const profile = result.classifierProfile || f.pointerType || 'mouse';
+
   const scoreLine = result.state === 'accessible_completion'
     ? [
       `state: ${result.state}`,
@@ -23,6 +26,8 @@ export function renderDebugPanel(root, payload) {
       ...(result.contributions || []).map((c) => `• ${c}`)
     ]
     : [
+      `Classifier profile: ${profile}`,
+      `Calibration: provisional`,
       `state: ${result.state}`,
       `modelType: ${result.modelType || 'heuristic'}`,
       `humanLikeScore: ${fmtNum(result.humanLikeScore)}`,
@@ -32,16 +37,66 @@ export function renderDebugPanel(root, payload) {
       '',
       'Note: humanLikeScore is NOT a calibrated probability.',
       '',
+      'Top positive signals:',
+      ...((d.topPositive && d.topPositive.length) ? d.topPositive.map((x) => `• ${x}`) : ['• —']),
+      '',
+      'Top negative signals:',
+      ...((d.topNegative && d.topNegative.length) ? d.topNegative.map((x) => `• ${x}`) : ['• —']),
+      '',
+      ...(f.pointerType === 'touch' && (d.uncertaintyDrivers || []).length
+        ? [
+          'Touch uncertainty drivers:',
+          ...d.uncertaintyDrivers.map((x) => `• ${x}`),
+          ''
+        ]
+        : []),
       'contributions:',
       ...(result.contributions || []).map((c) => `• ${c}`)
     ];
 
   root.innerHTML = `
-    <p class="hc-debug-title">Debug · ${result.calibrationVersion || 'heuristic'}</p>
+    <p class="hc-debug-title">Debug · ${result.calibrationVersion || 'heuristic'} · profile=${escapeText(profile)}</p>
     <div class="hc-debug-grid">
       <section>
         <h3>Classification</h3>
         <pre>${escapeText(scoreLine.join('\n'))}</pre>
+      </section>
+      <section>
+        <h3>Touch / modality snapshot</h3>
+        <pre>${escapeText(fmt({
+          pointerType: f.pointerType,
+          state: result.state,
+          humanLikeScore: fmtNum(result.humanLikeScore),
+          syntheticRisk: fmtNum(result.syntheticRisk),
+          confidence: fmtNum(result.confidence),
+          sampleCount: f.sampleCount,
+          movementTime: rnd(f.movementTime),
+          pathLength: rnd(f.pathLength),
+          displacement: rnd(f.displacement),
+          startTargetDistance: rnd(f.startTargetDistance),
+          normalizedPathLength: fmtNum(d.normalizedPathLength, 3),
+          normalizedDisplacement: fmtNum(d.normalizedDisplacement, 3),
+          pathEfficiency: fmtNum(f.pathEfficiency, 3),
+          velocityCV: fmtNum(f.velocityCV, 3),
+          normalizedPeakTime: fmtNum(f.normalizedPeakTime, 3),
+          sampleIntervalCV: fmtNum(f.sampleIntervalCV, 3),
+          timingEntropy: fmtNum(f.timingEntropy, 3),
+          meanAbsDirectionChange: fmtNum(f.meanAbsDirectionChange, 3),
+          microCorrectionCount: nullish(f.microCorrectionCount),
+          lateMicroCorrectionCount: nullish(f.lateMicroCorrectionCount),
+          meanAxisDeviationNorm: fmtNum(f.meanAxisDeviationNorm, 4),
+          submovementCount: nullish(f.submovementCount),
+          normalizedJerk: f.normalizedJerk == null ? 'null' : Number(f.normalizedJerk).toExponential(2)
+        }))}</pre>
+      </section>
+      <section>
+        <h3>Weighted feature contributions</h3>
+        <pre>${escapeText(fmt(Object.fromEntries(
+          Object.entries(result.weightedContributions || {}).map(([k, v]) => [
+            k,
+            v == null ? 'null' : Number(v).toFixed(4)
+          ])
+        )))}</pre>
       </section>
       <section>
         <h3>Feature validity</h3>
