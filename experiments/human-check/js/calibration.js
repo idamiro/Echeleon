@@ -1,15 +1,20 @@
 /**
  * PROVISIONAL calibration constants for Human Check.
- * Replace with empirical dataset calibration (median/MAD or trained coefficients).
+ * NOT EMPIRICALLY CALIBRATED.
+ *
+ * Gaussian plausibility centers (μ, σ) below are PLACEHOLDERS.
+ * They must later be replaced by real human distribution estimates
+ * (e.g. median/MAD from a labelled corpus) or by trained model coefficients.
+ * Do not treat these numbers as academically validated.
  *
  * Units assume board-local pixels and milliseconds unless noted.
  */
 
 export const calibration = {
-  version: '2026-08-26-heuristic-v1',
-  provenance: 'PROVISIONAL — not trained on a labelled human/synthetic corpus',
+  version: '2026-08-26-heuristic-v2',
+  provenance: 'PROVISIONAL — NOT EMPIRICALLY CALIBRATED — placeholder Gaussians only',
 
-  /** Minimum data quality before classification is attempted */
+  /** Minimum data quality before full behavioral classification is attempted */
   minimum: {
     sampleCount: 8,
     pathLengthPx: 48,
@@ -18,8 +23,9 @@ export const calibration = {
   },
 
   /**
-   * Classifier thresholds on humanProbability (0..1)
+   * Classifier thresholds on heuristic humanLikeScore (0..1) — NOT probability.
    * Outside the band → uncertain
+   * PROVISIONAL — NOT EMPIRICALLY CALIBRATED
    */
   thresholds: {
     humanLike: 0.58,
@@ -27,7 +33,7 @@ export const calibration = {
   },
 
   mouse: {
-    // Plausibility centers (μ) and scales (σ) for soft Gaussian-like scores
+    // PROVISIONAL placeholder μ/σ — NOT EMPIRICALLY CALIBRATED
     pathEfficiency: { mu: 0.86, sigma: 0.11 },
     velocityCV: { mu: 0.55, sigma: 0.28 },
     normalizedPeakTime: { mu: 0.42, sigma: 0.18 },
@@ -40,6 +46,7 @@ export const calibration = {
     normalizedJerkLog: { mu: 2.5, sigma: 1.8 }
   },
 
+  // PROVISIONAL placeholder μ/σ — NOT EMPIRICALLY CALIBRATED
   touch: {
     pathEfficiency: { mu: 0.88, sigma: 0.12 },
     velocityCV: { mu: 0.42, sigma: 0.26 },
@@ -53,6 +60,7 @@ export const calibration = {
     normalizedJerkLog: { mu: 2.2, sigma: 1.8 }
   },
 
+  // PROVISIONAL placeholder μ/σ — NOT EMPIRICALLY CALIBRATED
   pen: {
     pathEfficiency: { mu: 0.87, sigma: 0.11 },
     velocityCV: { mu: 0.5, sigma: 0.26 },
@@ -66,8 +74,8 @@ export const calibration = {
     normalizedJerkLog: { mu: 2.4, sigma: 1.8 }
   },
 
-  /** Interaction-risk weights (combination penalties) — PROVISIONAL */
-    interactionWeights: {
+  /** Interaction-risk weights — PROVISIONAL — NOT EMPIRICALLY CALIBRATED */
+  interactionWeights: {
       linearConstantMotion: 0.32,
       perfectEase: 0.28,
       randomNoise: 0.24,

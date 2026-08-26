@@ -251,15 +251,31 @@ export function computeKinematics(samples) {
 /**
  * Minimum-jerk reference deviation on normalized progress.
  * s(τ) = 10τ³ − 15τ⁴ + 6τ⁵
+ *
+ * τ MUST use actual timestamps, not sample index.
+ *
+ * @param {number[]} progressSamples normalized target progress per sample
+ * @param {Array<{t:number}>} samples same-length samples with timestamps
  */
-export function minimumJerkDeviation(progressSamples) {
-  if (!progressSamples.length) return 1;
+export function minimumJerkDeviation(progressSamples, samples) {
+  if (!progressSamples?.length) return null;
+  if (!samples?.length || samples.length !== progressSamples.length) {
+    // Refuse index-based fallback — callers must pass timestamps
+    return null;
+  }
+  const t0 = samples[0].t;
+  const t1 = samples[samples.length - 1].t;
+  const dur = t1 - t0;
+  if (!(dur > 0)) return null;
+
   let err = 0;
+  let n = 0;
   for (let i = 0; i < progressSamples.length; i += 1) {
-    const τ = clamp(i / Math.max(progressSamples.length - 1, 1), 0, 1);
+    const τ = clamp((samples[i].t - t0) / dur, 0, 1);
     const ideal = 10 * τ ** 3 - 15 * τ ** 4 + 6 * τ ** 5;
     const actual = clamp(progressSamples[i], -0.2, 1.4);
     err += (actual - ideal) ** 2;
+    n += 1;
   }
-  return Math.sqrt(err / progressSamples.length);
+  return n ? Math.sqrt(err / n) : null;
 }

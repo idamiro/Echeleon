@@ -2,7 +2,17 @@
  * Human Check — main interaction boot.
  *
  * Pipeline:
- *   Raw trajectory → preprocess → geometry/kinematics/corrections → features → classifier → result
+ *   Pointer events
+ *   → circle-center userTrajectory (board-local)
+ *   → preprocessing
+ *   → optional ~100 Hz resampled analysis representation
+ *   → geometry / kinematics / corrections / neuromotor proxies
+ *   → feature validity
+ *   → heuristic likelihood model
+ *   → state
+ *
+ * Behavioral observation ends at pointerup / keyboard confirm.
+ * Inertia and target-snap animation are presentation-only (never sampled).
  *
  * Local-only research prototype. Not production bot detection.
  */
@@ -73,7 +83,12 @@ function boot() {
   let keyboardActive = false;
   let challengeShownAt = 0;
   let firstInteractAt = 0;
+  /** Live buffer while observationOpen; frozen into userTrajectory at end of user control */
   let samples = [];
+  /** Frozen circle-center trajectory used for analysis (excludes snap/inertia) */
+  let userTrajectory = [];
+  /** True only while the user controls the disc (pointer drag or keyboard move) */
+  let observationOpen = false;
   let lastExtraction = null;
   let lastResult = null;
   let settled = false;
@@ -98,7 +113,8 @@ function boot() {
       recLine.hidden = false;
       if (name === 'result' && lastResult) {
         const short =
-          lastResult.state === 'human_like' ? 'Human enough. One signal — not proof.'
+          lastResult.state === 'human_like' || lastResult.state === 'accessible_completion'
+            ? 'Human enough. One signal — not proof.'
             : lastResult.state === 'synthetic_like' ? 'Movement looks synthetic.'
               : lastResult.state === 'uncertain' ? 'Not enough confidence.'
                 : 'Not enough movement data.';
@@ -159,6 +175,8 @@ function boot() {
     keyboardActive = false;
     firstInteractAt = 0;
     samples = [];
+    userTrajectory = [];
+    observationOpen = false;
     lastExtraction = null;
     lastResult = null;
     inputMethod = null;
@@ -182,20 +200,33 @@ function boot() {
     if (!firstInteractAt) firstInteractAt = performance.now();
   };
 
-  const pushSample = (clientX, clientY, t = performance.now(), extra = {}) => {
-    const br = boardRect();
+  /**
+   * Record board-local disc center after setDiscPosition.
+   * Pointer client coords are never the behavioral trajectory.
+   * No-op when observation is closed (snap / inertia / settled).
+   */
+  const recordDiscCenterSample = (t = performance.now(), extra = {}) => {
+    if (!observationOpen || settled) return;
+    const c = discCenter();
     samples.push({
-      x: clientX - br.left,
-      y: clientY - br.top,
+      x: c.x,
+      y: c.y,
       t,
       ...extra
     });
   };
 
+  /** pointerup / keyboard confirm = end of behavioral observation */
+  const closeObservation = () => {
+    observationOpen = false;
+    userTrajectory = samples.map((s) => ({ ...s }));
+  };
+
   const analyzeAndClassify = () => {
     const br = boardRect();
+    const trajectory = userTrajectory.length ? userTrajectory : samples.slice();
     const extracted = extractFeatures({
-      samples,
+      samples: trajectory,
       container: { width: br.width, height: br.height },
       targetCenter: targetCenterLocal(),
       targetRadius: targetSize / 2,
@@ -218,11 +249,15 @@ function boot() {
     lastExtraction = extracted;
     const copy = copyForResult(result);
     const stateKey = result.state;
-    resultRoot?.setAttribute('data-hc-result', stateKey === 'human_like' ? 'natural'
-      : stateKey === 'synthetic_like' ? 'suspicious'
-        : stateKey === 'uncertain' ? 'uncertain'
-          : 'insufficient');
-    if (iconEl) iconEl.innerHTML = ICONS[stateKey] || ICONS.human_like;
+    resultRoot?.setAttribute('data-hc-result',
+      stateKey === 'human_like' || stateKey === 'accessible_completion' ? 'natural'
+        : stateKey === 'synthetic_like' ? 'suspicious'
+          : stateKey === 'uncertain' ? 'uncertain'
+            : 'insufficient');
+    if (iconEl) {
+      iconEl.innerHTML = ICONS[stateKey]
+        || (stateKey === 'accessible_completion' ? ICONS.human_like : ICONS.insufficient_signal);
+    }
     if (resultTitleEl) resultTitleEl.textContent = copy.title;
     noteEl.textContent = copy.note;
     if (evidenceEl) {
@@ -266,8 +301,12 @@ function boot() {
           width: result.features.fittsWidth
         },
         features: result.features,
-        label: 'human',
-        classification: result.state
+        label: inputMethod === 'keyboard' ? 'accessible' : 'human',
+        classification: result.state,
+        modelType: result.modelType,
+        humanLikeScore: result.humanLikeScore,
+        syntheticRisk: result.syntheticRisk,
+        confidence: result.confidence
       }, {
         includeRaw: researchRaw,
         rawTrajectory: extracted?.rawTrajectory || null
@@ -278,8 +317,8 @@ function boot() {
   };
 
   const drawTrail = () => {
-    if (!trailCanvas || !samples.length) return;
-    const pts = lastExtraction?.analysisTrajectory || samples;
+    const pts = lastExtraction?.analysisTrajectory || userTrajectory;
+    if (!trailCanvas || !pts.length) return;
     const ctx = trailCanvas.getContext('2d');
     const w = trailCanvas.width;
     const h = trailCanvas.height;
@@ -316,6 +355,11 @@ function boot() {
     if (!revealBtn.hidden) drawTrail();
   };
 
+  /**
+   * Target snap is UI presentation only.
+   * Behavioral observation must already be closed (closeObservation).
+   * Snap easing must never append samples to userTrajectory.
+   */
   const trySettle = () => {
     if (!updateTargetProximity()) return false;
     const goal = targetCenterLocal();
@@ -332,6 +376,7 @@ function boot() {
     const step = (now) => {
       const t = clamp((now - from) / duration, 0, 1);
       const e = 1 - (1 - t) ** 3;
+      // Visual only — observationOpen is false; recordDiscCenterSample is a no-op
       setDiscPosition(start.x + (offsetX - start.x) * e, start.y + (offsetY - start.y) * e, 1);
       if (t < 1) requestAnimationFrame(step);
       else complete();
@@ -358,14 +403,15 @@ function boot() {
       vx: 0,
       vy: 0
     };
-    pushSample(event.clientX, event.clientY, performance.now(), {
+    observationOpen = true;
+    setDiscPosition(pos.x, pos.y, 1.06);
+    recordDiscCenterSample(performance.now(), {
       pointerType: type,
       pressure: event.pressure,
       width: event.width,
       height: event.height,
       buttons: event.buttons
     });
-    setDiscPosition(pos.x, pos.y, 1.06);
     document.documentElement.style.overflow = 'hidden';
     event.preventDefault();
   };
@@ -381,7 +427,7 @@ function boot() {
     drag.vy = (event.clientY - drag.last.y) / dt;
     drag.last = { x: event.clientX, y: event.clientY, t: now };
     setDiscPosition(nextX, nextY, 1.06);
-    pushSample(event.clientX, event.clientY, now, {
+    recordDiscCenterSample(now, {
       pointerType: event.pointerType,
       pressure: event.pressure,
       width: event.width,
@@ -397,6 +443,8 @@ function boot() {
     const releaseVx = drag.vx;
     const releaseVy = drag.vy;
     drag = null;
+    // End of user-controlled movement — freeze trajectory before any UI animation
+    closeObservation();
     disc.classList.remove('is-dragging');
     disc.setAttribute('aria-grabbed', 'false');
     document.documentElement.style.overflow = '';
@@ -406,6 +454,7 @@ function boot() {
       updateTargetProximity();
       return;
     }
+    // Inertia is visual presentation only (observation already closed)
     let vx = releaseVx * 14;
     let vy = releaseVy * 14;
     const tick = () => {
@@ -431,26 +480,29 @@ function boot() {
     const isArrow = event.key.startsWith('Arrow');
     if (isArrow && !keyboardActive) {
       keyboardActive = true;
+      observationOpen = true;
       disc.classList.add('is-keyboard-active');
       disc.setAttribute('aria-grabbed', 'true');
       setDiscPosition(pos.x, pos.y, 1.05);
       hintEl.textContent = 'Arrow keys to move. Enter to place.';
-      pushSample(boardRect().left + discCenter().x, boardRect().top + discCenter().y);
+      recordDiscCenterSample();
     }
     if (event.key === ' ' || event.key === 'Enter') {
       event.preventDefault();
       if (!keyboardActive) {
         keyboardActive = true;
+        observationOpen = true;
         disc.classList.add('is-keyboard-active');
         disc.setAttribute('aria-grabbed', 'true');
         setDiscPosition(pos.x, pos.y, 1.05);
         hintEl.textContent = 'Arrow keys to move. Enter to place.';
-        pushSample(boardRect().left + discCenter().x, boardRect().top + discCenter().y);
+        recordDiscCenterSample();
       } else {
         keyboardActive = false;
         disc.classList.remove('is-keyboard-active');
         disc.setAttribute('aria-grabbed', 'false');
-        pushSample(boardRect().left + discCenter().x, boardRect().top + discCenter().y);
+        recordDiscCenterSample();
+        closeObservation();
         if (!trySettle()) {
           setDiscPosition(pos.x, pos.y, 1);
           hintEl.textContent = 'Move closer to the ring, then press Enter.';
@@ -461,6 +513,7 @@ function boot() {
     if (event.key === 'Escape') {
       event.preventDefault();
       keyboardActive = false;
+      closeObservation();
       disc.classList.remove('is-keyboard-active');
       disc.setAttribute('aria-grabbed', 'false');
       setDiscPosition(pos.x, pos.y, 1);
@@ -474,7 +527,7 @@ function boot() {
     if (event.key === 'ArrowLeft') x -= step;
     if (event.key === 'ArrowRight') x += step;
     setDiscPosition(x, y, 1.05);
-    pushSample(boardRect().left + discCenter().x, boardRect().top + discCenter().y);
+    recordDiscCenterSample();
     updateTargetProximity();
   };
 
@@ -549,7 +602,7 @@ function boot() {
           label: 'Human replay (local)',
           expect: 'human_like (limitation)',
           state: result.state,
-          humanProbability: result.humanProbability,
+          humanLikeScore: result.humanLikeScore,
           syntheticRisk: result.syntheticRisk,
           confidence: result.confidence
         });
@@ -559,7 +612,7 @@ function boot() {
       console.table(rows.map((r) => ({
         id: r.id,
         state: r.state,
-        P_human: r.humanProbability,
+        humanLike: r.humanLikeScore,
         risk: r.syntheticRisk
       })));
     });

@@ -197,6 +197,57 @@ export function generatePiecewiseRobotic(start, end, opts = {}) {
   return pack(pts);
 }
 
+/** 3-point near-straight teleport across a long distance */
+export function generateSparseTeleport(start, end, opts = {}) {
+  const t0 = opts.t0 || 1000;
+  const mid = {
+    x: lerp(start.x, end.x, 0.5),
+    y: lerp(start.y, end.y, 0.5)
+  };
+  return pack([
+    { x: start.x, y: start.y, t: t0 },
+    { x: mid.x, y: mid.y, t: t0 + (opts.dt || 40) },
+    { x: end.x, y: end.y, t: t0 + 2 * (opts.dt || 40) }
+  ]);
+}
+
+/**
+ * Hand-crafted human-like-ish sample: irregular timing, mild path bow,
+ * late slowdown. Not a claim of biometric realism — battery contrast only.
+ */
+export function generateHumanLikeSample(start, end, opts = {}) {
+  const t0 = opts.t0 || 1000;
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const px = -dy / len;
+  const py = dx / len;
+  const knots = [
+    { u: 0, lat: 0, dt: 0 },
+    { u: 0.08, lat: 2, dt: 28 },
+    { u: 0.18, lat: 9, dt: 14 },
+    { u: 0.32, lat: 14, dt: 11 },
+    { u: 0.45, lat: 11, dt: 9 },
+    { u: 0.58, lat: 6, dt: 10 },
+    { u: 0.7, lat: 3, dt: 12 },
+    { u: 0.82, lat: -2, dt: 16 },
+    { u: 0.9, lat: -1, dt: 22 },
+    { u: 0.96, lat: 0.5, dt: 28 },
+    { u: 1, lat: 0, dt: 34 }
+  ];
+  let t = t0;
+  const pts = knots.map((k, i) => {
+    if (i > 0) t += k.dt;
+    const s = 10 * k.u ** 3 - 15 * k.u ** 4 + 6 * k.u ** 5;
+    return {
+      x: lerp(start.x, end.x, s) + px * k.lat,
+      y: lerp(start.y, end.y, s) + py * k.lat,
+      t
+    };
+  });
+  return pack(pts);
+}
+
 export function replayTrajectory(samples, opts = {}) {
   const scaleDt = opts.scaleDt || 1;
   if (!samples?.length) return pack([]);
@@ -217,7 +268,9 @@ export const SYNTHETIC_FAMILIES = [
   { id: 'random_jitter', label: 'Random jitter', fn: generateRandomJitter, expect: 'uncertain|synthetic_like' },
   { id: 'sinusoidal', label: 'Sinusoidal', fn: generateSinusoidal, expect: 'uncertain|synthetic_like' },
   { id: 'overshoot_script', label: 'Overshoot script', fn: generateOvershootScript, expect: 'uncertain|synthetic_like|human_like' },
-  { id: 'piecewise_robotic', label: 'Piecewise robotic', fn: generatePiecewiseRobotic, expect: 'synthetic_like' }
+  { id: 'piecewise_robotic', label: 'Piecewise robotic', fn: generatePiecewiseRobotic, expect: 'synthetic_like' },
+  { id: 'sparse_teleport', label: 'Sparse teleport', fn: generateSparseTeleport, expect: 'synthetic_like' },
+  { id: 'human_like_sample', label: 'Human-like sample', fn: generateHumanLikeSample, expect: 'human_like|uncertain' }
 ];
 
 /**
@@ -241,7 +294,8 @@ export function runSyntheticBattery({ start, end, extract, classify, container, 
       label: fam.label,
       expect: fam.expect,
       state: result.state,
-      humanProbability: result.humanProbability,
+      modelType: result.modelType,
+      humanLikeScore: result.humanLikeScore,
       syntheticRisk: result.syntheticRisk,
       confidence: result.confidence,
       contributions: result.contributions,

@@ -24,7 +24,11 @@ export function saveResearchSample(entry, { includeRaw = false, rawTrajectory = 
     geometry: entry.geometry || null,
     features: entry.features,
     label: entry.label || 'human',
-    classification: entry.classification || null
+    classification: entry.classification || null,
+    modelType: entry.modelType || null,
+    humanLikeScore: entry.humanLikeScore ?? null,
+    syntheticRisk: entry.syntheticRisk ?? null,
+    confidence: entry.confidence ?? null
   };
   store.samples.push(sample);
   localStorage.setItem(KEY, JSON.stringify(store));

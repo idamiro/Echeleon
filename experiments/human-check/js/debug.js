@@ -1,28 +1,51 @@
 /**
  * Debug panel rendering — feature groups, path viz, velocity graph, synthetic battery.
+ * Heuristic scores are humanLikeScore / syntheticRisk — never "P(human)".
  */
 
 export function renderDebugPanel(root, payload) {
   if (!root) return;
   const { result, series, geometryMeta, battery } = payload;
   const f = result.features;
-  const pct = (v) => `${Math.round((v || 0) * 100)}%`;
+  const scoreLine = result.state === 'accessible_completion'
+    ? [
+      `state: ${result.state}`,
+      `modelType: ${result.modelType || 'heuristic'}`,
+      'humanLikeScore: null (keyboard bypass)',
+      'syntheticRisk: null',
+      `confidence: ${fmtNum(result.confidence)}`,
+      `pointerType: ${f.pointerType}`,
+      '',
+      'Accessible keyboard completion.',
+      'Pointer trajectory classifier not applied.',
+      '',
+      'contributions:',
+      ...(result.contributions || []).map((c) => `• ${c}`)
+    ]
+    : [
+      `state: ${result.state}`,
+      `modelType: ${result.modelType || 'heuristic'}`,
+      `humanLikeScore: ${fmtNum(result.humanLikeScore)}`,
+      `syntheticRisk: ${fmtNum(result.syntheticRisk)}`,
+      `confidence: ${fmtNum(result.confidence)}`,
+      `pointerType: ${f.pointerType}`,
+      '',
+      'Note: humanLikeScore is NOT a calibrated probability.',
+      '',
+      'contributions:',
+      ...(result.contributions || []).map((c) => `• ${c}`)
+    ];
 
   root.innerHTML = `
     <p class="hc-debug-title">Debug · ${result.calibrationVersion || 'heuristic'}</p>
     <div class="hc-debug-grid">
       <section>
         <h3>Classification</h3>
-        <pre>${escapeText([
-          `state: ${result.state}`,
-          `humanProbability: ${result.humanProbability.toFixed(3)}`,
-          `syntheticRisk: ${result.syntheticRisk.toFixed(3)}`,
-          `confidence: ${result.confidence.toFixed(3)}`,
-          `pointerType: ${f.pointerType}`,
-          '',
-          'contributions:',
-          ...(result.contributions || []).map((c) => `• ${c}`)
-        ].join('\n'))}</pre>
+        <pre>${escapeText(scoreLine.join('\n'))}</pre>
+      </section>
+      <section>
+        <h3>Feature validity</h3>
+        <pre>${escapeText(fmt(f.featureValidity || {}))}</pre>
       </section>
       <section>
         <h3>Geometry</h3>
@@ -30,23 +53,25 @@ export function renderDebugPanel(root, payload) {
           distance: rnd(f.startTargetDistance),
           pathLength: rnd(f.pathLength),
           displacement: rnd(f.displacement),
-          pathEfficiency: f.pathEfficiency.toFixed(3),
-          pathDeviationRatio: f.pathDeviationRatio.toFixed(3),
-          meanAxisDeviationNorm: f.meanAxisDeviationNorm.toFixed(4),
-          maxAxisDeviationNorm: f.maxAxisDeviationNorm.toFixed(4),
-          fittsID: f.fittsID.toFixed(3),
+          pathEfficiency: fmtNum(f.pathEfficiency, 3),
+          pathDeviationRatio: fmtNum(f.pathDeviationRatio, 3),
+          meanAxisDeviationNorm: fmtNum(f.meanAxisDeviationNorm, 4),
+          maxAxisDeviationNorm: fmtNum(f.maxAxisDeviationNorm, 4),
+          fittsID: fmtNum(f.fittsID, 3),
           fittsWidth: rnd(f.fittsWidth)
         }))}</pre>
       </section>
       <section>
-        <h3>Timing</h3>
+        <h3>Timing (raw event intervals)</h3>
         <pre>${escapeText(fmt({
           movementTimeMs: rnd(f.movementTime),
           reactionMs: rnd(f.reactionMs),
           sampleCount: f.sampleCount,
-          dtMean: f.dtMean.toFixed(2),
-          sampleIntervalCV: f.sampleIntervalCV.toFixed(3),
-          timingEntropy: f.timingEntropy.toFixed(3)
+          resampledSampleCount: f.resampledSampleCount,
+          dtMean: fmtNum(f.dtMean, 2),
+          dtStd: fmtNum(f.dtStd, 2),
+          sampleIntervalCV: fmtNum(f.sampleIntervalCV, 3),
+          timingEntropy: fmtNum(f.timingEntropy, 3)
         }))}</pre>
       </section>
       <section>
@@ -54,34 +79,34 @@ export function renderDebugPanel(root, payload) {
         <pre>${escapeText(fmt({
           meanVelocity: rnd(f.meanVelocity),
           maxVelocity: rnd(f.maxVelocity),
-          velocityCV: f.velocityCV.toFixed(3),
-          normalizedPeakTime: f.normalizedPeakTime.toFixed(3),
+          velocityCV: fmtNum(f.velocityCV, 3),
+          normalizedPeakTime: fmtNum(f.normalizedPeakTime, 3),
           accelerationStd: rnd(f.accelerationStd),
           meanAbsoluteJerk: rnd(f.meanAbsoluteJerk),
-          normalizedJerk: f.normalizedJerk.toExponential(2)
+          normalizedJerk: f.normalizedJerk == null ? 'null' : Number(f.normalizedJerk).toExponential(2)
         }))}</pre>
       </section>
       <section>
         <h3>Direction</h3>
         <pre>${escapeText(fmt({
-          meanAbsDirectionChange: f.meanAbsDirectionChange.toFixed(3),
-          directionChangeCount: f.directionChangeCount,
-          directionEntropy: f.directionEntropy.toFixed(3),
-          meanCurvature: f.meanCurvature.toFixed(4),
-          curvatureEntropy: f.curvatureEntropy.toFixed(3)
+          meanAbsDirectionChange: fmtNum(f.meanAbsDirectionChange, 3),
+          directionChangeCount: nullish(f.directionChangeCount),
+          directionEntropy: fmtNum(f.directionEntropy, 3),
+          meanCurvature: fmtNum(f.meanCurvature, 4),
+          curvatureEntropy: fmtNum(f.curvatureEntropy, 3)
         }))}</pre>
       </section>
       <section>
         <h3>Corrections</h3>
         <pre>${escapeText(fmt({
-          microCorrectionCount: f.microCorrectionCount,
-          lateMicroCorrectionCount: f.lateMicroCorrectionCount,
-          backwardProgressCount: f.backwardProgressCount,
-          overshootCount: f.overshootCount,
+          microCorrectionCount: nullish(f.microCorrectionCount),
+          lateMicroCorrectionCount: nullish(f.lateMicroCorrectionCount),
+          backwardProgressCount: nullish(f.backwardProgressCount),
+          overshootCount: nullish(f.overshootCount),
           overshootDistance: rnd(f.overshootDistance),
-          submovementCount: f.submovementCount,
-          lateSubmovementCount: f.lateSubmovementCount,
-          minimumJerkDeviation: f.minimumJerkDeviation.toFixed(3)
+          submovementCount: nullish(f.submovementCount),
+          lateSubmovementCount: nullish(f.lateSubmovementCount),
+          minimumJerkDeviation: fmtNum(f.minimumJerkDeviation, 3)
         }))}</pre>
       </section>
       <section>
@@ -118,7 +143,17 @@ function fmt(obj) {
 }
 
 function rnd(v) {
+  if (v == null || !Number.isFinite(v)) return 'null';
   return Math.round(v * 100) / 100;
+}
+
+function fmtNum(v, digits = 3) {
+  if (v == null || !Number.isFinite(v)) return 'null';
+  return Number(v).toFixed(digits);
+}
+
+function nullish(v) {
+  return v == null ? 'null' : v;
 }
 
 function escapeText(s) {
@@ -137,16 +172,11 @@ function drawPath(canvas, series, geometryMeta) {
   ctx.fillStyle = '#f7f4ed';
   ctx.fillRect(0, 0, w, h);
 
-  const samples = series?.progress
-    ? null
-    : null;
-  // analysis samples passed via geometryMeta.linkedSamples optionally
   const pts = geometryMeta.samples || [];
   const container = geometryMeta.container || { width: 1, height: 1 };
   const sx = (x) => (x / container.width) * w;
   const sy = (y) => (y / container.height) * h;
 
-  // Ideal axis
   const start = geometryMeta.start;
   const target = geometryMeta.targetCenter;
   if (start && target) {
@@ -199,12 +229,17 @@ function drawVelocity(canvas, velocities) {
   ctx.stroke();
   ctx.fillStyle = 'rgba(23,23,21,0.55)';
   ctx.font = '10px ui-monospace, monospace';
-  ctx.fillText('velocity / normalized time', 8, 12);
+  ctx.fillText('velocity / sample index', 8, 12);
 }
 
 export function formatBatteryReport(rows) {
   return rows.map((r) => {
-    const risk = r.syntheticRisk >= 0.62 ? 'HIGH' : r.syntheticRisk >= 0.4 ? 'MEDIUM' : 'LOW';
-    return `${r.label}\n  state: ${r.state} · synthetic risk: ${risk} (${r.syntheticRisk.toFixed(2)}) · P(human)=${r.humanProbability.toFixed(2)}\n  expect: ${r.expect}`;
-  }).join('\n\n') + '\n\nNote: a replayed genuine human trajectory may still look human-like — trajectory-only detection cannot stop exact replay.';
+    const riskVal = r.syntheticRisk;
+    const riskLabel = riskVal == null
+      ? 'n/a'
+      : riskVal >= 0.62 ? 'HIGH' : riskVal >= 0.4 ? 'MEDIUM' : 'LOW';
+    const score = r.humanLikeScore == null ? 'null' : Number(r.humanLikeScore).toFixed(2);
+    const risk = riskVal == null ? 'null' : `${riskLabel} (${Number(riskVal).toFixed(2)})`;
+    return `${r.label}\n  state: ${r.state} · syntheticRisk: ${risk} · humanLikeScore=${score}\n  expect: ${r.expect}`;
+  }).join('\n\n') + '\n\nNote: heuristic humanLikeScore is not a calibrated probability. Replayed genuine trajectories may still look human-like.';
 }
