@@ -224,7 +224,7 @@ function drawLayer(c, l, s = 1) {
 /** Project photo in mesh-local space onto UV canvas so it sticks to the leather. */
 function stampProjectedImage(ctx, layer) {
   const img = layer.image;
-  const mesh = zoneMeshes[layer.surfaceZone || ZONE.BACK];
+  const mesh = meshForLayer(layer);
   const p = layer.proj;
   if (!img || !mesh?.geometry || !p) return;
 
@@ -344,7 +344,7 @@ function refreshProjectionOrigin(layer, originOut, right, up) {
     if (originOut && layer.proj) originOut.set(layer.proj.ox, layer.proj.oy, layer.proj.oz);
     return;
   }
-  const mesh = zoneMeshes[layer.surfaceZone || ZONE.BACK];
+  const mesh = meshForLayer(layer);
   let span = 40;
   if (mesh?.geometry) {
     if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
@@ -397,7 +397,9 @@ function applyProjection(layer, worldPoint, worldNormal, mesh) {
 }
 
 function initImageProjection(layer) {
-  const mesh = zoneMeshes[ZONE.BACK] || casePickMeshes.find((m) => m.userData.surfaceZone === ZONE.BACK);
+  const mesh = zoneMeshes[ZONE.BACK]
+    || [...surfaceMeshes.values()].find((m) => m.userData.surfaceZone === ZONE.BACK)
+    || casePickMeshes.find((m) => m.userData.surfaceZone === ZONE.BACK);
   if (!mesh) {
     say('Case not ready — wait a moment and upload again');
     return;
@@ -412,6 +414,7 @@ function initImageProjection(layer) {
   layer.x = W / 2;
   layer.y = H / 2;
   layer.surfaceZone = ZONE.BACK;
+  layer.surfaceId = mesh.userData.surfaceId || null;
   dirtyZones[ZONE.BACK] = true;
   flushPaint();
 }
@@ -964,6 +967,8 @@ let renderer, scene, camera, root, phoneSize;
 const zoneTex = {};
 const zoneMat = {};
 const zoneMeshes = {};
+/** Exact zone-mesh registry: surfaceId → Mesh (never overwrite by zone alone). */
+const surfaceMeshes = new Map();
 let caseMats = [];
 let casePickMeshes = [];
 let orbit = { x: 0.18, y: Math.PI };
@@ -976,9 +981,80 @@ let draggingArtwork = false;
 const raycaster = new THREE.Raycaster();
 const pointerNDC = new THREE.Vector2();
 
-function isLeatherCaseMesh(mesh) {
-  const name = `${mesh.name || ''} ${mesh.parent?.name || ''}`.toLowerCase();
-  return name.includes('leather') || (name.includes('case') && !/(iphone|ipohne|phone|glass|screen|body)/.test(name));
+function normalizeNodeName(name) {
+  return String(name || '').toLowerCase().replace(/[_\s-]+/g, ' ').trim();
+}
+
+/** Locate the Leather Case group/node (not the phone). */
+function findLeatherCaseNode(root) {
+  let found = null;
+  root.traverse((o) => {
+    if (found || o.isMesh) return;
+    const n = normalizeNodeName(o.name);
+    if (n === 'leather case' || (n.includes('leather') && n.includes('case'))) found = o;
+  });
+  return found;
+}
+
+/**
+ * Pick the true customizable shell mesh(es) by coverage of the Leather Case group bbox.
+ * Small children (buttons, camera trim, logos) are excluded and left original.
+ */
+function selectShellMeshes(caseNode) {
+  if (!caseNode) return [];
+  caseNode.updateMatrixWorld(true);
+  const caseBox = new THREE.Box3().setFromObject(caseNode);
+  const caseSize = caseBox.getSize(new THREE.Vector3());
+  const axes = [
+    { axis: 'x', v: caseSize.x },
+    { axis: 'y', v: caseSize.y },
+    { axis: 'z', v: caseSize.z }
+  ].sort((a, b) => b.v - a.v);
+  const heightAxis = axes[0].axis;
+  const widthAxis = axes[1].axis;
+  const thickAxis = axes[2].axis;
+
+  const splitRe = /_(Exterior|Interior|back|leftOuter|rightOuter|topOuter|bottomOuter|cameraLip|bevel|interior)/i;
+  const candidates = [];
+  caseNode.traverse((o) => {
+    if (!o.isMesh || splitRe.test(o.name || '')) return;
+    const geo = o.geometry;
+    if (!geo?.attributes?.position) return;
+    const tri = geo.index
+      ? (geo.index.count / 3) | 0
+      : ((geo.attributes.position.count || 0) / 3) | 0;
+    const box = new THREE.Box3().setFromObject(o);
+    const size = box.getSize(new THREE.Vector3());
+    const hCov = size[heightAxis] / Math.max(1e-9, caseSize[heightAxis]);
+    const wCov = size[widthAxis] / Math.max(1e-9, caseSize[widthAxis]);
+    const tCov = size[thickAxis] / Math.max(1e-9, caseSize[thickAxis]);
+    candidates.push({
+      mesh: o,
+      tri,
+      hCov,
+      wCov,
+      tCov,
+      score: hCov * wCov * Math.min(1, tCov)
+    });
+  });
+
+  // Full-shell coverage: nearly the whole case footprint + meaningful thickness
+  const shells = candidates.filter((c) => c.hCov >= 0.85 && c.wCov >= 0.85 && c.tCov >= 0.45);
+  shells.sort((a, b) => b.score - a.score || b.tri - a.tri);
+  if (shells.length) {
+    // Prefer exactly one true shell mesh
+    return [shells[0].mesh];
+  }
+  candidates.sort((a, b) => b.score - a.score || b.tri - a.tri);
+  return candidates[0] ? [candidates[0].mesh] : [];
+}
+
+function meshForLayer(layer) {
+  if (layer?.surfaceId && surfaceMeshes.has(layer.surfaceId)) {
+    return surfaceMeshes.get(layer.surfaceId);
+  }
+  const zone = layer?.surfaceZone || ZONE.BACK;
+  return zoneMeshes[zone] || null;
 }
 
 function copyPBRMaps(fromMat, toMat) {
@@ -1053,14 +1129,16 @@ function ensureZoneTexture(zone) {
 }
 
 function applyCaseTo3D() {
-  if (!Object.keys(zoneMat).length) return;
+  if (!caseMats.length && !surfaceMeshes.size) return;
   const g = material === 'gloss' ? Math.max(gloss, 0.7) : gloss;
   const roughness = clamp(1 - g, 0.08, 0.85);
   const clearcoat = material === 'gloss' ? 1 : material === 'soft' ? 0.35 : 0.15;
   const clearcoatRoughness = material === 'gloss' ? 0.08 : 0.4;
 
-  for (const [zone, mat] of Object.entries(zoneMat)) {
-    if (!mat) continue;
+  for (const mesh of surfaceMeshes.values()) {
+    const mat = mesh.material;
+    const zone = mesh.userData.surfaceZone;
+    if (!mat || !zone) continue;
     if (EDITABLE_ZONES.has(zone)) {
       if (!caseDebug) mat.color.set(0xffffff);
       mat.map = caseDebug ? null : ensureZoneTexture(zone);
@@ -1068,7 +1146,6 @@ function applyCaseTo3D() {
       mat.clearcoat = clearcoat;
       mat.clearcoatRoughness = clearcoatRoughness;
     } else if (zone === ZONE.INTERIOR) {
-      // Keep original GLB interior material — never apply user colours or canvas maps.
       if (caseDebug) {
         mat.color.set(DEBUG_ZONE_COLORS[zone] ?? 0xffffff);
         mat.map = null;
@@ -1097,12 +1174,13 @@ function updateTexture(force = false) {
   } else {
     schedulePaint('all');
   }
-  for (const z of EDITABLE_ZONES) {
-    const mat = zoneMat[z];
-    if (mat) {
-      mat.map = ensureZoneTexture(z);
-      mat.needsUpdate = true;
-    }
+  for (const mesh of surfaceMeshes.values()) {
+    const zone = mesh.userData.surfaceZone;
+    if (!EDITABLE_ZONES.has(zone)) continue;
+    const mat = mesh.material;
+    if (!mat) continue;
+    mat.map = ensureZoneTexture(zone);
+    mat.needsUpdate = true;
   }
 }
 
@@ -1126,11 +1204,10 @@ function loadGltf(loader, url) {
 
 function seatCaseOnPhone(product) {
   let phoneNode = null;
-  let caseNode = null;
+  const caseNode = findLeatherCaseNode(product);
   product.traverse((o) => {
-    const n = (o.name || '').toLowerCase();
+    const n = normalizeNodeName(o.name);
     if (!phoneNode && (n.includes('ipohne') || n.includes('iphone')) && !n.includes('leather')) phoneNode = o;
-    if (!caseNode && n === 'leather case') caseNode = o;
   });
   if (!phoneNode || !caseNode) return;
 
@@ -1158,6 +1235,7 @@ function seatCaseOnPhone(product) {
 function prepareProduct(sceneRoot) {
   caseMats = [];
   casePickMeshes = [];
+  surfaceMeshes.clear();
   for (const k of Object.keys(zoneTex)) delete zoneTex[k];
   for (const k of Object.keys(zoneMat)) delete zoneMat[k];
   for (const k of Object.keys(zoneMeshes)) delete zoneMeshes[k];
@@ -1167,7 +1245,7 @@ function prepareProduct(sceneRoot) {
 
   let phoneNode = null;
   sceneRoot.traverse((o) => {
-    const n = (o.name || '').toLowerCase();
+    const n = normalizeNodeName(o.name);
     if (!phoneNode && (n.includes('ipohne') || n.includes('iphone')) && !n.includes('leather')) phoneNode = o;
   });
   const phoneCenterWorld = new THREE.Vector3();
@@ -1175,16 +1253,11 @@ function prepareProduct(sceneRoot) {
     new THREE.Box3().setFromObject(phoneNode).getCenter(phoneCenterWorld);
   }
 
-  let caseCount = 0;
-  const caseMeshes = [];
+  // Normalize colour spaces on all materials; do not customize yet
   sceneRoot.traverse((o) => {
     if (!o.isMesh) return;
     o.castShadow = true;
     o.receiveShadow = true;
-    if (isLeatherCaseMesh(o) && !/_Exterior|_Interior|_back|_leftOuter|_rightOuter|_topOuter|_bottomOuter|_cameraLip|_bevel|_interior/i.test(o.name)) {
-      caseMeshes.push(o);
-      return;
-    }
     const mats = Array.isArray(o.material) ? o.material : [o.material];
     mats.forEach((m) => {
       if (!m) return;
@@ -1193,7 +1266,23 @@ function prepareProduct(sceneRoot) {
     });
   });
 
-  for (const mesh of caseMeshes) {
+  const caseNode = findLeatherCaseNode(sceneRoot);
+  const shellMeshes = selectShellMeshes(caseNode);
+  if (!shellMeshes.length) throw new Error('Leather case shell mesh not found in product GLB');
+
+  if (caseDebug) {
+    console.log('[caseDebug] shell meshes', shellMeshes.map((m) => ({
+      name: m.name,
+      parent: m.parent?.name,
+      tris: m.geometry?.index
+        ? (m.geometry.index.count / 3) | 0
+        : ((m.geometry?.attributes?.position?.count || 0) / 3) | 0
+    })));
+  }
+
+  // Customize only verified full-size shell mesh(es). Leave accessories original.
+  let caseCount = 0;
+  shellMeshes.forEach((mesh, shellIndex) => {
     caseCount += 1;
     if (mesh.geometry && !mesh.geometry.getAttribute('normal')) mesh.geometry.computeVertexNormals();
     const sourceMat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
@@ -1203,6 +1292,7 @@ function prepareProduct(sceneRoot) {
       console.log('[caseDebug] axes', axes);
     }
     const parent = mesh.parent || sceneRoot;
+    const shellKey = `shell${shellIndex}`;
 
     for (const [zone, geo] of Object.entries(geometries)) {
       if (!geo.attributes.position?.count) continue;
@@ -1221,12 +1311,14 @@ function prepareProduct(sceneRoot) {
         mat.color.set(DEBUG_ZONE_COLORS[zone] ?? 0xffffff);
         mat.map = null;
       }
-      zoneMat[zone] = mat;
       caseMats.push(mat);
 
+      const surfaceId = `${shellKey}:${zone}`;
       const zoneMesh = new THREE.Mesh(geo, mat);
       zoneMesh.name = `${mesh.name || 'Leather'}_${zone}`;
       zoneMesh.userData.surfaceZone = zone;
+      zoneMesh.userData.surfaceId = surfaceId;
+      zoneMesh.userData.shellKey = shellKey;
       zoneMesh.castShadow = true;
       zoneMesh.receiveShadow = true;
       zoneMesh.position.copy(mesh.position);
@@ -1236,12 +1328,15 @@ function prepareProduct(sceneRoot) {
 
       parent.add(zoneMesh);
       casePickMeshes.push(zoneMesh);
-      zoneMeshes[zone] = zoneMesh;
+      surfaceMeshes.set(surfaceId, zoneMesh);
+
+      // With a single shell, zoneMaps remain convenient mirrors of that shell.
+      // Never overwrite an existing zone entry from a different shell.
+      if (!zoneMeshes[zone]) zoneMeshes[zone] = zoneMesh;
+      if (!zoneMat[zone]) zoneMat[zone] = mat;
     }
     mesh.visible = false;
-  }
-
-  if (!caseCount) throw new Error('Leather case mesh not found in product GLB');
+  });
 
   phoneSize = fit(sceneRoot, 4.1);
   return caseCount;
@@ -1306,6 +1401,7 @@ function moveSelectedToUv(hit) {
   const l = layers.find((x) => x.id === selected);
   if (!l || !['image', 'text', 'pattern'].includes(l.type) || !hit) return false;
   const zone = hit.object?.userData?.surfaceZone || ZONE.BACK;
+  const surfaceId = hit.object?.userData?.surfaceId || null;
   if (!isEditableZone(zone)) {
     say('Exterior surfaces only');
     return false;
@@ -1320,6 +1416,7 @@ function moveSelectedToUv(hit) {
       if (n.dot(toCam) < 0) n.negate();
     }
     l.surfaceZone = zone;
+    l.surfaceId = surfaceId;
     l.x = W / 2;
     l.y = H / 2;
     const keepW = l.proj?.localW;
@@ -1335,6 +1432,7 @@ function moveSelectedToUv(hit) {
   const pt = uvToCanvas(hit.uv);
   if (liveMode !== 'move') beginLiveMove(zone, l.id);
   l.surfaceZone = zone;
+  l.surfaceId = surfaceId;
   l.x = pt.x;
   l.y = pt.y;
   liveMoveTick(l);
@@ -1344,6 +1442,7 @@ function moveSelectedToUv(hit) {
 function paintAtHit(hit) {
   if (!hit?.uv) return false;
   const zone = hit.object?.userData?.surfaceZone || ZONE.BACK;
+  const surfaceId = hit.object?.userData?.surfaceId || null;
   if (!isEditableZone(zone)) {
     say('Exterior surfaces only');
     return false;
@@ -1355,6 +1454,7 @@ function paintAtHit(hit) {
       id: uid(),
       type: 'stroke',
       surfaceZone: zone,
+      surfaceId,
       name: tool === 'eraser' ? 'Eraser' : 'Brush',
       color: brushColor,
       size: brushSize,

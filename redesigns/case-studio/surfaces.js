@@ -2,10 +2,10 @@
  * Case Studio — semantic surface classification for the leather case GLB.
  * Classification is in CASE-LOCAL space and is independent of camera orbit.
  *
- * Leather_Case local axes (verified from GLB):
- *   Z ≈ thickness (toward phone = +Z)
- *   Y ≈ height
- *   X ≈ width
+ * Shell local proportions (this Sketchfab asset):
+ *   smallest axis ≈ thickness
+ *   middle axis ≈ width
+ *   largest axis ≈ height
  */
 
 import * as THREE from 'three';
@@ -48,28 +48,30 @@ export const DEBUG_ZONE_COLORS = {
 };
 
 /**
- * Infer case-local thickness / height / width axes from phone offset + bbox.
- * @returns {{thickAxis:'x'|'y'|'z', heightAxis:'x'|'y'|'z', widthAxis:'x'|'y'|'z', towardPhoneSign:number}}
+ * Infer case-local axes from bbox proportions (not phone offset direction).
+ * Phone vector only helps choose the thickness sign when it is meaningful.
  */
 export function inferCaseAxes(caseLocalSize, toPhoneFromCenter) {
-  const abs = [
-    Math.abs(toPhoneFromCenter.x),
-    Math.abs(toPhoneFromCenter.y),
-    Math.abs(toPhoneFromCenter.z)
-  ];
-  const thickAxis = abs[0] >= abs[1] && abs[0] >= abs[2] ? 'x' : abs[1] >= abs[2] ? 'y' : 'z';
-  const towardPhoneSign = Math.sign(
-    thickAxis === 'x' ? toPhoneFromCenter.x
-      : thickAxis === 'y' ? toPhoneFromCenter.y
-        : toPhoneFromCenter.z
-  ) || 1;
-
   const dims = { x: caseLocalSize.x, y: caseLocalSize.y, z: caseLocalSize.z };
-  const rest = ['x', 'y', 'z'].filter((a) => a !== thickAxis).sort((a, b) => dims[b] - dims[a]);
+  const order = ['x', 'y', 'z'].sort((a, b) => dims[a] - dims[b]);
+  const thickAxis = order[0];
+  const widthAxis = order[1];
+  const heightAxis = order[2];
+
+  const thickSpan = Math.max(1e-9, dims[thickAxis]);
+  const thickOffset = thickAxis === 'x' ? toPhoneFromCenter.x
+    : thickAxis === 'y' ? toPhoneFromCenter.y
+      : toPhoneFromCenter.z;
+  // Only trust phone for thickness sign when it clearly lies along thickness
+  let towardPhoneSign = Math.sign(thickOffset) || 1;
+  if (Math.abs(thickOffset) < thickSpan * 0.35) {
+    towardPhoneSign = 1;
+  }
+
   return {
     thickAxis,
-    heightAxis: rest[0],
-    widthAxis: rest[1],
+    heightAxis,
+    widthAxis,
     towardPhoneSign,
     dims
   };
@@ -79,13 +81,75 @@ function comp(v, axis) {
   return axis === 'x' ? v.x : axis === 'y' ? v.y : v.z;
 }
 
+function quantKey(x, y, z, s) {
+  return `${Math.round(x * s)}|${Math.round(y * s)}|${Math.round(z * s)}`;
+}
+
+function edgeKey(a, b) {
+  return a < b ? `${a}_${b}` : `${b}_${a}`;
+}
+
+function traceLoops(edgeByKey, vertEdges) {
+  const used = new Set();
+  const loops = [];
+
+  for (const start of edgeByKey.values()) {
+    if (used.has(start.key)) continue;
+    const loop = [];
+    let key = start.key;
+    let prevVert = start.a;
+    let guard = 0;
+    const startKey = start.key;
+    while (key && guard++ < edgeByKey.size + 2) {
+      if (used.has(key)) break;
+      used.add(key);
+      const edge = edgeByKey.get(key);
+      if (!edge) break;
+      loop.push(edge);
+      const nextVert = edge.a === prevVert ? edge.b : edge.a;
+      const candidates = vertEdges.get(nextVert) || [];
+      let nextKey = null;
+      for (const ck of candidates) {
+        if (ck !== key && !used.has(ck)) {
+          nextKey = ck;
+          break;
+        }
+      }
+      if (!nextKey) {
+        if (candidates.includes(startKey) && loop.length >= 3) break;
+        break;
+      }
+      prevVert = nextVert;
+      key = nextKey;
+      if (key === startKey) break;
+    }
+    if (loop.length >= 3) loops.push(loop);
+  }
+  return loops;
+}
+
+function loopProjectedArea(loop, pos, heightAxis, widthAxis) {
+  let area = 0;
+  const pts = [];
+  for (const e of loop) {
+    const p0 = { x: pos.getX(e.vi0), y: pos.getY(e.vi0), z: pos.getZ(e.vi0) };
+    const p1 = { x: pos.getX(e.vi1), y: pos.getY(e.vi1), z: pos.getZ(e.vi1) };
+    pts.push([
+      (comp(p0, widthAxis) + comp(p1, widthAxis)) * 0.5,
+      (comp(p0, heightAxis) + comp(p1, heightAxis)) * 0.5
+    ]);
+  }
+  for (let i = 0; i < pts.length; i += 1) {
+    const [x0, y0] = pts[i];
+    const [x1, y1] = pts[(i + 1) % pts.length];
+    area += x0 * y1 - x1 * y0;
+  }
+  return Math.abs(area) * 0.5;
+}
+
 /**
  * Split leather case geometry into semantic surface zone BufferGeometries.
- * Preserves original primary UV values exactly (copied per triangle).
- *
- * @param {THREE.Mesh} mesh
- * @param {THREE.Vector3} phoneCenterWorld
- * @returns {{ geometries: Record<string, THREE.BufferGeometry>, stats: object, axes: object }}
+ * Patch classification + outer/hole rim topology (interior↔exterior interface).
  */
 export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
   const src = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
@@ -103,17 +167,6 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
   const toPhone = phoneLocal.clone().sub(center);
   const axes = inferCaseAxes(size, toPhone);
 
-  // Camera cutout region: upper portion of back face (high height axis)
-  const hMin = comp(bb.min, axes.heightAxis);
-  const hMax = comp(bb.max, axes.heightAxis);
-  const hSpan = Math.max(1e-6, hMax - hMin);
-  const wMin = comp(bb.min, axes.widthAxis);
-  const wMax = comp(bb.max, axes.widthAxis);
-  const wSpan = Math.max(1e-6, wMax - wMin);
-  // iPhone 14 Pro camera island ≈ top (~80–100% height) and one side of width
-  const camH0 = hMin + hSpan * 0.72;
-  const camW0 = wMin + wSpan * 0.55; // island sits toward +width in local X for this asset
-
   const buckets = {
     [ZONE.BACK]: [],
     [ZONE.LEFT]: [],
@@ -125,15 +178,12 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
     [ZONE.INTERIOR]: []
   };
 
+  const centers = new Array(triCount);
+  const normals = new Array(triCount);
+  const isInterior = new Uint8Array(triCount);
   const cLocal = new THREE.Vector3();
   const nLocal = new THREE.Vector3();
-  const toP = new THREE.Vector3();
-
-  const DOT_BACK = 0.42;
-  const DOT_SIDE = 0.55;
-  // Outer-perimeter walls must sit near the physical case edge — side-facing
-  // normals alone also appear on camera cutouts and bevels.
-  const SIDE_EDGE_DEPTH = 0.10;
+  const toCenter = new THREE.Vector3();
 
   for (let t = 0; t < triCount; t += 1) {
     const i = t * 3;
@@ -142,6 +192,7 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
       (pos.getY(i) + pos.getY(i + 1) + pos.getY(i + 2)) / 3,
       (pos.getZ(i) + pos.getZ(i + 1) + pos.getZ(i + 2)) / 3
     );
+    centers[t] = cLocal.clone();
 
     const e1x = pos.getX(i + 1) - pos.getX(i);
     const e1y = pos.getY(i + 1) - pos.getY(i);
@@ -154,95 +205,303 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
       e1z * e2x - e1x * e2z,
       e1x * e2y - e1y * e2x
     ).normalize();
+    normals[t] = nLocal.clone();
 
-    toP.copy(phoneLocal).sub(cLocal);
-    // Interior: geometric normal points toward the phone
-    if (nLocal.dot(toP) > 0) {
-      buckets[ZONE.INTERIOR].push(t);
+    // Inward faces of a hollow shell point toward the bbox center
+    toCenter.copy(center).sub(cLocal);
+    if (nLocal.dot(toCenter) > 0) isInterior[t] = 1;
+  }
+
+  // Refine thickness sign from the dominant outward exterior thick face (true back plate)
+  {
+    let posThick = 0;
+    let negThick = 0;
+    for (let t = 0; t < triCount; t += 1) {
+      if (isInterior[t]) continue;
+      const nT = comp(normals[t], axes.thickAxis);
+      const aT = Math.abs(nT);
+      const aH = Math.abs(comp(normals[t], axes.heightAxis));
+      const aW = Math.abs(comp(normals[t], axes.widthAxis));
+      if (aT < 0.7 || aT < aH || aT < aW) continue;
+      const fromC = comp(centers[t], axes.thickAxis) - comp(center, axes.thickAxis);
+      // outward thick face: normal and offset from center share sign
+      if (nT * fromC > 0) {
+        if (nT > 0) posThick += 1;
+        else negThick += 1;
+      }
+    }
+    // toward-phone is opposite the dominant outer back normal
+    if (posThick + negThick > 20) {
+      axes.towardPhoneSign = posThick >= negThick ? -1 : 1;
+    }
+  }
+  const awaySign = -axes.towardPhoneSign;
+
+  const qScale = 1 / Math.max(1e-9, size.length() * 1e-5);
+  const vertKeys = new Array(pos.count);
+  for (let i = 0; i < pos.count; i += 1) {
+    vertKeys[i] = quantKey(pos.getX(i), pos.getY(i), pos.getZ(i), qScale);
+  }
+
+  const edgeMap = new Map();
+  for (let t = 0; t < triCount; t += 1) {
+    const i = t * 3;
+    const verts = [i, i + 1, i + 2];
+    for (let e = 0; e < 3; e += 1) {
+      const i0 = verts[e];
+      const i1 = verts[(e + 1) % 3];
+      const a = vertKeys[i0];
+      const b = vertKeys[i1];
+      const key = edgeKey(a, b);
+      let rec = edgeMap.get(key);
+      if (!rec) {
+        rec = { key, a, b, tris: [], samples: [] };
+        edgeMap.set(key, rec);
+      }
+      if (!rec.tris.includes(t)) rec.tris.push(t);
+      rec.samples.push({ tri: t, vi0: i0, vi1: i1 });
+    }
+  }
+
+  const neighbors = Array.from({ length: triCount }, () => []);
+  for (const rec of edgeMap.values()) {
+    if (rec.tris.length === 2) {
+      neighbors[rec.tris[0]].push(rec.tris[1]);
+      neighbors[rec.tris[1]].push(rec.tris[0]);
+    }
+  }
+
+  // Rim loops at interior↔exterior interface (watertight shell has no open boundaries)
+  const rimByKey = new Map();
+  const rimVertEdges = new Map();
+  for (const rec of edgeMap.values()) {
+    if (rec.tris.length !== 2) continue;
+    const [t0, t1] = rec.tris;
+    if (isInterior[t0] === isInterior[t1]) continue;
+    const exteriorTri = isInterior[t0] ? t1 : t0;
+    const sample = rec.samples.find((s) => s.tri === exteriorTri) || rec.samples[0];
+    const edge = {
+      key: rec.key,
+      a: rec.a,
+      b: rec.b,
+      tri: exteriorTri,
+      vi0: sample.vi0,
+      vi1: sample.vi1
+    };
+    rimByKey.set(rec.key, edge);
+    if (!rimVertEdges.has(rec.a)) rimVertEdges.set(rec.a, []);
+    if (!rimVertEdges.has(rec.b)) rimVertEdges.set(rec.b, []);
+    rimVertEdges.get(rec.a).push(rec.key);
+    rimVertEdges.get(rec.b).push(rec.key);
+  }
+
+  const loops = traceLoops(rimByKey, rimVertEdges);
+  const loopAreas = loops.map((loop) => loopProjectedArea(loop, pos, axes.heightAxis, axes.widthAxis));
+  let outerLoopIdx = 0;
+  let bestArea = -1;
+  for (let li = 0; li < loopAreas.length; li += 1) {
+    if (loopAreas[li] > bestArea) {
+      bestArea = loopAreas[li];
+      outerLoopIdx = li;
+    }
+  }
+
+  const touchesOuter = new Uint8Array(triCount);
+  const touchesHole = new Uint8Array(triCount);
+  const holeRegions = [];
+  for (let li = 0; li < loops.length; li += 1) {
+    const area = loopAreas[li];
+    const isHole = li !== outerLoopIdx && area < bestArea * 0.35;
+    const isOuter = li === outerLoopIdx || (!isHole && area >= bestArea * 0.35);
+    let minW = Infinity;
+    let maxW = -Infinity;
+    let minH = Infinity;
+    let maxH = -Infinity;
+    for (const e of loops[li]) {
+      if (isOuter) touchesOuter[e.tri] = 1;
+      if (isHole) touchesHole[e.tri] = 1;
+      if (!isHole) continue;
+      for (const vi of [e.vi0, e.vi1]) {
+        const p = { x: pos.getX(vi), y: pos.getY(vi), z: pos.getZ(vi) };
+        const w = comp(p, axes.widthAxis);
+        const h = comp(p, axes.heightAxis);
+        minW = Math.min(minW, w);
+        maxW = Math.max(maxW, w);
+        minH = Math.min(minH, h);
+        maxH = Math.max(maxH, h);
+      }
+    }
+    if (isHole && Number.isFinite(minW)) {
+      const padW = Math.max((maxW - minW) * 0.2, size[axes.widthAxis] * 0.01);
+      const padH = Math.max((maxH - minH) * 0.2, size[axes.heightAxis] * 0.01);
+      holeRegions.push({
+        minW: minW - padW,
+        maxW: maxW + padW,
+        minH: minH - padH,
+        maxH: maxH + padH
+      });
+    }
+  }
+
+  const wMin = comp(bb.min, axes.widthAxis);
+  const wMax = comp(bb.max, axes.widthAxis);
+  const wSpan = Math.max(1e-9, wMax - wMin);
+  const hMin = comp(bb.min, axes.heightAxis);
+  const hMax = comp(bb.max, axes.heightAxis);
+  const hSpan = Math.max(1e-9, hMax - hMin);
+  // Physical outer perimeter band of the rectangular shell bbox (not a camera % box)
+  const OUTER_BAND = 0.12;
+
+  function inHoleRegion(t) {
+    const c = centers[t];
+    const w = comp(c, axes.widthAxis);
+    const h = comp(c, axes.heightAxis);
+    for (const r of holeRegions) {
+      if (w >= r.minW && w <= r.maxW && h >= r.minH && h <= r.maxH) return true;
+    }
+    return false;
+  }
+
+  function nearLeftOuter(t) {
+    return comp(centers[t], axes.widthAxis) <= wMin + wSpan * OUTER_BAND;
+  }
+  function nearRightOuter(t) {
+    return comp(centers[t], axes.widthAxis) >= wMax - wSpan * OUTER_BAND;
+  }
+  function nearBottomOuter(t) {
+    return comp(centers[t], axes.heightAxis) <= hMin + hSpan * OUTER_BAND;
+  }
+  function nearTopOuter(t) {
+    return comp(centers[t], axes.heightAxis) >= hMax - hSpan * OUTER_BAND;
+  }
+
+  const assigned = new Array(triCount).fill(null);
+  for (let t = 0; t < triCount; t += 1) {
+    if (!isInterior[t]) continue;
+    assigned[t] = ZONE.INTERIOR;
+    buckets[ZONE.INTERIOR].push(t);
+  }
+
+  function isStrongBack(t) {
+    const n = normals[t];
+    const nThick = comp(n, axes.thickAxis);
+    const aT = Math.abs(nThick);
+    const aH = Math.abs(comp(n, axes.heightAxis));
+    const aW = Math.abs(comp(n, axes.widthAxis));
+    return nThick * awaySign > 0.55 && aT >= aH && aT >= aW && aT > 0.7;
+  }
+
+  // CAMERA_LIP from internal hole rims only — stay inside hole regions, never claim outer side bands
+  const PATCH_DOT = 0.82;
+  const cameraQueue = [];
+  for (let t = 0; t < triCount; t += 1) {
+    if (assigned[t] || !touchesHole[t]) continue;
+    if (nearLeftOuter(t) || nearRightOuter(t) || nearTopOuter(t) || nearBottomOuter(t)) {
+      // Hole on the outer rim (button cutout): keep as non-side bevel later, not camera flood seed into sides
       continue;
     }
+    assigned[t] = ZONE.CAMERA_LIP;
+    buckets[ZONE.CAMERA_LIP].push(t);
+    cameraQueue.push(t);
+  }
+  while (cameraQueue.length) {
+    const t = cameraQueue.pop();
+    const n0 = normals[t];
+    for (const n of neighbors[t]) {
+      if (assigned[n]) continue;
+      if (!inHoleRegion(n) && !touchesHole[n]) continue;
+      if (nearLeftOuter(n) || nearRightOuter(n)) continue;
+      if (n0.dot(normals[n]) < PATCH_DOT) continue;
+      if (isStrongBack(n)) continue;
+      assigned[n] = ZONE.CAMERA_LIP;
+      buckets[ZONE.CAMERA_LIP].push(n);
+      cameraQueue.push(n);
+    }
+  }
 
-    const nThick = comp(nLocal, axes.thickAxis);
-    const nH = comp(nLocal, axes.heightAxis);
-    const nW = comp(nLocal, axes.widthAxis);
-    const awaySign = -axes.towardPhoneSign;
+  // Connected exterior patches
+  const patches = [];
+  const visited = new Uint8Array(triCount);
+  for (let seed = 0; seed < triCount; seed += 1) {
+    if (assigned[seed] || visited[seed]) continue;
+    const seedN = normals[seed];
+    const patch = [];
+    const stack = [seed];
+    visited[seed] = 1;
+    while (stack.length) {
+      const t = stack.pop();
+      patch.push(t);
+      for (const n of neighbors[t]) {
+        if (assigned[n] || visited[n]) continue;
+        if (seedN.dot(normals[n]) < PATCH_DOT) continue;
+        visited[n] = 1;
+        stack.push(n);
+      }
+    }
+    patches.push(patch);
+  }
+
+  function classifyPatch(patch) {
+    const avgN = new THREE.Vector3();
+    const centroid = new THREE.Vector3();
+    let hitHole = false;
+    let inHole = false;
+    let nLeft = 0;
+    let nRight = 0;
+    let nTop = 0;
+    let nBottom = 0;
+    for (const t of patch) {
+      avgN.add(normals[t]);
+      centroid.add(centers[t]);
+      if (touchesHole[t]) hitHole = true;
+      if (inHoleRegion(t)) inHole = true;
+      if (nearLeftOuter(t)) nLeft += 1;
+      if (nearRightOuter(t)) nRight += 1;
+      if (nearTopOuter(t)) nTop += 1;
+      if (nearBottomOuter(t)) nBottom += 1;
+    }
+    avgN.normalize();
+    centroid.multiplyScalar(1 / Math.max(1, patch.length));
+
+    const nThick = comp(avgN, axes.thickAxis);
+    const nH = comp(avgN, axes.heightAxis);
+    const nW = comp(avgN, axes.widthAxis);
     const aT = Math.abs(nThick);
     const aH = Math.abs(nH);
     const aW = Math.abs(nW);
+    const frac = 1 / Math.max(1, patch.length);
 
-    const cH = comp(cLocal, axes.heightAxis);
-    const cW = comp(cLocal, axes.widthAxis);
-    const inCameraRegion = cH >= camH0 && cW >= camW0;
-    const nearLeftOuter = cW <= wMin + wSpan * SIDE_EDGE_DEPTH;
-    const nearRightOuter = cW >= wMax - wSpan * SIDE_EDGE_DEPTH;
-    const nearBottomOuter = cH <= hMin + hSpan * SIDE_EDGE_DEPTH;
-    const nearTopOuter = cH >= hMax - hSpan * SIDE_EDGE_DEPTH;
-
-    // Camera outer lip: near cutout, normals not purely back-facing
-    // (must run before LEFT/RIGHT so cutout walls never take side colours)
-    if (inCameraRegion && nThick * awaySign > 0.15 && aT < 0.92 && (aW > 0.25 || aH > 0.25)) {
-      buckets[ZONE.CAMERA_LIP].push(t);
-      continue;
+    // Hole walls stay camera — never side colours
+    if (hitHole && (nLeft + nRight) * frac < 0.35 && aT < 0.9) return ZONE.CAMERA_LIP;
+    if (inHole && (nLeft + nRight) * frac < 0.35 && aT < 0.85 && (aW > 0.25 || aH > 0.25)) {
+      return ZONE.CAMERA_LIP;
     }
 
-    // Back exterior panel
-    if (nThick * awaySign > DOT_BACK && aT >= aH && aT >= aW) {
-      buckets[ZONE.BACK].push(t);
-      continue;
+    const fromCThick = comp(centroid, axes.thickAxis) - comp(center, axes.thickAxis);
+    if (aT >= aH && aT >= aW && aT > 0.42 && nThick * fromCThick > 0) return ZONE.BACK;
+    if (nThick * awaySign > 0.42 && aT >= aH && aT >= aW) return ZONE.BACK;
+
+    // Physical outer side walls: side-facing + on outer width band.
+    // Button cutouts on a side may touch a hole loop — still keep the outer wall as Left/Right
+    // when the patch is predominantly on the outer band.
+    if (aW >= 0.55 && aW >= aH && aW >= aT * 0.75) {
+      if (nW < 0 && nLeft * frac >= 0.35) return ZONE.LEFT;
+      if (nW > 0 && nRight * frac >= 0.35) return ZONE.RIGHT;
+    }
+    if (aH >= 0.55 && aH >= aW && aH >= aT * 0.75) {
+      if (nH < 0 && nBottom * frac >= 0.35) return ZONE.BOTTOM;
+      if (nH > 0 && nTop * frac >= 0.35) return ZONE.TOP;
     }
 
-    // Left / right: side-facing normal AND physically on the outer width edge
-    if (
-      nearRightOuter &&
-      nW > 0 &&
-      aW >= DOT_SIDE &&
-      aW >= aH &&
-      aW >= aT * 0.75
-    ) {
-      buckets[ZONE.RIGHT].push(t);
-      continue;
-    }
+    if (aT >= aH && aT >= aW && nThick * awaySign > 0) return ZONE.BACK;
+    return ZONE.BEVEL;
+  }
 
-    if (
-      nearLeftOuter &&
-      nW < 0 &&
-      aW >= DOT_SIDE &&
-      aW >= aH &&
-      aW >= aT * 0.75
-    ) {
-      buckets[ZONE.LEFT].push(t);
-      continue;
-    }
-
-    // Top / bottom: height-facing normal AND physically on the outer height edge
-    if (
-      nearTopOuter &&
-      nH > 0 &&
-      aH >= DOT_SIDE &&
-      aH >= aW &&
-      aH >= aT * 0.75
-    ) {
-      buckets[ZONE.TOP].push(t);
-      continue;
-    }
-
-    if (
-      nearBottomOuter &&
-      nH < 0 &&
-      aH >= DOT_SIDE &&
-      aH >= aW &&
-      aH >= aT * 0.75
-    ) {
-      buckets[ZONE.BOTTOM].push(t);
-      continue;
-    }
-
-    // Ambiguous exterior: prefer BACK when clearly away-facing, else BEVEL.
-    // Never guess LEFT/RIGHT/TOP/BOTTOM without outer-edge position.
-    if (aT >= aH && aT >= aW && nThick * awaySign > 0) {
-      buckets[ZONE.BACK].push(t);
-    } else {
-      buckets[ZONE.BEVEL].push(t);
+  for (const patch of patches) {
+    const zone = classifyPatch(patch);
+    for (const t of patch) {
+      assigned[t] = zone;
+      buckets[zone].push(t);
     }
   }
 
@@ -265,11 +524,8 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
       }
       g.setAttribute(name, new THREE.BufferAttribute(array, itemSize));
     }
-    if (g.attributes.uv1) g.deleteAttribute('uv1');
-    if (g.attributes.uv2) g.deleteAttribute('uv2');
-    if (g.attributes.TEXCOORD_1) g.deleteAttribute('TEXCOORD_1');
     if (tris.length) {
-      g.computeVertexNormals();
+      if (!g.getAttribute('normal')) g.computeVertexNormals();
       g.computeBoundingBox();
       g.computeBoundingSphere();
     }
@@ -302,7 +558,9 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
           min: g.boundingBox.min.toArray(),
           max: g.boundingBox.max.toArray()
         }
-        : null
+        : null,
+      rimLoops: loops.length,
+      outerLoopEdges: loops[outerLoopIdx]?.length || 0
     };
   }
 
