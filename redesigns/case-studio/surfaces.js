@@ -131,6 +131,9 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
 
   const DOT_BACK = 0.42;
   const DOT_SIDE = 0.55;
+  // Outer-perimeter walls must sit near the physical case edge — side-facing
+  // normals alone also appear on camera cutouts and bevels.
+  const SIDE_EDGE_DEPTH = 0.10;
 
   for (let t = 0; t < triCount; t += 1) {
     const i = t * 3;
@@ -170,8 +173,13 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
     const cH = comp(cLocal, axes.heightAxis);
     const cW = comp(cLocal, axes.widthAxis);
     const inCameraRegion = cH >= camH0 && cW >= camW0;
+    const nearLeftOuter = cW <= wMin + wSpan * SIDE_EDGE_DEPTH;
+    const nearRightOuter = cW >= wMax - wSpan * SIDE_EDGE_DEPTH;
+    const nearBottomOuter = cH <= hMin + hSpan * SIDE_EDGE_DEPTH;
+    const nearTopOuter = cH >= hMax - hSpan * SIDE_EDGE_DEPTH;
 
     // Camera outer lip: near cutout, normals not purely back-facing
+    // (must run before LEFT/RIGHT so cutout walls never take side colours)
     if (inCameraRegion && nThick * awaySign > 0.15 && aT < 0.92 && (aW > 0.25 || aH > 0.25)) {
       buckets[ZONE.CAMERA_LIP].push(t);
       continue;
@@ -183,25 +191,56 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
       continue;
     }
 
-    // Left / right outer side walls (width axis)
-    if (aW >= DOT_SIDE && aW >= aH && aW >= aT * 0.75) {
-      buckets[nW >= 0 ? ZONE.RIGHT : ZONE.LEFT].push(t);
+    // Left / right: side-facing normal AND physically on the outer width edge
+    if (
+      nearRightOuter &&
+      nW > 0 &&
+      aW >= DOT_SIDE &&
+      aW >= aH &&
+      aW >= aT * 0.75
+    ) {
+      buckets[ZONE.RIGHT].push(t);
       continue;
     }
 
-    // Top / bottom outer walls (height axis)
-    if (aH >= DOT_SIDE && aH >= aW && aH >= aT * 0.75) {
-      buckets[nH >= 0 ? ZONE.TOP : ZONE.BOTTOM].push(t);
+    if (
+      nearLeftOuter &&
+      nW < 0 &&
+      aW >= DOT_SIDE &&
+      aW >= aH &&
+      aW >= aT * 0.75
+    ) {
+      buckets[ZONE.LEFT].push(t);
       continue;
     }
 
-    // Remaining exterior transitions
+    // Top / bottom: height-facing normal AND physically on the outer height edge
+    if (
+      nearTopOuter &&
+      nH > 0 &&
+      aH >= DOT_SIDE &&
+      aH >= aW &&
+      aH >= aT * 0.75
+    ) {
+      buckets[ZONE.TOP].push(t);
+      continue;
+    }
+
+    if (
+      nearBottomOuter &&
+      nH < 0 &&
+      aH >= DOT_SIDE &&
+      aH >= aW &&
+      aH >= aT * 0.75
+    ) {
+      buckets[ZONE.BOTTOM].push(t);
+      continue;
+    }
+
+    // Ambiguous exterior: prefer BACK when clearly away-facing, else BEVEL.
+    // Never guess LEFT/RIGHT/TOP/BOTTOM without outer-edge position.
     if (aT >= aH && aT >= aW && nThick * awaySign > 0) {
       buckets[ZONE.BACK].push(t);
-    } else if (aW >= aH) {
-      buckets[nW >= 0 ? ZONE.RIGHT : ZONE.LEFT].push(t);
-    } else if (aH >= aW) {
-      buckets[nH >= 0 ? ZONE.TOP : ZONE.BOTTOM].push(t);
     } else {
       buckets[ZONE.BEVEL].push(t);
     }
