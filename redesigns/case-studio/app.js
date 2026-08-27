@@ -46,6 +46,11 @@ let history = [];
 let future = [];
 let saveTimer = 0;
 let orbitLocked = false;
+/** Active artwork target — updated by Lock-mode raycast on editable surfaces. */
+let activeArtworkZone = ZONE.BACK;
+let activeArtworkSurfaceId = null;
+/** Last Lock hit on an editable surface: { zone, surfaceId, worldPoint, worldNormal, uv? } */
+let activeArtworkHit = null;
 
 const artOff = document.createElement('canvas');
 artOff.width = W;
@@ -406,26 +411,122 @@ function applyProjection(layer, worldPoint, worldNormal, mesh) {
   layer.useProjection = true;
 }
 
-function initImageProjection(layer) {
-  const mesh = zoneMeshes[ZONE.BACK]
-    || [...surfaceMeshes.values()].find((m) => m.userData.surfaceZone === ZONE.BACK)
-    || casePickMeshes.find((m) => m.userData.surfaceZone === ZONE.BACK);
+function artworkMeshForTarget(targetZone, targetSurfaceId) {
+  if (targetSurfaceId && surfaceMeshes.has(targetSurfaceId)) {
+    return surfaceMeshes.get(targetSurfaceId);
+  }
+  for (const mesh of surfaceMeshes.values()) {
+    const zone = mesh.userData.surfaceZone;
+    const cg = mesh.userData.colorGroup;
+    if (zone !== targetZone) continue;
+    if (targetZone === ZONE.BACK && cg === COLOR_GROUP.BACK) return mesh;
+    if (targetZone === ZONE.INTERIOR && cg === COLOR_GROUP.INTERIOR) return mesh;
+    if (OUTER_EDGE_ZONES.has(targetZone) && cg === COLOR_GROUP.OUTER_EDGE) return mesh;
+  }
+  return zoneMeshes[targetZone] || null;
+}
+
+function resolveArtworkSurfaceId(targetZone) {
+  for (const [id, mesh] of surfaceMeshes.entries()) {
+    const zone = mesh.userData.surfaceZone;
+    const cg = mesh.userData.colorGroup;
+    if (zone !== targetZone) continue;
+    if (targetZone === ZONE.BACK && cg === COLOR_GROUP.BACK) return id;
+    if (targetZone === ZONE.INTERIOR && cg === COLOR_GROUP.INTERIOR) return id;
+    if (OUTER_EDGE_ZONES.has(targetZone) && cg === COLOR_GROUP.OUTER_EDGE) return id;
+  }
+  return null;
+}
+
+function worldNormalFromHit(hit) {
+  const mesh = hit.object;
+  if (hit.face?.normal) {
+    return hit.face.normal.clone().transformDirection(mesh.matrixWorld).normalize();
+  }
+  return hit.normal?.clone?.().normalize() || new THREE.Vector3(0, 0, 1);
+}
+
+function meshSurfaceNormalAtCenter(mesh) {
+  mesh.updateMatrixWorld(true);
+  const geo = mesh.geometry;
+  if (!geo?.attributes?.position) return new THREE.Vector3(0, 0, 1);
+  if (!geo.attributes.normal) geo.computeVertexNormals();
+  if (!geo.boundingBox) geo.computeBoundingBox();
+  const center = geo.boundingBox.getCenter(new THREE.Vector3());
+  const pos = geo.attributes.position;
+  const norm = geo.attributes.normal;
+  const triCenter = new THREE.Vector3();
+  let bestD = Infinity;
+  let bestN = null;
+  for (let t = 0, triCount = pos.count / 3; t < triCount; t += 1) {
+    const i = t * 3;
+    triCenter.set(0, 0, 0);
+    for (let v = 0; v < 3; v += 1) {
+      triCenter.add(new THREE.Vector3().fromBufferAttribute(pos, i + v));
+    }
+    triCenter.multiplyScalar(1 / 3);
+    const d = triCenter.distanceToSquared(center);
+    if (d < bestD) {
+      bestD = d;
+      bestN = new THREE.Vector3().fromBufferAttribute(norm, i);
+    }
+  }
+  return bestN
+    ? bestN.transformDirection(mesh.matrixWorld).normalize()
+    : new THREE.Vector3(0, 0, 1);
+}
+
+function activeHitMatchesTarget(targetZone, targetSurfaceId) {
+  if (!activeArtworkHit || activeArtworkHit.zone !== targetZone) return false;
+  if (targetSurfaceId && activeArtworkHit.surfaceId !== targetSurfaceId) return false;
+  return !!(activeArtworkHit.worldPoint && activeArtworkHit.worldNormal);
+}
+
+function updateActiveArtworkTarget(hit) {
+  const zone = hit.object?.userData?.surfaceZone;
+  const surfaceId = hit.object?.userData?.surfaceId || null;
+  if (!isArtworkEditableZone(zone)) return;
+  activeArtworkZone = zone;
+  activeArtworkSurfaceId = surfaceId;
+  activeArtworkHit = {
+    zone,
+    surfaceId,
+    worldPoint: hit.point.clone(),
+    worldNormal: worldNormalFromHit(hit),
+    uv: hit.uv ? { x: hit.uv.x, y: hit.uv.y } : null
+  };
+}
+
+function initImageProjection(layer, targetZone = activeArtworkZone, targetSurfaceId = activeArtworkSurfaceId) {
+  const zone = targetZone || ZONE.BACK;
+  const surfaceId = targetSurfaceId || resolveArtworkSurfaceId(zone);
+  const mesh = artworkMeshForTarget(zone, surfaceId);
   if (!mesh) {
     say('Case not ready — wait a moment and upload again');
     return;
   }
   mesh.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(mesh);
-  const point = box.getCenter(new THREE.Vector3());
-  const normal = camera
-    ? camera.position.clone().sub(point).normalize()
-    : new THREE.Vector3(0, 0, 1);
+  let point;
+  let normal;
+  if (activeHitMatchesTarget(zone, surfaceId)) {
+    point = activeArtworkHit.worldPoint.clone();
+    normal = activeArtworkHit.worldNormal.clone();
+  } else {
+    const box = new THREE.Box3().setFromObject(mesh);
+    point = box.getCenter(new THREE.Vector3());
+    normal = meshSurfaceNormalAtCenter(mesh);
+  }
   applyProjection(layer, point, normal, mesh);
   layer.x = W / 2;
   layer.y = H / 2;
-  layer.surfaceZone = ZONE.BACK;
-  layer.surfaceId = mesh.userData.surfaceId || null;
-  dirtyZones[ZONE.BACK] = true;
+  if (activeHitMatchesTarget(zone, surfaceId) && activeArtworkHit.uv) {
+    const pt = uvToCanvas(activeArtworkHit.uv);
+    layer.x = pt.x;
+    layer.y = pt.y;
+  }
+  layer.surfaceZone = zone;
+  layer.surfaceId = mesh.userData.surfaceId || surfaceId || null;
+  dirtyZones[zone] = true;
   flushPaint();
 }
 
@@ -663,7 +764,6 @@ function addImageFromFile(file) {
       const layer = {
         id: uid(),
         type: 'image',
-        surfaceZone: ZONE.BACK,
         name: file.name.slice(0, 28),
         src: reader.result,
         image: im,
@@ -682,11 +782,12 @@ function addImageFromFile(file) {
       tool = 'select';
       placingArtwork = true;
       setOrbitLocked(true);
-      initImageProjection(layer);
+      initImageProjection(layer, activeArtworkZone, activeArtworkSurfaceId);
       snapshot();
       renderLayers();
       syncTransform(layer);
-      say('Photo on case · Lock, drag on exterior leather to place · scroll to scale');
+      const zoneLabel = ZONE_LABELS[activeArtworkZone] || 'back';
+      say(`Photo on ${zoneLabel} · Lock, drag on case to move · scroll to scale`);
     };
     im.src = reader.result;
   };
@@ -854,16 +955,26 @@ $('#caseTitle').oninput = () => scheduleSave();
 $('#addTextBtn').onclick = () => {
   const text = ($('#textInput').value || 'VULCET').trim();
   const fontSize = clamp(+$('#textSize').value || 120, 40, 280);
+  const targetZone = activeArtworkZone;
+  const targetSurfaceId = activeArtworkSurfaceId || resolveArtworkSurfaceId(targetZone);
+  let x = W / 2;
+  let y = H * 0.55;
+  if (activeHitMatchesTarget(targetZone, targetSurfaceId) && activeArtworkHit.uv) {
+    const pt = uvToCanvas(activeArtworkHit.uv);
+    x = pt.x;
+    y = pt.y;
+  }
   const layer = {
     id: uid(),
     type: 'text',
-    surfaceZone: ZONE.BACK,
+    surfaceZone: targetZone,
+    surfaceId: targetSurfaceId,
     name: text.split('\n')[0].slice(0, 24),
     text,
     fontSize,
     color: $('#textColor').value,
-    x: W / 2,
-    y: H * 0.55,
+    x,
+    y,
     scale: 1,
     rotation: 0,
     opacity: 1,
@@ -871,13 +982,14 @@ $('#addTextBtn').onclick = () => {
     w: 400,
     h: fontSize
   };
-  measureText(zoneCtx[ZONE.BACK], layer);
+  measureText(zoneCtx[targetZone], layer);
   layers.push(layer);
   selected = layer.id;
   snapshot();
-  render(ZONE.BACK);
+  render(targetZone);
   renderLayers();
-  say('Text stamped on exterior case.');
+  const zoneLabel = ZONE_LABELS[targetZone] || 'back';
+  say(`Text stamped on ${zoneLabel}.`);
 };
 
 $('#fileInput').onchange = (e) => { addImageFromFile(e.target.files[0]); e.target.value = ''; };
@@ -942,7 +1054,7 @@ $('#placeOnCaseBtn')?.addEventListener('click', () => {
   setOrbitLocked(true);
   tool = 'select';
   syncUI();
-  say('Locked · click/drag on exterior surfaces to place artwork');
+  say('Locked · click/drag on back, outer edges, or interior to place artwork');
 });
 
 lockBtn?.addEventListener('click', () => setOrbitLocked(!orbitLocked));
@@ -1405,6 +1517,9 @@ function prepareProduct(sceneRoot) {
   });
 
   phoneSize = fit(sceneRoot, 4.1);
+  activeArtworkZone = ZONE.BACK;
+  activeArtworkSurfaceId = resolveArtworkSurfaceId(ZONE.BACK);
+  activeArtworkHit = null;
   return caseCount;
 }
 
@@ -1472,6 +1587,7 @@ function moveSelectedToUv(hit) {
     say('Draw on back, outer edges, or interior');
     return false;
   }
+  updateActiveArtworkTarget(hit);
   if (l.type === 'image') {
     const mesh = hit.object;
     const n = hit.face?.normal
@@ -1513,6 +1629,7 @@ function paintAtHit(hit) {
     say('Draw on back, outer edges, or interior');
     return false;
   }
+  updateActiveArtworkTarget(hit);
   const pt = uvToCanvas(hit.uv);
   if (!painting || !paintStroke) {
     painting = true;
@@ -1575,6 +1692,9 @@ function bindViewportPointer(el) {
 
     if (orbitLocked) {
       const hit = hitCase(e.clientX, e.clientY);
+      if (hit && isArtworkEditableZone(hit.object?.userData?.surfaceZone)) {
+        updateActiveArtworkTarget(hit);
+      }
       const sel = layers.find((x) => x.id === selected);
 
       if (placingArtwork || (sel && ['image', 'text', 'pattern'].includes(sel.type) && tool !== 'brush' && tool !== 'eraser')) {
@@ -1590,7 +1710,7 @@ function bindViewportPointer(el) {
           paintAtHit(hit);
           return;
         }
-        say('Aim at an exterior leather surface to draw');
+        say('Aim at back, outer edges, or interior to draw');
         return;
       }
     }
