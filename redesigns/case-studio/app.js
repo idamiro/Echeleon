@@ -5,6 +5,8 @@ import {
   ARTWORK_ZONES,
   EDITABLE_ZONES,
   OUTER_EDGE_ZONES,
+  COLOR_GROUP,
+  colorGroupForZone,
   ZONE_LABELS,
   DEBUG_ZONE_COLORS,
   splitCaseBySurfaces,
@@ -441,6 +443,7 @@ function paintZone(targetCtx, zone, scale = 1, excludeId = null) {
   }
   const a = artOff.getContext('2d', { alpha: true });
   a.clearRect(0, 0, aw, ah);
+  // Layer stack order: layers[0] is bottom, layers[length-1] is top (matches Layers UI reverse list).
   layers
     .filter((l) => (l.surfaceZone || ZONE.BACK) === zone && l.id !== excludeId)
     .forEach((l) => drawLayer(a, l, scale));
@@ -1089,7 +1092,14 @@ function makeCaseMat(map, sourceMat, opts = {}) {
     clearcoatRoughness: opts.clearcoatRoughness ?? (material === 'gloss' ? 0.08 : 0.4),
     side: THREE.FrontSide
   });
-  copyPBRMaps(sourceMat, mat);
+  // Artwork / user-coloured case surfaces must not inherit authored leather seam maps
+  if (opts.preserveSourceSurfaceMaps) {
+    copyPBRMaps(sourceMat, mat);
+  } else {
+    mat.normalMap = null;
+    mat.roughnessMap = null;
+    mat.aoMap = null;
+  }
   return mat;
 }
 
@@ -1146,6 +1156,7 @@ function applyCaseTo3D() {
   for (const mesh of surfaceMeshes.values()) {
     const mat = mesh.material;
     const zone = mesh.userData.surfaceZone;
+    const colorGroup = mesh.userData.colorGroup || colorGroupForZone(zone);
     if (!mat || !zone) continue;
     if (ARTWORK_ZONES.has(zone)) {
       if (!caseDebug) mat.color.set(0xffffff);
@@ -1153,14 +1164,13 @@ function applyCaseTo3D() {
       mat.roughness = roughness;
       mat.clearcoat = clearcoat;
       mat.clearcoatRoughness = clearcoatRoughness;
-    } else if (zone === ZONE.CAMERA_LIP) {
-      // Camera lip follows Back colour — never Outer Edge
+    } else if (colorGroup === COLOR_GROUP.CAMERA) {
       if (!caseDebug) mat.color.set(backExteriorColor);
       mat.map = null;
       mat.roughness = roughness;
       mat.clearcoat = clearcoat;
       mat.clearcoatRoughness = clearcoatRoughness;
-    } else if (zone === ZONE.BEVEL) {
+    } else if (colorGroup === COLOR_GROUP.OUTER_EDGE) {
       if (!caseDebug) mat.color.set(outerEdgeColor);
       mat.map = null;
       mat.roughness = roughness;
@@ -1172,6 +1182,12 @@ function applyCaseTo3D() {
       mat.roughness = roughness;
       mat.clearcoat = clearcoat;
       mat.clearcoatRoughness = clearcoatRoughness;
+    }
+    // Keep artwork surfaces free of authored leather detail maps
+    if (!caseDebug) {
+      mat.normalMap = null;
+      mat.roughnessMap = null;
+      mat.aoMap = null;
     }
     if (caseDebug) {
       mat.color.set(DEBUG_ZONE_COLORS[zone] ?? 0xffffff);
@@ -1314,17 +1330,18 @@ function prepareProduct(sceneRoot) {
       if (!geo.attributes.position?.count) continue;
 
       let mat;
+      const colorGroup = colorGroupForZone(zone);
       if (ARTWORK_ZONES.has(zone)) {
         paintZone(zoneCtx[zone], zone, 1);
-        mat = makeCaseMat(ensureZoneTexture(zone), sourceMat);
-      } else if (zone === ZONE.CAMERA_LIP) {
-        mat = makeCaseMat(null, sourceMat);
+        mat = makeCaseMat(ensureZoneTexture(zone), sourceMat, { preserveSourceSurfaceMaps: false });
+      } else if (colorGroup === COLOR_GROUP.CAMERA) {
+        mat = makeCaseMat(null, sourceMat, { preserveSourceSurfaceMaps: false });
         mat.color.set(backExteriorColor);
-      } else if (OUTER_EDGE_ZONES.has(zone) || zone === ZONE.BEVEL) {
-        mat = makeCaseMat(null, sourceMat);
+      } else if (colorGroup === COLOR_GROUP.OUTER_EDGE) {
+        mat = makeCaseMat(null, sourceMat, { preserveSourceSurfaceMaps: false });
         mat.color.set(outerEdgeColor);
       } else {
-        mat = makeCaseMat(null, sourceMat);
+        mat = makeCaseMat(null, sourceMat, { preserveSourceSurfaceMaps: false });
         mat.color.set(backExteriorColor);
       }
       if (caseDebug) {
@@ -1337,6 +1354,7 @@ function prepareProduct(sceneRoot) {
       const zoneMesh = new THREE.Mesh(geo, mat);
       zoneMesh.name = `${mesh.name || 'Leather'}_${zone}`;
       zoneMesh.userData.surfaceZone = zone;
+      zoneMesh.userData.colorGroup = colorGroup;
       zoneMesh.userData.surfaceId = surfaceId;
       zoneMesh.userData.shellKey = shellKey;
       zoneMesh.castShadow = true;
