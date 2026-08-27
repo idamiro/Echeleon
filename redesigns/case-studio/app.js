@@ -13,6 +13,7 @@ import {
 const W = 1170;
 const H = 2532;
 const STORE = 'vulcet-case-studio-v8';
+const LEGACY_STORE = 'vulcet-case-studio-v7';
 const caseDebug = new URLSearchParams(window.location.search).get('caseDebug') === '1';
 
 const $ = (s, p = document) => p.querySelector(s);
@@ -1009,19 +1010,26 @@ function makeCaseMat(map, sourceMat, opts = {}) {
 }
 
 function makeInteriorMat(sourceMat) {
+  if (sourceMat?.clone) {
+    const mat = sourceMat.clone();
+    mat.side = THREE.FrontSide;
+    mat.polygonOffset = true;
+    mat.polygonOffsetFactor = -1;
+    mat.polygonOffsetUnits = -1;
+    return mat;
+  }
+
   const mat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color('#1a1614'),
-    map: sourceMat?.map || null,
+    color: 0xffffff,
     roughness: 0.75,
     metalness: 0,
-    clearcoat: 0.1,
-    clearcoatRoughness: 0.5,
     side: THREE.FrontSide
   });
-  copyPBRMaps(sourceMat, mat);
+
   mat.polygonOffset = true;
   mat.polygonOffsetFactor = -1;
   mat.polygonOffsetUnits = -1;
+
   return mat;
 }
 
@@ -1060,11 +1068,11 @@ function applyCaseTo3D() {
       mat.clearcoat = clearcoat;
       mat.clearcoatRoughness = clearcoatRoughness;
     } else if (zone === ZONE.INTERIOR) {
-      if (!caseDebug) mat.color.set('#1a1614');
-      mat.map = caseDebug ? null : (mat.map || null);
-      mat.roughness = Math.min(0.95, roughness + 0.15);
-      mat.clearcoat = clearcoat * 0.35;
-      mat.clearcoatRoughness = Math.min(1, clearcoatRoughness + 0.25);
+      // Keep original GLB interior material — never apply user colours or canvas maps.
+      if (caseDebug) {
+        mat.color.set(DEBUG_ZONE_COLORS[zone] ?? 0xffffff);
+        mat.map = null;
+      }
     } else {
       if (!caseDebug) mat.color.set(backExteriorColor);
       mat.map = null;
@@ -1583,10 +1591,28 @@ setOrbitLocked(false, false);
 
 (async () => {
   try {
-    const saved = localStorage.getItem(STORE);
+    let saved = localStorage.getItem(STORE);
+    let migratedFromLegacy = false;
+    if (!saved) {
+      const legacySaved = localStorage.getItem(LEGACY_STORE);
+      if (legacySaved) {
+        try {
+          JSON.parse(legacySaved);
+          saved = legacySaved;
+          migratedFromLegacy = true;
+        } catch (err) {
+          console.warn('Could not migrate legacy Case Studio state', err);
+        }
+      }
+    }
     if (saved) {
       history = [saved];
       await restore(JSON.parse(saved), false);
+      if (migratedFromLegacy) {
+        const migrated = JSON.stringify(serial());
+        localStorage.setItem(STORE, migrated);
+        history = [migrated];
+      }
       say('Welcome back — last design restored.');
     } else {
       layers = [];
