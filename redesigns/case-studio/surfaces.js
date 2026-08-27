@@ -344,7 +344,7 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
   const touchesOtherHole = new Uint8Array(triCount);
 
   // Internal holes = every rim loop except the outer perimeter.
-  // Camera opening = largest internal hole by projected area (not bbox %).
+  // Camera opening = largest internal hole by projected area.
   let cameraLoopIdx = -1;
   let cameraArea = -1;
   for (let li = 0; li < loops.length; li += 1) {
@@ -355,49 +355,12 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
     }
   }
 
-  let camMinW = Infinity;
-  let camMaxW = -Infinity;
-  let camMinH = Infinity;
-  let camMaxH = -Infinity;
   for (let li = 0; li < loops.length; li += 1) {
     for (const e of loops[li]) {
-      if (li === outerLoopIdx) {
-        touchesOuter[e.tri] = 1;
-      } else if (li === cameraLoopIdx) {
-        touchesCamera[e.tri] = 1;
-        for (const vi of [e.vi0, e.vi1]) {
-          const p = { x: pos.getX(vi), y: pos.getY(vi), z: pos.getZ(vi) };
-          const w = comp(p, axes.widthAxis);
-          const h = comp(p, axes.heightAxis);
-          camMinW = Math.min(camMinW, w);
-          camMaxW = Math.max(camMaxW, w);
-          camMinH = Math.min(camMinH, h);
-          camMaxH = Math.max(camMaxH, h);
-        }
-      } else {
-        touchesOtherHole[e.tri] = 1;
-      }
+      if (li === outerLoopIdx) touchesOuter[e.tri] = 1;
+      else if (li === cameraLoopIdx) touchesCamera[e.tri] = 1;
+      else touchesOtherHole[e.tri] = 1;
     }
-  }
-
-  // Local influence box around the camera hole loop only
-  let camPadW = 0;
-  let camPadH = 0;
-  if (Number.isFinite(camMinW)) {
-    camPadW = Math.max((camMaxW - camMinW) * 0.35, size[axes.widthAxis] * 0.015);
-    camPadH = Math.max((camMaxH - camMinH) * 0.35, size[axes.heightAxis] * 0.015);
-    camMinW -= camPadW;
-    camMaxW += camPadW;
-    camMinH -= camPadH;
-    camMaxH += camPadH;
-  }
-
-  function inCameraRegion(t) {
-    if (!Number.isFinite(camMinW)) return false;
-    const c = centers[t];
-    const w = comp(c, axes.widthAxis);
-    const h = comp(c, axes.heightAxis);
-    return w >= camMinW && w <= camMaxW && h >= camMinH && h <= camMaxH;
   }
 
   const wMin = comp(bb.min, axes.widthAxis);
@@ -437,33 +400,41 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
     return nThick * awaySign > 0.55 && aT >= aH && aT >= aW && aT > 0.7;
   }
 
-  // CAMERA_LIP: seed from the camera INTERNAL hole loop — never reject because
-  // the hole sits near the top/left/right bbox edge of the case.
+  // CAMERA_LIP via graph distance from the camera internal rim loop (no W/H bbox).
+  const MAX_CAMERA_RING_DISTANCE = 3;
   const PATCH_DOT = 0.82;
+  const cameraDistance = new Int16Array(triCount);
+  cameraDistance.fill(-1);
   const cameraQueue = [];
   for (let t = 0; t < triCount; t += 1) {
     if (assigned[t] || !touchesCamera[t]) continue;
     assigned[t] = ZONE.CAMERA_LIP;
+    cameraDistance[t] = 0;
     buckets[ZONE.CAMERA_LIP].push(t);
     cameraQueue.push(t);
   }
-  while (cameraQueue.length) {
-    const t = cameraQueue.pop();
+  let camQi = 0;
+  while (camQi < cameraQueue.length) {
+    const t = cameraQueue[camQi++];
+    const dist = cameraDistance[t];
+    if (dist >= MAX_CAMERA_RING_DISTANCE) continue;
     const n0 = normals[t];
     for (const n of neighbors[t]) {
-      if (assigned[n]) continue;
-      if (!inCameraRegion(n) && !touchesCamera[n]) continue;
-      // Stay local to the camera hole — do not flood into the outer phone-opening rim
-      if (touchesOuter[n] && !touchesCamera[n] && !inCameraRegion(n)) continue;
-      if (n0.dot(normals[n]) < 0.72) continue;
-      if (isStrongBack(n) && !touchesCamera[n]) continue;
+      if (assigned[n] === ZONE.INTERIOR) continue;
+      if (cameraDistance[n] >= 0) continue;
+      // Do not cross into the main outer phone-opening perimeter
+      if (touchesOuter[n] && !touchesCamera[n]) continue;
+      // Do not consume the broad rear plate beyond the lip rings
+      if (isStrongBack(n) && dist > 0) continue;
+      if (dist > 0 && n0.dot(normals[n]) < 0.55) continue;
+      cameraDistance[n] = dist + 1;
       assigned[n] = ZONE.CAMERA_LIP;
       buckets[ZONE.CAMERA_LIP].push(n);
       cameraQueue.push(n);
     }
   }
 
-  // Connected exterior patches
+  // Connected exterior patches (artwork / semantic zones)
   const patches = [];
   const visited = new Uint8Array(triCount);
   for (let seed = 0; seed < triCount; seed += 1) {
@@ -489,23 +460,25 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
     const avgN = new THREE.Vector3();
     const centroid = new THREE.Vector3();
     let hitCam = false;
-    let inCam = false;
     let touchCam = false;
     let nLeft = 0;
     let nRight = 0;
     let nTop = 0;
     let nBottom = 0;
+    let nearCamDist = 99;
     for (const t of patch) {
       avgN.add(normals[t]);
       centroid.add(centers[t]);
       if (touchesCamera[t]) hitCam = true;
-      if (inCameraRegion(t)) inCam = true;
       if (nearLeftOuter(t)) nLeft += 1;
       if (nearRightOuter(t)) nRight += 1;
       if (nearTopOuter(t)) nTop += 1;
       if (nearBottomOuter(t)) nBottom += 1;
       for (const n of neighbors[t]) {
-        if (assigned[n] === ZONE.CAMERA_LIP) touchCam = true;
+        if (assigned[n] === ZONE.CAMERA_LIP) {
+          touchCam = true;
+          if (cameraDistance[n] >= 0) nearCamDist = Math.min(nearCamDist, cameraDistance[n]);
+        }
       }
     }
     avgN.normalize();
@@ -519,10 +492,9 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
     const aW = Math.abs(nW);
     const frac = 1 / Math.max(1, patch.length);
 
-    // Camera-hole local patches — never Outer Edge
+    // Leftover hole-local patches adjacent to camera lip (graph-near only)
     if (hitCam) return ZONE.CAMERA_LIP;
-    if (touchCam && inCam && (nLeft + nRight) * frac < 0.55) return ZONE.CAMERA_LIP;
-    if (inCam && patch.length <= 64 && (nLeft + nRight) * frac < 0.45 && aT < 0.92) {
+    if (touchCam && nearCamDist <= MAX_CAMERA_RING_DISTANCE && (nLeft + nRight) * frac < 0.55) {
       return ZONE.CAMERA_LIP;
     }
 
@@ -551,8 +523,31 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
     }
   }
 
-  // Outer-perimeter wall reach (topology): exterior, not strong back, not camera.
-  // Any BACK triangle on this wall is a mis-coloured top/bottom/side strip — rebucket.
+  // Camera reclaim: pull BEVEL within graph-distance of the camera lip
+  {
+    const reclaim = [];
+    for (let t = 0; t < triCount; t += 1) {
+      if (assigned[t] !== ZONE.CAMERA_LIP || cameraDistance[t] < 0) continue;
+      for (const n of neighbors[t]) {
+        if (assigned[n] !== ZONE.BEVEL) continue;
+        if (cameraDistance[t] >= MAX_CAMERA_RING_DISTANCE) continue;
+        reclaim.push(n);
+        cameraDistance[n] = cameraDistance[t] + 1;
+      }
+    }
+    for (const t of reclaim) {
+      if (assigned[t] !== ZONE.BEVEL) continue;
+      const arr = buckets[ZONE.BEVEL];
+      if (arr) {
+        const idx = arr.indexOf(t);
+        if (idx >= 0) arr.splice(idx, 1);
+      }
+      assigned[t] = ZONE.CAMERA_LIP;
+      buckets[ZONE.CAMERA_LIP].push(t);
+    }
+  }
+
+  // Outer-perimeter wall reach (topology). Colour uses this directly — no semantic rebucket.
   const outerWall = new Uint8Array(triCount);
   {
     const q = [];
@@ -575,55 +570,13 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
     }
   }
 
-  function rebucket(t, nextZone) {
-    const prev = assigned[t];
-    if (prev === nextZone) return;
-    const arr = buckets[prev];
-    if (arr) {
-      const idx = arr.indexOf(t);
-      if (idx >= 0) arr.splice(idx, 1);
-    }
-    assigned[t] = nextZone;
-    buckets[nextZone].push(t);
-  }
-
+  // Authoritative per-triangle colour groups from topology (priority: INTERIOR > CAMERA > OUTER_EDGE > BACK)
+  const colorGroups = new Array(triCount);
   for (let t = 0; t < triCount; t += 1) {
-    if (!outerWall[t]) continue;
-    if (assigned[t] === ZONE.CAMERA_LIP || assigned[t] === ZONE.INTERIOR) continue;
-    // Already a perimeter artwork/side zone — keep for raycast, colour group is Outer Edge
-    if (OUTER_EDGE_ZONES.has(assigned[t]) || assigned[t] === ZONE.BEVEL) continue;
-    if (assigned[t] !== ZONE.BACK) continue;
-    if (isStrongBack(t)) continue;
-
-    const n = normals[t];
-    const nH = comp(n, axes.heightAxis);
-    const nW = comp(n, axes.widthAxis);
-    const aH = Math.abs(nH);
-    const aW = Math.abs(nW);
-    const aT = Math.abs(comp(n, axes.thickAxis));
-    if (aW >= aH && aW >= aT * 0.55) {
-      rebucket(t, nW >= 0 ? ZONE.RIGHT : ZONE.LEFT);
-    } else if (aH >= aW && aH >= aT * 0.55) {
-      rebucket(t, nH >= 0 ? ZONE.TOP : ZONE.BOTTOM);
-    } else {
-      rebucket(t, ZONE.BEVEL);
-    }
-  }
-
-  // Reclaim camera-local BEVEL next to CAMERA_LIP (never steal outer-edge walls)
-  {
-    const isCam = new Uint8Array(triCount);
-    for (const t of buckets[ZONE.CAMERA_LIP]) isCam[t] = 1;
-    const reclaim = [];
-    for (let t = 0; t < triCount; t += 1) {
-      if (!isCam[t]) continue;
-      for (const n of neighbors[t]) {
-        if (isCam[n] || assigned[n] !== ZONE.BEVEL) continue;
-        if (!inCameraRegion(n) && !touchesCamera[n]) continue;
-        reclaim.push(n);
-      }
-    }
-    for (const t of reclaim) rebucket(t, ZONE.CAMERA_LIP);
+    if (assigned[t] === ZONE.INTERIOR) colorGroups[t] = COLOR_GROUP.INTERIOR;
+    else if (assigned[t] === ZONE.CAMERA_LIP) colorGroups[t] = COLOR_GROUP.CAMERA;
+    else if (outerWall[t]) colorGroups[t] = COLOR_GROUP.OUTER_EDGE;
+    else colorGroups[t] = COLOR_GROUP.BACK;
   }
 
   function buildFromTris(tris) {
@@ -653,39 +606,53 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
     return g;
   }
 
-  const geometries = {};
-  const stats = {};
-  for (const [zone, tris] of Object.entries(buckets)) {
-    geometries[zone] = buildFromTris(tris);
-    const g = geometries[zone];
-    const uv = g.attributes.uv;
-    let minU = 1;
-    let maxU = 0;
-    let minV = 1;
-    let maxV = 0;
-    if (uv) {
-      for (let i = 0; i < uv.count; i += 1) {
-        minU = Math.min(minU, uv.getX(i));
-        maxU = Math.max(maxU, uv.getX(i));
-        minV = Math.min(minV, uv.getY(i));
-        maxV = Math.max(maxV, uv.getY(i));
-      }
+  // Build geometry parts by (surfaceZone, colorGroup) — artwork zone and colour are independent
+  const partTris = new Map();
+  for (let t = 0; t < triCount; t += 1) {
+    const zone = assigned[t];
+    const cg = colorGroups[t];
+    if (!zone || !cg) continue;
+    const key = `${zone}::${cg}`;
+    let list = partTris.get(key);
+    if (!list) {
+      list = [];
+      partTris.set(key, list);
     }
-    stats[zone] = {
-      triangleCount: tris.length,
-      uvBounds: uv && tris.length ? { minU, maxU, minV, maxV } : null,
-      bbox: g.boundingBox
-        ? {
-          min: g.boundingBox.min.toArray(),
-          max: g.boundingBox.max.toArray()
-        }
-        : null,
-      rimLoops: loops.length,
-      outerLoopEdges: loops[outerLoopIdx]?.length || 0
-    };
+    list.push(t);
   }
 
-  return { geometries, stats, axes, phoneLocal: phoneLocal.toArray() };
+  const parts = [];
+  const stats = {};
+  const geometries = {};
+  for (const [key, tris] of partTris.entries()) {
+    const [zone, colorGroup] = key.split('::');
+    const geometry = buildFromTris(tris);
+    if (!geometry.attributes.position?.count) continue;
+    parts.push({ zone, colorGroup, geometry, triangleCount: tris.length });
+    // Legacy aggregate by zone (first part wins for empty check tooling)
+    if (!geometries[zone]) geometries[zone] = geometry;
+    if (!stats[zone]) {
+      stats[zone] = {
+        triangleCount: 0,
+        colorGroups: {},
+        rimLoops: loops.length,
+        outerLoopEdges: loops[outerLoopIdx]?.length || 0,
+        cameraLoopEdges: cameraLoopIdx >= 0 ? (loops[cameraLoopIdx]?.length || 0) : 0,
+        maxCameraRing: MAX_CAMERA_RING_DISTANCE
+      };
+    }
+    stats[zone].triangleCount += tris.length;
+    stats[zone].colorGroups[colorGroup] = (stats[zone].colorGroups[colorGroup] || 0) + tris.length;
+  }
+
+  return {
+    parts,
+    geometries,
+    stats,
+    axes,
+    phoneLocal: phoneLocal.toArray(),
+    maxCameraRingDistance: MAX_CAMERA_RING_DISTANCE
+  };
 }
 
 export function isArtworkEditableZone(zone) {

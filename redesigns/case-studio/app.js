@@ -1158,7 +1158,14 @@ function applyCaseTo3D() {
     const zone = mesh.userData.surfaceZone;
     const colorGroup = mesh.userData.colorGroup || colorGroupForZone(zone);
     if (!mat || !zone) continue;
-    if (ARTWORK_ZONES.has(zone)) {
+    // Artwork follows surfaceZone; base colour follows topology colorGroup.
+    // A BACK patch marked OUTER_EDGE must not pick up the back artwork map.
+    const useArtwork = ARTWORK_ZONES.has(zone) && (
+      (zone === ZONE.BACK && colorGroup === COLOR_GROUP.BACK)
+      || (zone === ZONE.INTERIOR && colorGroup === COLOR_GROUP.INTERIOR)
+      || (OUTER_EDGE_ZONES.has(zone) && colorGroup === COLOR_GROUP.OUTER_EDGE)
+    );
+    if (useArtwork) {
       if (!caseDebug) mat.color.set(0xffffff);
       mat.map = caseDebug ? null : ensureZoneTexture(zone);
       mat.roughness = roughness;
@@ -1172,6 +1179,12 @@ function applyCaseTo3D() {
       mat.clearcoatRoughness = clearcoatRoughness;
     } else if (colorGroup === COLOR_GROUP.OUTER_EDGE) {
       if (!caseDebug) mat.color.set(outerEdgeColor);
+      mat.map = null;
+      mat.roughness = roughness;
+      mat.clearcoat = clearcoat;
+      mat.clearcoatRoughness = clearcoatRoughness;
+    } else if (colorGroup === COLOR_GROUP.INTERIOR) {
+      if (!caseDebug) mat.color.set(interiorColor);
       mat.map = null;
       mat.roughness = roughness;
       mat.clearcoat = clearcoat;
@@ -1318,20 +1331,33 @@ function prepareProduct(sceneRoot) {
     caseCount += 1;
     if (mesh.geometry && !mesh.geometry.getAttribute('normal')) mesh.geometry.computeVertexNormals();
     const sourceMat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
-    const { geometries, stats, axes } = splitCaseBySurfaces(mesh, phoneCenterWorld);
+    const { parts, stats, axes } = splitCaseBySurfaces(mesh, phoneCenterWorld);
     if (caseDebug) {
       console.log('[caseDebug] splitCaseBySurfaces stats', stats);
       console.log('[caseDebug] axes', axes);
+      console.log('[caseDebug] parts', parts.map((p) => ({
+        zone: p.zone,
+        colorGroup: p.colorGroup,
+        tris: p.triangleCount
+      })));
     }
     const parent = mesh.parent || sceneRoot;
     const shellKey = `shell${shellIndex}`;
 
-    for (const [zone, geo] of Object.entries(geometries)) {
-      if (!geo.attributes.position?.count) continue;
+    for (const part of parts) {
+      const zone = part.zone;
+      const colorGroup = part.colorGroup;
+      const geo = part.geometry;
+      if (!geo?.attributes?.position?.count) continue;
+
+      const useArtwork = ARTWORK_ZONES.has(zone) && (
+        (zone === ZONE.BACK && colorGroup === COLOR_GROUP.BACK)
+        || (zone === ZONE.INTERIOR && colorGroup === COLOR_GROUP.INTERIOR)
+        || (OUTER_EDGE_ZONES.has(zone) && colorGroup === COLOR_GROUP.OUTER_EDGE)
+      );
 
       let mat;
-      const colorGroup = colorGroupForZone(zone);
-      if (ARTWORK_ZONES.has(zone)) {
+      if (useArtwork) {
         paintZone(zoneCtx[zone], zone, 1);
         mat = makeCaseMat(ensureZoneTexture(zone), sourceMat, { preserveSourceSurfaceMaps: false });
       } else if (colorGroup === COLOR_GROUP.CAMERA) {
@@ -1340,6 +1366,9 @@ function prepareProduct(sceneRoot) {
       } else if (colorGroup === COLOR_GROUP.OUTER_EDGE) {
         mat = makeCaseMat(null, sourceMat, { preserveSourceSurfaceMaps: false });
         mat.color.set(outerEdgeColor);
+      } else if (colorGroup === COLOR_GROUP.INTERIOR) {
+        mat = makeCaseMat(null, sourceMat, { preserveSourceSurfaceMaps: false });
+        mat.color.set(interiorColor);
       } else {
         mat = makeCaseMat(null, sourceMat, { preserveSourceSurfaceMaps: false });
         mat.color.set(backExteriorColor);
@@ -1350,9 +1379,9 @@ function prepareProduct(sceneRoot) {
       }
       caseMats.push(mat);
 
-      const surfaceId = `${shellKey}:${zone}`;
+      const surfaceId = `${shellKey}:${zone}:${colorGroup}`;
       const zoneMesh = new THREE.Mesh(geo, mat);
-      zoneMesh.name = `${mesh.name || 'Leather'}_${zone}`;
+      zoneMesh.name = `${mesh.name || 'Leather'}_${zone}_${colorGroup}`;
       zoneMesh.userData.surfaceZone = zone;
       zoneMesh.userData.colorGroup = colorGroup;
       zoneMesh.userData.surfaceId = surfaceId;
@@ -1368,10 +1397,9 @@ function prepareProduct(sceneRoot) {
       casePickMeshes.push(zoneMesh);
       surfaceMeshes.set(surfaceId, zoneMesh);
 
-      // With a single shell, zoneMaps remain convenient mirrors of that shell.
-      // Never overwrite an existing zone entry from a different shell.
-      if (!zoneMeshes[zone]) zoneMeshes[zone] = zoneMesh;
-      if (!zoneMat[zone]) zoneMat[zone] = mat;
+      // Prefer artwork-bearing part for zoneMeshes convenience lookup
+      if (!zoneMeshes[zone] || useArtwork) zoneMeshes[zone] = zoneMesh;
+      if (!zoneMat[zone] || useArtwork) zoneMat[zone] = mat;
     }
     mesh.visible = false;
   });
