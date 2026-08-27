@@ -86,7 +86,7 @@
           </div>
           <label class="field">Colour<input id="brushColor" type="color" value="#f4f1ea"></label>
           <label class="field">Size <output id="brushSizeOut">28</output><input id="brushSize" type="range" min="4" max="120" value="28"></label>
-          <p class="help">Turn the case, press <strong>Lock</strong>, then draw on exterior surfaces only. Interior is not editable. Scroll to resize a selected photo.</p>
+          <p class="help">Turn the case, press <strong>Lock</strong>, then draw on the back, outer edges, or interior. Scroll to resize a selected photo.</p>
         </div>
 
         <div class="panel-view" data-view="upload">
@@ -154,23 +154,23 @@
             <button type="button" class="swatch" data-color="#2f4a3a" style="--c:#2f4a3a" aria-label="Dark green"></button>
             <button type="button" class="swatch" data-color="#8b1e2d" style="--c:#8b1e2d" aria-label="Red"></button>
           </div>
-          <p class="section-label">Left side</p>
-          <div class="swatches" id="leftSwatches" data-target="leftOuter">
+          <p class="section-label">Outer edge</p>
+          <div class="swatches" id="outerEdgeSwatches" data-target="outerEdge">
             <button type="button" class="swatch is-on" data-color="#1a1a1c" style="--c:#1a1a1c" aria-label="Black"></button>
             <button type="button" class="swatch" data-color="#f4f1ea" style="--c:#f4f1ea" aria-label="White"></button>
             <button type="button" class="swatch" data-color="#d8c3a8" style="--c:#d8c3a8" aria-label="Beige"></button>
             <button type="button" class="swatch" data-color="#2f4a3a" style="--c:#2f4a3a" aria-label="Dark green"></button>
             <button type="button" class="swatch" data-color="#1e4b8b" style="--c:#1e4b8b" aria-label="Blue"></button>
           </div>
-          <p class="section-label">Right side</p>
-          <div class="swatches" id="rightSwatches" data-target="rightOuter">
-            <button type="button" class="swatch is-on" data-color="#1a1a1c" style="--c:#1a1a1c" aria-label="Black"></button>
+          <p class="section-label">Interior</p>
+          <div class="swatches" id="interiorSwatches" data-target="interior">
+            <button type="button" class="swatch is-on" data-color="#1a1614" style="--c:#1a1614" aria-label="Dark interior"></button>
             <button type="button" class="swatch" data-color="#f4f1ea" style="--c:#f4f1ea" aria-label="White"></button>
             <button type="button" class="swatch" data-color="#d8c3a8" style="--c:#d8c3a8" aria-label="Beige"></button>
             <button type="button" class="swatch" data-color="#2f4a3a" style="--c:#2f4a3a" aria-label="Dark green"></button>
-            <button type="button" class="swatch" data-color="#1f7a3a" style="--c:#1f7a3a" aria-label="Green"></button>
+            <button type="button" class="swatch" data-color="#8b1e2d" style="--c:#8b1e2d" aria-label="Red"></button>
           </div>
-          <p class="help">Interior surfaces stay original and cannot be painted.</p>
+          <p class="help">Outer edge colours left, right, top and bottom together. Interior is independently paintable.</p>
         </div>
 
         <div class="props-block">

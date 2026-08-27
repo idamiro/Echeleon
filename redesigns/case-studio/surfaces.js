@@ -21,8 +21,26 @@ export const ZONE = {
   INTERIOR: 'interior'
 };
 
-/** Zones the user may paint / place artwork onto */
-export const EDITABLE_ZONES = new Set([ZONE.BACK, ZONE.LEFT, ZONE.RIGHT]);
+/** Zones that support artwork canvases / raycast painting */
+export const ARTWORK_ZONES = new Set([
+  ZONE.BACK,
+  ZONE.LEFT,
+  ZONE.RIGHT,
+  ZONE.TOP,
+  ZONE.BOTTOM,
+  ZONE.INTERIOR
+]);
+
+/** @deprecated use ARTWORK_ZONES — kept as alias for older call sites */
+export const EDITABLE_ZONES = ARTWORK_ZONES;
+
+/** Zones that share the single Outer Edge user colour */
+export const OUTER_EDGE_ZONES = new Set([
+  ZONE.LEFT,
+  ZONE.RIGHT,
+  ZONE.TOP,
+  ZONE.BOTTOM
+]);
 
 export const ZONE_LABELS = {
   [ZONE.BACK]: 'back',
@@ -446,6 +464,7 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
     const centroid = new THREE.Vector3();
     let hitHole = false;
     let inHole = false;
+    let touchCam = false;
     let nLeft = 0;
     let nRight = 0;
     let nTop = 0;
@@ -459,6 +478,9 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
       if (nearRightOuter(t)) nRight += 1;
       if (nearTopOuter(t)) nTop += 1;
       if (nearBottomOuter(t)) nBottom += 1;
+      for (const n of neighbors[t]) {
+        if (assigned[n] === ZONE.CAMERA_LIP) touchCam = true;
+      }
     }
     avgN.normalize();
     centroid.multiplyScalar(1 / Math.max(1, patch.length));
@@ -471,9 +493,13 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
     const aW = Math.abs(nW);
     const frac = 1 / Math.max(1, patch.length);
 
-    // Hole walls stay camera — never side colours
+    // Hole walls / camera-notch patches stay camera — never Outer Edge colours
     if (hitHole && (nLeft + nRight) * frac < 0.35 && aT < 0.9) return ZONE.CAMERA_LIP;
     if (inHole && (nLeft + nRight) * frac < 0.35 && aT < 0.85 && (aW > 0.25 || aH > 0.25)) {
+      return ZONE.CAMERA_LIP;
+    }
+    // Small leftover patches touching CAMERA_LIP inside the hole region
+    if (touchCam && inHole && patch.length <= 48 && (nLeft + nRight) * frac < 0.5) {
       return ZONE.CAMERA_LIP;
     }
 
@@ -481,9 +507,7 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
     if (aT >= aH && aT >= aW && aT > 0.42 && nThick * fromCThick > 0) return ZONE.BACK;
     if (nThick * awaySign > 0.42 && aT >= aH && aT >= aW) return ZONE.BACK;
 
-    // Physical outer side walls: side-facing + on outer width band.
-    // Button cutouts on a side may touch a hole loop — still keep the outer wall as Left/Right
-    // when the patch is predominantly on the outer band.
+    // Physical outer side walls
     if (aW >= 0.55 && aW >= aH && aW >= aT * 0.75) {
       if (nW < 0 && nLeft * frac >= 0.35) return ZONE.LEFT;
       if (nW > 0 && nRight * frac >= 0.35) return ZONE.RIGHT;
@@ -502,6 +526,32 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
     for (const t of patch) {
       assigned[t] = zone;
       buckets[zone].push(t);
+    }
+  }
+
+  // Reclaim hole-local BEVEL next to CAMERA_LIP so the left camera notch cannot
+  // inherit Outer Edge colour via BEVEL. Never steal LEFT/RIGHT/TOP/BOTTOM.
+  {
+    const isCam = new Uint8Array(triCount);
+    for (const t of buckets[ZONE.CAMERA_LIP]) isCam[t] = 1;
+    const reclaim = [];
+    for (let t = 0; t < triCount; t += 1) {
+      if (!isCam[t]) continue;
+      for (const n of neighbors[t]) {
+        if (isCam[n] || assigned[n] !== ZONE.BEVEL) continue;
+        if (!inHoleRegion(n) && !touchesHole[n]) continue;
+        reclaim.push(n);
+      }
+    }
+    for (const t of reclaim) {
+      const arr = buckets[ZONE.BEVEL];
+      if (arr) {
+        const idx = arr.indexOf(t);
+        if (idx >= 0) arr.splice(idx, 1);
+      }
+      assigned[t] = ZONE.CAMERA_LIP;
+      buckets[ZONE.CAMERA_LIP].push(t);
+      isCam[t] = 1;
     }
   }
 
@@ -567,29 +617,34 @@ export function splitCaseBySurfaces(mesh, phoneCenterWorld) {
   return { geometries, stats, axes, phoneLocal: phoneLocal.toArray() };
 }
 
+export function isArtworkEditableZone(zone) {
+  return ARTWORK_ZONES.has(zone);
+}
+
+/** @deprecated use isArtworkEditableZone */
 export function isEditableZone(zone) {
-  return EDITABLE_ZONES.has(zone);
+  return isArtworkEditableZone(zone);
 }
 
 /**
  * Migrate legacy layer face → surfaceZone.
- * Interior artwork is not editable — move to back or drop strokes.
+ * Interior is now a valid artwork target.
  */
 export function migrateLayerSurface(layer) {
   if (layer.surfaceZone && layer.surfaceZone !== 'exterior' && layer.surfaceZone !== 'interior') {
-    if (layer.surfaceZone === ZONE.INTERIOR) {
-      if (layer.type === 'stroke') return null;
-      return { ...layer, surfaceZone: ZONE.BACK, face: undefined };
-    }
     return layer;
   }
-  if (layer.face === 'interior') {
-    if (layer.type === 'stroke') return null;
+  if (layer.face === 'interior' || layer.surfaceZone === 'interior') {
+    const next = { ...layer, surfaceZone: ZONE.INTERIOR };
+    delete next.face;
+    return next;
+  }
+  if (layer.surfaceZone === 'exterior') {
     const next = { ...layer, surfaceZone: ZONE.BACK };
     delete next.face;
     return next;
   }
-  const next = { ...layer, surfaceZone: ZONE.BACK };
+  const next = { ...layer, surfaceZone: layer.surfaceZone || ZONE.BACK };
   delete next.face;
   return next;
 }

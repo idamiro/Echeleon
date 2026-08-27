@@ -2,10 +2,13 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import {
   ZONE,
+  ARTWORK_ZONES,
   EDITABLE_ZONES,
+  OUTER_EDGE_ZONES,
   ZONE_LABELS,
   DEBUG_ZONE_COLORS,
   splitCaseBySurfaces,
+  isArtworkEditableZone,
   isEditableZone,
   migrateLayerSurface
 } from './surfaces.js';
@@ -28,8 +31,8 @@ const previewHost = $('#previewHost');
 const lockBtn = $('#lockOrbit');
 
 let backExteriorColor = '#1a1a1c';
-let leftOuterColor = '#1a1a1c';
-let rightOuterColor = '#1a1a1c';
+let outerEdgeColor = '#1a1a1c';
+let interiorColor = '#1a1614';
 let material = 'soft';
 let gloss = 0.2;
 let tool = 'brush';
@@ -48,7 +51,7 @@ artOff.height = H;
 
 const zoneCanvas = {};
 const zoneCtx = {};
-for (const z of EDITABLE_ZONES) {
+for (const z of ARTWORK_ZONES) {
   const c = document.createElement('canvas');
   c.width = W;
   c.height = H;
@@ -57,9 +60,10 @@ for (const z of EDITABLE_ZONES) {
 }
 
 function zoneBaseColor(zone) {
-  if (zone === ZONE.LEFT) return leftOuterColor;
-  if (zone === ZONE.RIGHT) return rightOuterColor;
-  if (zone === ZONE.INTERIOR) return '#1a1614';
+  if (OUTER_EDGE_ZONES.has(zone)) return outerEdgeColor;
+  if (zone === ZONE.INTERIOR) return interiorColor;
+  if (zone === ZONE.CAMERA_LIP) return backExteriorColor;
+  if (zone === ZONE.BEVEL) return outerEdgeColor;
   return backExteriorColor;
 }
 
@@ -75,8 +79,8 @@ function markSaved(ok = true) {
 function serial() {
   return {
     backExteriorColor,
-    leftOuterColor,
-    rightOuterColor,
+    outerEdgeColor,
+    interiorColor,
     material,
     gloss,
     title: $('#caseTitle').value,
@@ -132,8 +136,12 @@ async function loadImages(list) {
 async function restore(data, announce = true) {
   const legacy = data.exteriorColor || data.caseColor || '#1a1a1c';
   backExteriorColor = data.backExteriorColor || legacy;
-  leftOuterColor = data.leftOuterColor || legacy;
-  rightOuterColor = data.rightOuterColor || legacy;
+  outerEdgeColor = data.outerEdgeColor
+    || data.leftOuterColor
+    || data.rightOuterColor
+    || backExteriorColor
+    || legacy;
+  interiorColor = data.interiorColor || '#1a1614';
   material = data.material || 'soft';
   gloss = data.gloss ?? 0.2;
   if (data.title) $('#caseTitle').value = data.title;
@@ -444,7 +452,7 @@ function paintZone(targetCtx, zone, scale = 1, excludeId = null) {
 }
 
 let paintRaf = 0;
-const dirtyZones = Object.fromEntries([...EDITABLE_ZONES].map((z) => [z, false]));
+const dirtyZones = Object.fromEntries([...ARTWORK_ZONES].map((z) => [z, false]));
 let liveMode = null; // null | 'stroke' | 'move'
 let liveZone = ZONE.BACK;
 let liveExcludeId = null;
@@ -455,8 +463,8 @@ let wheelLiveTimer = 0;
 function schedulePaint(zone) {
   if (liveMode) return;
   if (zone === 'all' || zone === 'both') {
-    for (const z of EDITABLE_ZONES) dirtyZones[z] = true;
-  } else if (EDITABLE_ZONES.has(zone)) {
+    for (const z of ARTWORK_ZONES) dirtyZones[z] = true;
+  } else if (ARTWORK_ZONES.has(zone)) {
     dirtyZones[zone] = true;
   }
   if (paintRaf) return;
@@ -467,7 +475,7 @@ function schedulePaint(zone) {
 }
 
 function flushPaint() {
-  for (const z of EDITABLE_ZONES) {
+  for (const z of ARTWORK_ZONES) {
     if (dirtyZones[z]) {
       paintZone(zoneCtx[z], z, 1);
       if (zoneTex[z]) zoneTex[z].needsUpdate = true;
@@ -601,8 +609,8 @@ function syncTransform(l) {
 
 function syncUI() {
   $$('#backSwatches .swatch').forEach((b) => b.classList.toggle('is-on', b.dataset.color === backExteriorColor));
-  $$('#leftSwatches .swatch').forEach((b) => b.classList.toggle('is-on', b.dataset.color === leftOuterColor));
-  $$('#rightSwatches .swatch').forEach((b) => b.classList.toggle('is-on', b.dataset.color === rightOuterColor));
+  $$('#outerEdgeSwatches .swatch').forEach((b) => b.classList.toggle('is-on', b.dataset.color === outerEdgeColor));
+  $$('#interiorSwatches .swatch').forEach((b) => b.classList.toggle('is-on', b.dataset.color === interiorColor));
   $$('.mat').forEach((b) => b.classList.toggle('is-on', b.dataset.mat === material));
   $$('.seg-btn').forEach((b) => b.classList.toggle('is-on', b.dataset.tool === tool));
   if ($('#brushSize')) $('#brushSize').value = brushSize;
@@ -633,8 +641,8 @@ function setOrbitLocked(on, announce = true) {
   previewHost?.classList.toggle('is-locked', orbitLocked);
   if (announce) {
     say(orbitLocked
-      ? 'Scene locked · draw on exterior surfaces only'
-      : 'Unlocked · drag to orbit · Lock before drawing on exterior');
+      ? 'Scene locked · draw on back, outer edges, or interior'
+      : 'Unlocked · drag to orbit · Lock before drawing on the case');
   }
 }
 
@@ -790,10 +798,10 @@ $$('[data-act]').forEach((b) => b.addEventListener('click', () => {
   else mutate(act);
 }));
 
-$$('#backSwatches .swatch, #leftSwatches .swatch, #rightSwatches .swatch').forEach((b) => b.addEventListener('click', () => {
+$$('#backSwatches .swatch, #outerEdgeSwatches .swatch, #interiorSwatches .swatch').forEach((b) => b.addEventListener('click', () => {
   const target = b.closest('.swatches')?.dataset.target || 'back';
-  if (target === 'leftOuter') leftOuterColor = b.dataset.color;
-  else if (target === 'rightOuter') rightOuterColor = b.dataset.color;
+  if (target === 'outerEdge') outerEdgeColor = b.dataset.color;
+  else if (target === 'interior') interiorColor = b.dataset.color;
   else backExteriorColor = b.dataset.color;
   syncUI();
   snapshot();
@@ -1110,7 +1118,7 @@ function makeInteriorMat(sourceMat) {
 }
 
 function ensureZoneTexture(zone) {
-  if (!EDITABLE_ZONES.has(zone)) return null;
+  if (!ARTWORK_ZONES.has(zone)) return null;
   let tex = zoneTex[zone];
   if (!tex) {
     paintZone(zoneCtx[zone], zone, 1);
@@ -1139,17 +1147,25 @@ function applyCaseTo3D() {
     const mat = mesh.material;
     const zone = mesh.userData.surfaceZone;
     if (!mat || !zone) continue;
-    if (EDITABLE_ZONES.has(zone)) {
+    if (ARTWORK_ZONES.has(zone)) {
       if (!caseDebug) mat.color.set(0xffffff);
       mat.map = caseDebug ? null : ensureZoneTexture(zone);
       mat.roughness = roughness;
       mat.clearcoat = clearcoat;
       mat.clearcoatRoughness = clearcoatRoughness;
-    } else if (zone === ZONE.INTERIOR) {
-      if (caseDebug) {
-        mat.color.set(DEBUG_ZONE_COLORS[zone] ?? 0xffffff);
-        mat.map = null;
-      }
+    } else if (zone === ZONE.CAMERA_LIP) {
+      // Camera lip follows Back colour — never Outer Edge
+      if (!caseDebug) mat.color.set(backExteriorColor);
+      mat.map = null;
+      mat.roughness = roughness;
+      mat.clearcoat = clearcoat;
+      mat.clearcoatRoughness = clearcoatRoughness;
+    } else if (zone === ZONE.BEVEL) {
+      if (!caseDebug) mat.color.set(outerEdgeColor);
+      mat.map = null;
+      mat.roughness = roughness;
+      mat.clearcoat = clearcoat;
+      mat.clearcoatRoughness = clearcoatRoughness;
     } else {
       if (!caseDebug) mat.color.set(backExteriorColor);
       mat.map = null;
@@ -1169,14 +1185,14 @@ function applyCaseTo3D() {
 function updateTexture(force = false) {
   if (!renderer) return;
   if (force) {
-    for (const z of EDITABLE_ZONES) dirtyZones[z] = true;
+    for (const z of ARTWORK_ZONES) dirtyZones[z] = true;
     flushPaint();
   } else {
     schedulePaint('all');
   }
   for (const mesh of surfaceMeshes.values()) {
     const zone = mesh.userData.surfaceZone;
-    if (!EDITABLE_ZONES.has(zone)) continue;
+    if (!ARTWORK_ZONES.has(zone)) continue;
     const mat = mesh.material;
     if (!mat) continue;
     mat.map = ensureZoneTexture(zone);
@@ -1298,11 +1314,15 @@ function prepareProduct(sceneRoot) {
       if (!geo.attributes.position?.count) continue;
 
       let mat;
-      if (EDITABLE_ZONES.has(zone)) {
+      if (ARTWORK_ZONES.has(zone)) {
         paintZone(zoneCtx[zone], zone, 1);
         mat = makeCaseMat(ensureZoneTexture(zone), sourceMat);
-      } else if (zone === ZONE.INTERIOR) {
-        mat = makeInteriorMat(sourceMat);
+      } else if (zone === ZONE.CAMERA_LIP) {
+        mat = makeCaseMat(null, sourceMat);
+        mat.color.set(backExteriorColor);
+      } else if (OUTER_EDGE_ZONES.has(zone) || zone === ZONE.BEVEL) {
+        mat = makeCaseMat(null, sourceMat);
+        mat.color.set(outerEdgeColor);
       } else {
         mat = makeCaseMat(null, sourceMat);
         mat.color.set(backExteriorColor);
@@ -1402,8 +1422,8 @@ function moveSelectedToUv(hit) {
   if (!l || !['image', 'text', 'pattern'].includes(l.type) || !hit) return false;
   const zone = hit.object?.userData?.surfaceZone || ZONE.BACK;
   const surfaceId = hit.object?.userData?.surfaceId || null;
-  if (!isEditableZone(zone)) {
-    say('Exterior surfaces only');
+  if (!isArtworkEditableZone(zone)) {
+    say('Draw on back, outer edges, or interior');
     return false;
   }
   if (l.type === 'image') {
@@ -1443,8 +1463,8 @@ function paintAtHit(hit) {
   if (!hit?.uv) return false;
   const zone = hit.object?.userData?.surfaceZone || ZONE.BACK;
   const surfaceId = hit.object?.userData?.surfaceId || null;
-  if (!isEditableZone(zone)) {
-    say('Exterior surfaces only');
+  if (!isArtworkEditableZone(zone)) {
+    say('Draw on back, outer edges, or interior');
     return false;
   }
   const pt = uvToCanvas(hit.uv);
