@@ -9,7 +9,7 @@
 ---
 
 **Meta title (≤60):** When a Business Website Needs a Redesign | Vulcet  
-**Meta description (≤155):** Clear signs your company site needs a redesign — and when a refresh is enough. How Vulcet decides between a focused rebuild and a deeper growth platform.  
+**Meta description (≤155):** Clear signs your company site needs a redesign — and when a refresh is enough. How Vulcet decides scope without defaulting to a full rebuild.  
 **Suggested slug:** `when-a-business-website-needs-a-redesign`
 
 ---
@@ -92,27 +92,21 @@ Studios that skip this invent a beautiful site for a fictional company. Vulcet s
 
 ## How Vulcet scopes the work
 
-### Business website
+### Unclear offer or positioning
 
-Best when you need a focused, credible presence: clear offer, custom UI, responsive build, enquiry flow, technical SEO foundation.
+Start with [brand strategy](https://vulcet.com/services/brand-strategy/) before redesigning screens.
 
-Good fit for professional services, consultants, launches and clean replacements.
+### Expression is tired, story is true
 
-Details: [Business website design & development](https://vulcet.com/services/brand-strategy/)
+Tighten [visual identity](https://vulcet.com/services/visual-identity/) and rebuild the site surfaces that carry it.
 
-### Growth website
+### The “website” is actually a product
 
-Best when the business needs depth: stronger positioning, richer architecture, multilingual structure, CMS, content that can grow.
+Use [product design](https://vulcet.com/services/product-design/) when journeys, states and interaction models are the bottleneck.
 
-Good fit for international companies and teams publishing projects, news or case studies.
+### Implementation and ongoing quality
 
-Details: [Growth website design](https://vulcet.com/services/visual-identity/)
-
-### Website care
-
-Best after launch, when you need ongoing fixes, content support and technical upkeep so the site does not quietly decay.
-
-Details: [Website care](https://vulcet.com/services/web-development/)
+[Web development](https://vulcet.com/services/web-development/) covers responsive implementation, technical foundations and the care required after launch.
 
 The right scope is the smallest one that solves the real constraint. Bigger is not automatically better.
 
@@ -179,6 +173,6 @@ If you want a direct read on your current site — rebuild, refresh, or leave it
 - Internal links from Services and Studio  
 - Update `sitemap.xml` and `llms.txt`  
 - Cluster follow-ups:  
-  1. “Business website vs growth website: which do you need?”  
+  1. “Focused website vs content platform: which do you need?”  
   2. “What to prepare before hiring a web design studio”  
   3. “Technical SEO basics for a new company website”  

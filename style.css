@@ -131,7 +131,7 @@ img { display: block; }
 .growth-intro > span { color: var(--signal); font-size: 12px; font-weight: 650; text-transform: uppercase; letter-spacing: .08em; }
 .growth-intro h3 { margin: 0; font-size: 58px; line-height: 1; font-weight: 550; letter-spacing: -.04em; }
 .growth-intro p { margin: 0; max-width: 500px; color: var(--dark-text); font-size: 19px; line-height: 1.55; }
-.scope-grid { grid-column: 3 / 13; margin-top: 72px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; }
+.scope-grid { grid-column: 3 / 13; margin-top: 72px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
 .scope-grid > div { border-top: 1px solid var(--dark-rule); padding-top: 32px; }
 .scope-grid h4 { margin: 0 0 24px; font-size: 24px; line-height: 1.2; font-weight: 560; }
 .scope-grid ul { margin: 0; padding: 0; list-style: none; color: var(--dark-muted); font-size: 15px; line-height: 1.55; }
@@ -321,7 +321,7 @@ img { display: block; }
   .growth-intro { grid-column: 1 / 9; margin-top: 88px; display: block; }
   .growth-intro h3 { margin-top: 18px; font-size: 44px; }
   .growth-intro p { margin-top: 32px; }
-  .scope-grid { grid-column: 1 / 9; display: block; }
+  .scope-grid { grid-column: 1 / 9; display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
   .scope-grid > div + div { margin-top: 48px; }
   .growth-price { grid-column: 1 / 6; margin-top: 64px; }
   .growth-actions { grid-column: 1 / 9; margin-top: 40px; }
