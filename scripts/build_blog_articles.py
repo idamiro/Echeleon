@@ -766,7 +766,7 @@ def build_articles() -> None:
         article_page(
             slug="human-check-captcha-alternative",
             title="Human Check: Rethinking CAPTCHA Verification | Vulcet",
-            description="We built Human Check to explore whether a simple drag can contribute to human verification without CAPTCHA puzzles. What pointer movement reveals — and what it cannot prove.",
+            description="Human Check explores whether a simple drag can contribute to human verification without CAPTCHA puzzles — and what pointer movement can actually reveal.",
             og_title="Human Check: Rethinking CAPTCHA Verification | Vulcet",
             og_description="Can verification become part of an interaction instead of an interruption? What we learned building Human Check.",
             twitter_description="An experiment in movement-based human verification — honest limits included.",
@@ -779,11 +779,11 @@ def build_articles() -> None:
             cover="/blog/assets/cover-human-check.svg?v=20260828-1",
             cover_alt="Editorial cover — a pointer trajectory traveling toward a target ring.",
             og_image="https://vulcet.com/blog/assets/og-human-check.png",
-            h1="Can human verification become an interaction instead of an interruption?",
+            h1="Rethinking CAPTCHA: Can verification become part of the interaction?",
             dek="Human Check is a studio experiment: one drag, a trajectory worth reading, and an honest look at what movement can — and cannot — tell us about bots.",
             schema=blog_posting(
-                headline="Can Human Verification Become an Interaction Instead of an Interruption?",
-                description="We built Human Check to explore whether a simple drag can contribute to human verification without CAPTCHA puzzles. What pointer movement reveals — and what it cannot prove.",
+                headline="Rethinking CAPTCHA: Can Verification Become Part of the Interaction?",
+                description="Human Check explores whether a simple drag can contribute to human verification without CAPTCHA puzzles. What pointer movement reveals — and what it cannot prove.",
                 url="https://vulcet.com/blog/human-check-captcha-alternative/",
                 published="2026-08-28",
                 updated="2026-08-28",
@@ -804,7 +804,6 @@ def build_articles() -> None:
             related=[
                 ("/experiments/human-check/", "Experiment", "Human Check"),
                 ("/blog/what-redesign-experiments-teach/", "Article", "What redesign experiments teach"),
-                ("/blog/what-is-product-design/", "Article", "What is product design?"),
             ],
         ),
     )
@@ -1146,7 +1145,7 @@ def build_index() -> None:
             "category": "Experiments",
             "date": "Aug 28, 2026",
             "read": "18 min",
-            "title": "Can human verification become an interaction instead of an interruption?",
+            "title": "Rethinking CAPTCHA: Can verification become part of the interaction?",
             "dek": "Human Check — one drag, trajectory analysis, and what movement can tell us about verification.",
             "img": "/blog/assets/cover-human-check.svg?v=20260828-1",
             "alt": "Editorial cover — pointer trajectory toward a target ring.",

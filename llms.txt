@@ -37,7 +37,7 @@
 ## Blog / Journal
 
 - Journal index — https://vulcet.com/blog/
-- Can Human Verification Become an Interaction Instead of an Interruption? (Human Check) — https://vulcet.com/blog/human-check-captcha-alternative/
+- Rethinking CAPTCHA: Can Verification Become Part of the Interaction? (Human Check) — https://vulcet.com/blog/human-check-captcha-alternative/
 - Your Brand Isn’t Outdated. Your System Is. — https://vulcet.com/blog/your-brand-isnt-outdated-your-system-is/
 - What Is Product Design? — https://vulcet.com/blog/what-is-product-design/
 - Why Most SaaS Websites Look the Same — https://vulcet.com/blog/why-most-saas-websites-look-the-same/
