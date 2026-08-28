@@ -9,6 +9,8 @@ from textwrap import dedent
 ROOT = Path("/workspace")
 BLOG = ROOT / "blog"
 
+from article_human_check_body import human_check_body, human_check_faq  # noqa: E402
+
 HEADER = '''<!DOCTYPE html><html lang="en" data-root="/"><head>
   <meta charset="utf-8"><meta name="robots" content="index,follow"><meta name="viewport" content="width=device-width, initial-scale=1">
   <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('consent','default',{{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500}});gtag('js',new Date());gtag('config','G-BD641SSN63',{{anonymize_ip:true}});</script>
@@ -31,7 +33,7 @@ HEADER = '''<!DOCTYPE html><html lang="en" data-root="/"><head>
   <title>{title}</title>
   <link rel="icon" href="/favicon.ico?v=20260821-mark4" sizes="any"><link rel="icon" href="/favicon-48.png?v=20260821-mark4" type="image/png" sizes="48x48"><link rel="icon" href="/favicon.svg?v=20260821-mark4" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20260821-mark4"><link rel="manifest" href="/site.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=20260824-hero"><link rel="stylesheet" href="/editorial.css?v=20260813-4"><link rel="stylesheet" href="/blog.css?v=20260824-pub"><link rel="stylesheet" href="/consent.css?v=20260807-1">
+  <link rel="stylesheet" href="/style.css?v=20260824-hero"><link rel="stylesheet" href="/editorial.css?v=20260813-4"><link rel="stylesheet" href="/blog.css?v=20260828-hc"><link rel="stylesheet" href="/consent.css?v=20260807-1">
   <script src="/script.js?v=20260823-visible" defer=""></script><script src="/consent.js?v=20260724-18" defer=""></script><script src="/blog.js?v=20260824-pub" defer=""></script>
   <script type="application/ld+json">{schema}</script>
 </head>
@@ -760,6 +762,54 @@ experiments_body = '''
 
 def build_articles() -> None:
     write(
+        BLOG / "human-check-captcha-alternative/index.html",
+        article_page(
+            slug="human-check-captcha-alternative",
+            title="Human Check: Rethinking CAPTCHA Verification | Vulcet",
+            description="We built Human Check to explore whether a simple drag can contribute to human verification without CAPTCHA puzzles. What pointer movement reveals — and what it cannot prove.",
+            og_title="Human Check: Rethinking CAPTCHA Verification | Vulcet",
+            og_description="Can verification become part of an interaction instead of an interruption? What we learned building Human Check.",
+            twitter_description="An experiment in movement-based human verification — honest limits included.",
+            category="Experiments",
+            published="2026-08-28",
+            updated="2026-08-28",
+            published_label="Aug 28, 2026",
+            updated_label="Aug 28, 2026",
+            reading="18 min read",
+            cover="/blog/assets/cover-human-check.svg?v=20260828-1",
+            cover_alt="Editorial cover — a pointer trajectory traveling toward a target ring.",
+            og_image="https://vulcet.com/blog/assets/og-human-check.png",
+            h1="Can human verification become an interaction instead of an interruption?",
+            dek="Human Check is a studio experiment: one drag, a trajectory worth reading, and an honest look at what movement can — and cannot — tell us about bots.",
+            schema=blog_posting(
+                headline="Can Human Verification Become an Interaction Instead of an Interruption?",
+                description="We built Human Check to explore whether a simple drag can contribute to human verification without CAPTCHA puzzles. What pointer movement reveals — and what it cannot prove.",
+                url="https://vulcet.com/blog/human-check-captcha-alternative/",
+                published="2026-08-28",
+                updated="2026-08-28",
+                image="https://vulcet.com/blog/assets/og-human-check.png",
+                section="Experiments",
+                word_count=2900,
+                minutes=18,
+                faq=human_check_faq,
+            ),
+            body=human_check_body,
+            takeaways=[
+                "Verification often interrupts the interaction it protects — modern systems already move toward lower friction.",
+                "A drag is a time series; Human Check analyzes geometry, kinematics and corrections — not just start and end points.",
+                "human_like means movement looked structured under heuristics — not proof of identity or humanity.",
+                "Uncertainty and insufficient_signal are deliberate outputs when evidence is weak.",
+                "Trajectory analysis runs in the browser in normal use; this is an experiment, not production security.",
+            ],
+            related=[
+                ("/experiments/human-check/", "Experiment", "Human Check"),
+                ("/blog/what-redesign-experiments-teach/", "Article", "What redesign experiments teach"),
+                ("/blog/what-is-product-design/", "Article", "What is product design?"),
+            ],
+        ),
+    )
+
+    write(
         BLOG / "your-brand-isnt-outdated-your-system-is/index.html",
         article_page(
             slug="your-brand-isnt-outdated-your-system-is",
@@ -1092,6 +1142,17 @@ def build_articles() -> None:
 def build_index() -> None:
     posts = [
         {
+            "href": "/blog/human-check-captcha-alternative/",
+            "category": "Experiments",
+            "date": "Aug 28, 2026",
+            "read": "18 min",
+            "title": "Can human verification become an interaction instead of an interruption?",
+            "dek": "Human Check — one drag, trajectory analysis, and what movement can tell us about verification.",
+            "img": "/blog/assets/cover-human-check.svg?v=20260828-1",
+            "alt": "Editorial cover — pointer trajectory toward a target ring.",
+            "featured": True,
+        },
+        {
             "href": "/blog/your-brand-isnt-outdated-your-system-is/",
             "category": "Branding",
             "date": "Updated Aug 24, 2026",
@@ -1100,7 +1161,6 @@ def build_index() -> None:
             "dek": "Branding vs rebranding — when a refresh is enough, and when you need to rebuild.",
             "img": "/blog/assets/cover-branding-system.webp?v=20260817-1",
             "alt": "Open notebook with a brand mark sketch and system notes.",
-            "featured": True,
         },
         {
             "href": "/blog/what-is-product-design/",

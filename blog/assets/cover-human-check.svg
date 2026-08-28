@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-label="Human Check editorial cover  trajectory from origin to target">
+  <rect width="1600" height="1000" fill="#171715"/>
+  <rect x="120" y="160" width="720" height="680" fill="#f2eee6" opacity=".94"/>
+  <circle cx="1180" cy="500" r="220" fill="none" stroke="#d08a4c" stroke-width="3" opacity=".35"/>
+  <circle cx="1180" cy="500" r="68" fill="none" stroke="#171715" stroke-width="2" opacity=".5"/>
+  <circle cx="980" cy="620" r="28" fill="#171715" opacity=".85"/>
+  <path d="M980 620 C1040 580, 1100 520, 1180 500" fill="none" stroke="#171715" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="1040" cy="590" r="4" fill="#d08a4c" opacity=".7"/>
+  <circle cx="1100" cy="545" r="4" fill="#d08a4c" opacity=".7"/>
+  <circle cx="1145" cy="518" r="4" fill="#d08a4c" opacity=".7"/>
+  <text x="180" y="260" fill="#171715" font-family="Georgia, serif" font-size="52" opacity=".5">HC</text>
+</svg>
