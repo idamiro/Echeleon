@@ -322,7 +322,7 @@ img { display: block; }
   .growth-intro h3 { margin-top: 18px; font-size: 44px; }
   .growth-intro p { margin-top: 32px; }
   .scope-grid { grid-column: 1 / 9; display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
-  .scope-grid > div + div { margin-top: 48px; }
+  .scope-grid > div + div { margin-top: 0; }
   .growth-price { grid-column: 1 / 6; margin-top: 64px; }
   .growth-actions { grid-column: 1 / 9; margin-top: 40px; }
   .other-services { padding: 112px 0; }
@@ -1496,7 +1496,14 @@ html, body { max-width: 100%; overflow-x: clip; }
   .growth-intro > span { font-size: 10px; }
   .growth-intro h3 { margin-top: 14px; font-size: 36px; }
   .growth-intro p { margin-top: 18px; font-size: 16px; line-height: 1.52; }
-  .scope-grid { margin-top: 38px; display: block; }
+  .scope-grid {
+    margin-top: 38px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    row-gap: 0;
+  }
+  .scope-grid > div + div { margin-top: 0; }
   .scope-grid > div { padding: 20px 0; }
   .scope-grid h4 { margin-bottom: 14px; font-size: 19px; }
   .scope-grid ul { font-size: 13px; line-height: 1.48; }
