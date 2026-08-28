@@ -1,0 +1,293 @@
+"""Human Check flagship article body for build_blog_articles.py."""
+
+human_check_faq = [
+    (
+        "Does Human Check replace CAPTCHA?",
+        "No. Human Check is a studio experiment that studies whether a simple drag can contribute movement signals. It is not production bot mitigation and does not replace services such as reCAPTCHA, Turnstile or hCaptcha.",
+    ),
+    (
+        "What does a human_like result mean?",
+        "It means the trajectory showed structured variation consistent with motor-controlled movement under the experiment’s heuristic model. It is not proof of identity or humanity.",
+    ),
+    (
+        "Is trajectory data sent to Vulcet?",
+        "In normal use, classification runs in the browser and no movement data is uploaded. Optional research mode (?debug=1) can store summaries locally in the browser only.",
+    ),
+    (
+        "Can bots fool pointer-based verification?",
+        "Yes. Synthetic trajectories can imitate timing, curvature and corrections. Behavioral movement should be treated as one signal among many, not as proof.",
+    ),
+    (
+        "Is the keyboard path scored like mouse movement?",
+        "No. Keyboard completion uses a separate accessible_completion state. Pointer biometrics are not applied and no fake human-likelihood score is assigned.",
+    ),
+]
+
+human_check_body = '''
+        <p>A verification system needs evidence that an interaction is human. Many systems collect that evidence by stopping the interaction first — a puzzle, a checkbox gate, an image grid, an audio transcription task.</p>
+        <p>That trade-off is understandable. It is also awkward. The moment you need the user most is often the moment you ask them to do something else.</p>
+        <p>We built <a href="/experiments/human-check/">Human Check</a> to test a narrower question: <strong>can verification become part of an interaction instead of an interruption?</strong> The experiment is one drag — a circle to a ring. The destination is obvious. The puzzle is not the point. What matters is how the movement unfolds over time.</p>
+        <div class="article-callout"><p><strong>Key takeaway:</strong> Human Check does not try to prove that a user is human from one drag. It tests whether movement dynamics from an ordinary interaction can contribute a useful verification signal.</p></div>
+        <p class="article-cta-inline"><a href="/experiments/human-check/">Try Human Check <span aria-hidden="true">→</span></a></p>
+
+        <h2 id="verification-interruption">Verification became an interruption</h2>
+        <p>Early CAPTCHAs often used distorted text — a task easy for humans and hard for early OCR. Image selection, checkbox gates and audio alternatives followed, each inserting a separate task between the user and the action they came to perform. Later systems added risk scoring and challenge-free modes; the interruption model did not disappear, but it stopped being the only design.</p>
+        <p>Modern verification has moved beyond that default. <a href="https://developers.google.com/recaptcha/docs/v3" target="_blank" rel="noreferrer noopener">reCAPTCHA v3</a> returns a risk score from background signals and can run without interrupting the user flow. <a href="https://developers.cloudflare.com/turnstile/" target="_blank" rel="noreferrer noopener">Cloudflare Turnstile</a> uses non-interactive browser challenges and often avoids visual puzzles entirely. <a href="https://docs.hcaptcha.com/" target="_blank" rel="noreferrer noopener">hCaptcha</a> supports passive and invisible modes alongside explicit challenges.</p>
+        <p>That shift matters. The industry has already been reducing friction, which suggests verification does not inherently need to be a separate cognitive task. Risk scoring, passive signals and challenge-free widgets are different design choices — not proof that movement-based experiments are obsolete, but evidence that the UX problem is real and widely acknowledged.</p>
+        <p>reCAPTCHA v2’s checkbox flow often completes without an image grid — but when risk scores are unfavorable, users still see visual challenges. v3 inverts the default: it runs in the background and returns a score your backend interprets. Turnstile similarly separates managed, non-interactive and invisible widget modes, using client-side challenge work rather than always showing a puzzle. These systems are not straw men. They are the mature baseline Human Check must be honest about not replacing.</p>
+        <p>Usability research backs the friction concern. In a large study of modern CAPTCHAs, Searles and colleagues report significant differences in solving time across challenge types. In a follow-up abandonment study within the same work, 174 of 574 participants (30%) quit before finishing the assigned sequence; participants in a contextualized account-creation framing were 120% more likely to quit than those given a direct solving task (<a href="https://www.usenix.org/system/files/usenixsecurity23-searles.pdf" target="_blank" rel="noreferrer noopener">USENIX Security 2023</a>). CAPTCHAs push human abilities at the edge of perception and motor control — which is why accessibility guidance treats them as inherently problematic (<a href="https://www.w3.org/TR/turingtest/" target="_blank" rel="noreferrer noopener">W3C, Inaccessibility of CAPTCHA</a>).</p>
+        <p>Human Check does not claim to solve any of that at production scale. It asks a design question from the other direction: if the user already performs a simple pointing action, what can that action reveal?</p>
+
+        <h2 id="hypothesis">The hypothesis</h2>
+        <p>The hypothesis is deliberately modest:</p>
+        <div class="article-callout"><p><strong>Can useful verification signals be collected from an interaction the user was already willing to perform?</strong></p></div>
+        <p>In Human Check, that interaction is a drag. We chose it because it:</p>
+        <ul>
+          <li>has an obvious spatial goal (the ring), so puzzle knowledge is not the bottleneck;</li>
+          <li>covers enough distance to produce a trajectory worth analyzing;</li>
+          <li>stays easy enough that accuracy itself is rarely the challenge;</li>
+          <li>resembles pointing tasks studied in HCI for decades.</li>
+        </ul>
+        <p>Pointing toward a target is one of the most studied movements in human–computer interaction. Fitts’s law, introduced in 1954, models movement time as a function of distance and target width (<a href="https://doi.org/10.1037/h0055392" target="_blank" rel="noreferrer noopener">Fitts, 1954</a>). Human Check borrows that framing lightly — Fitts-related metrics appear in the feature pipeline — but the experiment is interested in trajectory dynamics, not whether someone hits a target quickly.</p>
+        <p>The drag task also differs from classic Fitts tapping studies: it is continuous, user-paced, and ends with a release inside a tolerance zone rather than a discrete click on a fixed pixel. That aligns with point-drag sequences studied in HCI, where pointing and dragging are separate kinematic phases with their own targets (<a href="https://doi.org/10.1145/97243.97278" target="_blank" rel="noreferrer noopener">Gillan et al., 1990</a>).</p>
+
+        <h2 id="drag-time-series">A drag is more than two coordinates</h2>
+        <p>A drag is not a start point and an end point. It is a time series:</p>
+        <p><code>(x₁, y₁, t₁), (x₂, y₂, t₂), … (xₙ, yₙ, tₙ)</code></p>
+        <p>Human Check records board-local samples of the disc center during user control — not the pointer cursor directly, and not the presentation-only snap animation after a successful release. From that series, the experiment estimates geometry, kinematics and correction behavior.</p>
+
+        <figure class="article-figure">
+          <div class="article-figure-frame" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" width="960" height="320">
+              <rect width="960" height="320" fill="#ebe7e0"/>
+              <circle cx="800" cy="110" r="48" fill="none" stroke="#171715" stroke-width="2" stroke-opacity=".35"/>
+              <circle cx="800" cy="110" r="16" fill="none" stroke="#171715" stroke-width="1.5" stroke-opacity=".5"/>
+              <circle cx="120" cy="210" r="14" fill="#171715"/>
+              <path d="M120 210 C210 175, 360 130, 540 115 C650 108, 740 108, 784 110" fill="none" stroke="#171715" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="210" cy="178" r="4" fill="#d08a4c"/>
+              <circle cx="360" cy="138" r="4" fill="#d08a4c"/>
+              <circle cx="540" cy="118" r="4" fill="#d08a4c"/>
+              <circle cx="680" cy="112" r="4" fill="#d08a4c"/>
+              <text x="120" y="252" font-family="Inter,Arial,sans-serif" font-size="14" fill="#595650">Origin</text>
+              <text x="720" y="252" font-family="Inter,Arial,sans-serif" font-size="14" fill="#595650">Target</text>
+              <text x="120" y="292" font-family="Inter,Arial,sans-serif" font-size="12" fill="#595650">Illustrative phases: acceleration → peak velocity → correction → deceleration</text>
+            </svg>
+          </div>
+          <figcaption>Conceptual anatomy of a drag — illustrative, not measured from a specific session.<span class="source">Diagram by Vulcet</span></figcaption>
+        </figure>
+
+        <p>Some features the implementation actually computes:</p>
+        <h3 id="path-efficiency">Path efficiency</h3>
+        <p>Conceptually, path efficiency is straight-line displacement divided by total path length. A perfectly straight movement approaches 1. In code, Human Check clamps this ratio between 0 and 1. High efficiency alone does not imply automation — a confident human swipe can be very direct.</p>
+        <h3 id="velocity">Velocity and timing</h3>
+        <p>Between consecutive samples, velocity is distance divided by Δt. The experiment tracks mean and peak velocity, velocity coefficient of variation (CV), and when peak velocity occurs relative to movement duration (normalized peak time). Point-to-point reaching movements often show a single-peaked, bell-shaped velocity profile — acceleration toward a peak, then deceleration — though the shape varies by distance, device and intent (<a href="https://doi.org/10.1007/BF00236911" target="_blank" rel="noreferrer noopener">Morasso, 1981</a>).</p>
+        <h3 id="corrections-curvature">Corrections, curvature and direction change</h3>
+        <p>Micro-corrections, late corrections, backward progress along the target axis, mean curvature and direction-change statistics describe how the path deviates from a single ballistic segment. Classic models of aimed movement treat longer reaches as sequences of submovements — discrete corrective components guided by sensory feedback rather than one uninterrupted stroke (<a href="https://doi.org/10.1080/14640748308402133" target="_blank" rel="noreferrer noopener">Crossman &amp; Goodeve, 1983</a>). Human Check includes a submovement proxy when sample count allows.</p>
+        <h3 id="jerk-timing">Jerk, timing entropy and Fitts-related metrics</h3>
+        <p>Jerk (rate of change of acceleration) and timing statistics such as sample-interval CV and timing entropy describe how regular or irregular the motion clock feels. A perfectly periodic sample clock can look scripted — Human Check’s interaction-risk layer treats over-regular timing as one synthetic signal among several, with different weighting for touch versus mouse.</p>
+        <p>Fitts-related metrics (index of difficulty, throughput) sit in the feature vector as contextual geometry, not as pass/fail gates. They help normalize movements across board sizes and target distances inside the experiment.</p>
+
+        <h3 id="modalities">Mouse, touch and pen see different physics</h3>
+        <p>The classifier loads separate calibration profiles for mouse, touch and pen input. A straight finger swipe can be normal; the same geometry on mouse input contributes differently to synthetic-risk heuristics. This matches everyday experience — trackpads, mice, styluses and touchscreens sample and filter motion differently — and it is a reminder that any movement-based verifier must model modality, not assume one universal trajectory template.</p>
+
+        <h2 id="noise-not-proof">Human movement is noisy — but “noise” is not proof</h2>
+        <p>Even when a path looks smooth, joint-level control can vary widely while hand trajectories preserve familiar kinematic structure (<a href="https://doi.org/10.1007/BF00236911" target="_blank" rel="noreferrer noopener">Morasso, 1981</a>). Motor control involves variability, feedback and correction — not perfectly repeatable geometry. But the inverse is equally important:</p>
+        <ul>
+          <li>humans can move very smoothly when trying to;</li>
+          <li>automation can add deliberate noise;</li>
+          <li>synthetic generators can imitate velocity curves, pauses and corrections.</li>
+        </ul>
+        <p>Human Check does not use <code>straight line = bot</code> or <code>wiggly line = human</code>. Classification combines weighted feature plausibility with separate interaction-risk heuristics (linear constant motion, overly perfect easing, injected randomness patterns, over-regular timing, teleport-like sparse paths).</p>
+        <p>Mouse-dynamics research treats trajectories as behavioral signals — mouse movement patterns can distinguish users in re-authentication settings, though not reliably enough alone for stand-alone security (<a href="https://doi.org/10.1145/1029208.1029210" target="_blank" rel="noreferrer noopener">Pusara &amp; Brodley, 2004</a>). Surveys also note drift over time and adaptation limits in continuous use (<a href="https://doi.org/10.1016/j.cose.2025.104731" target="_blank" rel="noreferrer noopener">Computers &amp; Security, 2025</a>). Human Check sits farther from that use case: one anonymous drag, no enrollment, no identity claim.</p>
+        <p>Behavioral similarity is evidence, not identity. That distinction is the difference between an honest experiment and marketing copy.</p>
+
+        <h2 id="pipeline">How Human Check evaluates a movement</h2>
+        <p>The live experiment follows a pipeline implemented in JavaScript modules under <code>/experiments/human-check/js/</code>:</p>
+
+        <figure class="article-figure">
+          <div class="article-figure-frame" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" width="960" height="420">
+              <rect width="960" height="420" fill="#ebe7e0"/>
+              <g font-family="Inter,Arial,sans-serif" font-size="13" fill="#171715">
+                <rect x="40" y="48" width="150" height="44" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".15"/>
+                <text x="58" y="76">Pointer samples</text>
+                <rect x="220" y="48" width="130" height="44" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".15"/>
+                <text x="238" y="76">Preprocess</text>
+                <rect x="380" y="48" width="120" height="44" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".15"/>
+                <text x="402" y="76">Geometry</text>
+                <rect x="530" y="48" width="120" height="44" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".15"/>
+                <text x="548" y="76">Kinematics</text>
+                <rect x="680" y="48" width="120" height="44" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".15"/>
+                <text x="696" y="76">Corrections</text>
+                <rect x="830" y="48" width="90" height="44" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".15"/>
+                <text x="842" y="76">Fitts</text>
+                <path d="M190 70 L220 70" stroke="#171715" stroke-opacity=".35" marker-end="url(#arr)"/>
+                <path d="M350 70 L380 70" stroke="#171715" stroke-opacity=".35" marker-end="url(#arr)"/>
+                <path d="M500 70 L530 70" stroke="#171715" stroke-opacity=".35" marker-end="url(#arr)"/>
+                <path d="M650 70 L680 70" stroke="#171715" stroke-opacity=".35" marker-end="url(#arr)"/>
+                <path d="M800 70 L830 70" stroke="#171715" stroke-opacity=".35" marker-end="url(#arr)"/>
+                <rect x="220" y="140" width="160" height="44" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".15"/>
+                <text x="238" y="168">Neuromotor proxies</text>
+                <rect x="420" y="140" width="150" height="44" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".15"/>
+                <text x="438" y="168">Feature validity</text>
+                <rect x="610" y="140" width="150" height="44" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".15"/>
+                <text x="628" y="168">Feature vector</text>
+                <path d="M480 92 L480 120 L300 120 L300 140" stroke="#171715" stroke-opacity=".35" fill="none" marker-end="url(#arr)"/>
+                <path d="M480 92 L480 120 L500 120 L500 140" stroke="#171715" stroke-opacity=".35" fill="none"/>
+                <path d="M380 184 L420 184" stroke="#171715" stroke-opacity=".35" marker-end="url(#arr)"/>
+                <path d="M570 184 L610 184" stroke="#171715" stroke-opacity=".35" marker-end="url(#arr)"/>
+                <rect x="220" y="240" width="180" height="44" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".15"/>
+                <text x="238" y="268">Heuristic classifier</text>
+                <rect x="440" y="240" width="120" height="44" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".15"/>
+                <text x="458" y="268">Confidence</text>
+                <path d="M685 184 L685 220 L310 220 L310 240" stroke="#171715" stroke-opacity=".35" fill="none" marker-end="url(#arr)"/>
+                <path d="M400 262 L440 262" stroke="#171715" stroke-opacity=".35" marker-end="url(#arr)"/>
+                <rect x="40" y="330" width="130" height="36" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".12"/>
+                <text x="52" y="353" font-size="12">human_like</text>
+                <rect x="190" y="330" width="150" height="36" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".12"/>
+                <text x="202" y="353" font-size="12">synthetic_like</text>
+                <rect x="360" y="330" width="110" height="36" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".12"/>
+                <text x="372" y="353" font-size="12">uncertain</text>
+                <rect x="490" y="330" width="160" height="36" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".12"/>
+                <text x="502" y="353" font-size="12">insufficient_signal</text>
+                <rect x="670" y="330" width="200" height="36" rx="4" fill="#f7f5f1" stroke="#171715" stroke-opacity=".12"/>
+                <text x="682" y="353" font-size="12">accessible_completion</text>
+                <path d="M500 284 L500 310 L105 310 L105 330" stroke="#171715" stroke-opacity=".35" fill="none"/>
+                <path d="M500 284 L500 310 L265 310 L265 330" stroke="#171715" stroke-opacity=".35" fill="none"/>
+                <path d="M500 284 L500 310 L415 310 L415 330" stroke="#171715" stroke-opacity=".35" fill="none"/>
+                <path d="M500 284 L500 310 L570 310 L570 330" stroke="#171715" stroke-opacity=".35" fill="none"/>
+                <path d="M500 284 L500 310 L770 310 L770 330" stroke="#171715" stroke-opacity=".35" fill="none"/>
+              </g>
+              <defs>
+                <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 Z" fill="#171715" fill-opacity=".45"/>
+                </marker>
+              </defs>
+            </svg>
+          </div>
+          <figcaption>Human Check analysis pipeline — heuristic layer only in the public experiment.<span class="source">Diagram by Vulcet</span></figcaption>
+        </figure>
+
+        <p>Preprocessing deduplicates samples and produces a cleaned analysis trajectory; some distribution features use an optional ~100 Hz resample, while timing features always come from real event intervals. Feature validity gates higher-order metrics — if there are too few samples, jerk, entropy or submovement counts return null rather than guessing.</p>
+        <p>The classifier is explicitly a heuristic likelihood model — Gaussian plausibility scores with provisional calibration, not trained probabilities. The code comments state this plainly: use <code>humanLikeScore</code> / <code>syntheticRisk</code>, never imply <code>P(human)</code>. A future trained logistic layer exists as an interface stub but is not wired into the public experiment.</p>
+        <p>Confidence is derived from sample richness, movement duration, path coverage relative to the start→target distance, and how decisive the score is — then low confidence can force an <code>uncertain</code> state even when a naive threshold might have picked a side.</p>
+        <p>Result states and what they mean in the implementation:</p>
+        <ul>
+          <li><strong>human_like</strong> — movement showed structured variation under the heuristic; displayed as “Human enough” in the UI. Not proof of humanity.</li>
+          <li><strong>synthetic_like</strong> — geometry, timing and kinematics together looked more scripted than motor-controlled.</li>
+          <li><strong>uncertain</strong> — mixed signals or low confidence; the model refuses a crisp label.</li>
+          <li><strong>insufficient_signal</strong> — too few samples, too short a path, or too brief a movement to evaluate meaningfully.</li>
+          <li><strong>accessible_completion</strong> — keyboard path completed; pointer classifier not applied.</li>
+        </ul>
+        <p>Only a release inside the target ring triggers classification. Failed attempts are discarded; each new drag starts a fresh sample buffer.</p>
+
+        <h2 id="uncertainty-feature">Why we deliberately allow uncertainty</h2>
+        <p>Binary classification creates pressure to manufacture confidence. Human behavior overlaps. Synthetic behavior can overlap with human behavior. When evidence is weak, “not enough confidence” is more truthful than pretending the system knows.</p>
+        <p>A verification system should be allowed to say <em>we don’t know</em>. Human Check forces low-confidence cases toward <code>uncertain</code> rather than rounding every trajectory into human or bot. That is a design choice aligned with skepticism, not a security guarantee.</p>
+
+        <h2 id="privacy-local">What the experiment does locally</h2>
+        <p>In normal use, trajectory analysis runs in the browser. The main module describes Human Check as a local-only research prototype; we did not find network uploads of movement data in the public code path.</p>
+        <p>Optional research mode (<code>?debug=1</code>) can store feature summaries in <code>localStorage</code> on the user’s device. Raw trajectories are stored only when explicitly enabled. Export produces a downloadable JSON file — still local, not automatic upload. The experiment does not build a cross-site behavioral identity.</p>
+        <p>That is local processing, not a blanket “privacy-preserving CAPTCHA replacement.” Server-side verification, threat modeling and data governance would be entirely different problems.</p>
+
+        <h2 id="accessibility">Accessibility matters</h2>
+        <p>A pointer gesture cannot be the only route to verification. W3C guidance is explicit: CAPTCHAs push sensory and cognitive edges, and sites that use them must provide alternatives in different modalities (<a href="https://www.w3.org/WAI/WCAG22/Understanding/non-text-content" target="_blank" rel="noreferrer noopener">WCAG Understanding 1.1.1</a>).</p>
+        <p>Human Check includes a keyboard path: focus the disc, use arrow keys to move, Enter or Space to confirm placement. That path returns <code>accessible_completion</code> — completion without applying pointer biometrics and without assigning a fake human-likelihood score.</p>
+        <p>That is a necessary bypass for an experiment, not a claim of full accessibility compliance. Motor ability, assistive technology and input hardware still change what “movement” looks like. Any verification interaction that reduces friction for one group while excluding another repeats the same failure mode as inaccessible CAPTCHA design.</p>
+
+        <h2 id="bots-imitate">Can bots imitate human movement?</h2>
+        <p>Yes. The experiment’s own synthetic battery generates Bézier paths, eased timing, injected noise and replayed human trajectories for debugging. Peer-reviewed work on synthetic mouse trajectories shows that heuristic curves, eased timing and GAN-generated paths can imitate human-like movement well enough to stress bot detectors (<a href="https://doi.org/10.1016/j.patcog.2022.108643" target="_blank" rel="noreferrer noopener">Acien et al., 2022</a>).</p>
+        <p>Any movement verifier that treats “non-linear” as synonymous with “human” will age poorly. The research question is not “can one drag defeat every bot?” It is whether an ordinary interaction can contribute <em>a</em> signal — alongside rate limits, attestation, device integrity and everything else production systems already use.</p>
+
+        <h2 id="comparison">Three verification design patterns</h2>
+        <p>Human Check is not a drop-in replacement for reCAPTCHA, Turnstile or hCaptcha. It explores a different axis. The table below compares design patterns, not equivalent products.</p>
+
+        <figure class="article-figure">
+          <div class="article-table-wrap">
+            <table class="article-table">
+              <thead>
+                <tr>
+                  <th scope="col">Dimension</th>
+                  <th scope="col">Explicit challenge CAPTCHA</th>
+                  <th scope="col">Passive / risk-based verification</th>
+                  <th scope="col">Human Check (experiment)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>User task</td>
+                  <td>Separate puzzle or checkbox gate</td>
+                  <td>Often none visible; background scoring</td>
+                  <td>Single drag with obvious goal</td>
+                </tr>
+                <tr>
+                  <td>Primary signal</td>
+                  <td>Challenge completion</td>
+                  <td>Environmental + behavioral risk ensemble</td>
+                  <td>Pointer trajectory dynamics</td>
+                </tr>
+                <tr>
+                  <td>Friction profile</td>
+                  <td>Spikes when challenge appears</td>
+                  <td>Low visible friction; third-party dependency</td>
+                  <td>Low cognitive load; motor action required</td>
+                </tr>
+                <tr>
+                  <td>Processing in this build</td>
+                  <td>Vendor server-side</td>
+                  <td>Vendor server-side</td>
+                  <td>Browser-local heuristic analysis</td>
+                </tr>
+                <tr>
+                  <td>Production readiness</td>
+                  <td>Mature hosted services</td>
+                  <td>Mature hosted services</td>
+                  <td>Experimental — not security infrastructure</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <figcaption>Conceptual comparison of verification approaches — not a product benchmark.<span class="source">Table by Vulcet</span></figcaption>
+        </figure>
+
+        <h2 id="lessons">What we learned while building it</h2>
+        <p>We have not published a formal user study or labeled bot corpus from Human Check. What follows is qualitative — observations from building and testing the experiment, not performance statistics.</p>
+        <ol>
+          <li><strong>A simple interaction contains more information than its final state.</strong> Start and end coordinates alone discard most of what happened in between.</li>
+          <li><strong>Perfect-looking movement is insufficient evidence.</strong> Straight, fast paths trigger structural and interaction-risk checks, but smooth movement alone cannot prove humanity.</li>
+          <li><strong>Multiple weak signals beat one rule.</strong> The classifier weights path efficiency, velocity variation, corrections, jerk, timing and submovement proxies — then modulates by synthetic-risk heuristics.</li>
+          <li><strong>Touch, mouse and pen behave differently.</strong> Separate calibration profiles exist; touch straight swipes are treated as less suspicious in isolation than identical mouse paths.</li>
+          <li><strong>Sparse trajectories complicate analysis.</strong> Very few samples over a long distance may yield structural-only checks or insufficient signal — not a confident human label.</li>
+          <li><strong>Uncertainty is sometimes the correct output.</strong> Forcing binary labels would lie about confidence.</li>
+          <li><strong>Verification is also an interaction-design problem.</strong> Copy, motion, keyboard bypass and honest caveats matter as much as the feature math.</li>
+        </ol>
+        <p>We have not run a controlled study comparing Human Check completion times to production CAPTCHAs on this site. Any future evaluation would need predefined tasks, labeled data and transparent metrics — none of which we claim here.</p>
+        <p>Related studio work lives in <a href="/blog/what-redesign-experiments-teach/">what redesign experiments teach</a> and the live <a href="/experiments/human-check/">Human Check</a> build.</p>
+
+        <h2 id="production-gap">What production verification would still require</h2>
+        <p>If movement signals ever mattered outside a lab page, they would be one layer in a stack — not the stack itself. Production bot mitigation typically combines rate limiting, session history, device attestation where available, server-side validation of vendor tokens, honeypots, and threat intelligence. None of that exists in Human Check by design.</p>
+        <p>Server-side replay of client-reported features would also require signed payloads, tamper detection and assumptions about what clients can forge. The current experiment avoids that entirely by analyzing locally and treating results as demonstrative.</p>
+        <p>Even then, accessibility would require vetted non-pointer paths — Human Check’s keyboard completion is an experiment-level bypass, not a audited alternative CAPTCHA in the WCAG sense (<a href="https://www.w3.org/WAI/WCAG22/Techniques/general/G144" target="_blank" rel="noreferrer noopener">WCAG Technique G144</a> expects a second modality when CAPTCHA is used).</p>
+
+        <h2 id="limitations">What Human Check cannot prove</h2>
+        <div class="article-callout">
+          <p><strong>Human Check is an experiment.</strong> It cannot prove identity, guarantee that an actor is human, or replace production bot mitigation. Sophisticated automation can imitate movement. Input hardware, browser sampling rates, motor ability and fatigue change trajectories. Heuristic thresholds can false-positive on unusual but legitimate movement. Production systems need broader signals, server-side validation and explicit threat models — none of which this page provides.</p>
+        </div>
+
+        <h2 id="future">Where verification could go next</h2>
+        <p>The future may not be a better puzzle. It may be verification that collects appropriate signals from ordinary interactions while minimizing extra work for legitimate users — combined with accessible alternatives when those interactions exclude people.</p>
+        <p>Human Check does not claim to be that future. It explores one small piece: whether a drag you were already willing to perform can contribute useful movement evidence, and whether an honest system can say <em>not enough data</em> when it should.</p>
+
+        <h2 id="try-it">Try the experiment</h2>
+        <p>If you test <a href="/experiments/human-check/">Human Check</a>, try a few different styles: natural mouse movement, an intentionally straight line, trackpad, touch, slow versus fast approaches. The goal is observation, not beating a security product.</p>
+        <p class="article-cta-inline"><a href="/experiments/human-check/">Try Human Check <span aria-hidden="true">→</span></a></p>
+
+        <h2 id="faq">FAQ</h2>
+        <div class="article-faq">
+          <div><h3>Does Human Check replace CAPTCHA?</h3><p>No. Human Check is a studio experiment that studies whether a simple drag can contribute movement signals. It is not production bot mitigation and does not replace services such as reCAPTCHA, Turnstile or hCaptcha.</p></div>
+          <div><h3>What does a human_like result mean?</h3><p>It means the trajectory showed structured variation consistent with motor-controlled movement under the experiment’s heuristic model. It is not proof of identity or humanity.</p></div>
+          <div><h3>Is trajectory data sent to Vulcet?</h3><p>In normal use, classification runs in the browser and no movement data is uploaded. Optional research mode (?debug=1) can store summaries locally in the browser only.</p></div>
+          <div><h3>Can bots fool pointer-based verification?</h3><p>Yes. Synthetic trajectories can imitate timing, curvature and corrections. Behavioral movement should be treated as one signal among many, not as proof.</p></div>
+          <div><h3>Is the keyboard path scored like mouse movement?</h3><p>No. Keyboard completion uses a separate accessible_completion state. Pointer biometrics are not applied and no fake human-likelihood score is assigned.</p></div>
+        </div>
+'''

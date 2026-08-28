@@ -20,6 +20,7 @@
     { "path": "/services/web-development/", "changefreq": "monthly", "priority": "0.7" },
     { "path": "/studio/", "changefreq": "monthly", "priority": "0.7" },
     { "path": "/blog/", "changefreq": "weekly", "priority": "0.8" },
+    { "path": "/blog/human-check-captcha-alternative/", "changefreq": "monthly", "priority": "0.9" },
     { "path": "/blog/your-brand-isnt-outdated-your-system-is/", "changefreq": "monthly", "priority": "0.8" },
     { "path": "/blog/what-is-product-design/", "changefreq": "monthly", "priority": "0.8" },
     { "path": "/blog/why-most-saas-websites-look-the-same/", "changefreq": "monthly", "priority": "0.8" },
