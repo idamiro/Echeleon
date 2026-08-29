@@ -89,6 +89,7 @@
     { "path": "/redesigns/case-studio/", "changefreq": "monthly", "priority": "0.8" },
     { "path": "/redesigns/hold/", "changefreq": "monthly", "priority": "0.7" },
     { "path": "/experiments/human-check/", "changefreq": "monthly", "priority": "0.7" },
+    { "path": "/experiments/windows-11/", "changefreq": "monthly", "priority": "0.7" },
     {
       "path": "/services/",
       "changefreq": "weekly",

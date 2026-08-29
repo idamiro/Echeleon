@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Windows 11 Reimagined — Vulcet Experiment</title>
+  <meta name="description" content="An interactive Vulcet experiment exploring a floating, focused interpretation of the Windows 11 desktop.">
+  <link rel="canonical" href="https://vulcet.com/experiments/windows-11/">
+  <meta property="og:title" content="Windows 11 Reimagined — Vulcet Experiment">
+  <meta property="og:description" content="An interactive Vulcet experiment exploring a floating, focused interpretation of the Windows 11 desktop.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://vulcet.com/experiments/windows-11/">
+  <meta property="og:image" content="https://vulcet.com/experiments/windows-11/assets/og.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="desktop" aria-label="Windows 11 Reimagined desktop">
+    <p class="disclaimer">Windows 11 Reimagined · Fan-made interface experiment by Vulcet · Not affiliated with Microsoft.</p>
+    <section id="panel-start" class="panel start-panel" hidden aria-label="Start menu">
+      <label class="searchbox"><span>⌕</span><input type="search" placeholder="Type here to search"></label>
+      <div class="panel-heading"><b>Pinned</b><button>All apps ›</button></div>
+      <div class="pinned-grid">
+        <button data-open="edge"><span class="mini edge-mini">e</span>Edge</button><button data-open="explorer"><span class="mini folder-mini">▰</span>Explorer</button>
+        <button data-open="store"><span class="mini store-mini">▦</span>Store</button><button><span class="mini">⚙</span>Settings</button><button><span class="mini">▧</span>Photos</button><button><span class="mini">▣</span>Calendar</button>
+      </div>
+      <div class="recommended"><b>Recommended</b><p>Welcome to Windows 11 Reimagined</p><small>Recently added</small></div>
+      <footer class="start-footer"><span class="avatar">V</span><span>Vulcet</span><button aria-label="Power">⏻</button></footer>
+    </section>
+    <section id="panel-search" class="panel search-panel" hidden aria-label="Search">
+      <label class="searchbox"><span>⌕</span><input id="search-input" type="search" placeholder="Search apps, settings and documents"></label>
+      <h2>Best match</h2><div id="search-results"></div>
+    </section>
+    <section id="panel-taskview" class="taskview panel" hidden aria-label="Task view"><h2>Desktops and open windows</h2><div id="taskview-list"></div></section>
+    <section id="panel-quick" class="panel quick-panel" hidden aria-label="Quick settings">
+      <div class="toggle-grid"><button class="active">◉<span>Wi-Fi</span></button><button>ᛒ<span>Bluetooth</span></button><button>✈<span>Airplane mode</span></button><button>◐<span>Accessibility</span></button></div>
+      <label>☀ <input type="range" min="0" max="100" value="72"></label><label>🔊 <input type="range" min="0" max="100" value="58"></label>
+    </section>
+    <section id="panel-calendar" class="panel calendar-panel" hidden aria-label="Calendar"><header><b id="calendar-month"></b><span id="calendar-today"></span></header><div class="calendar-grid" id="calendar-grid"></div></section>
+    <div id="window-layer" aria-live="polite"></div>
+
+    <nav class="taskbar" aria-label="Taskbar">
+      <div class="apps">
+        <button class="task-button start" data-panel="start" aria-label="Start"><span class="start-logo"><i></i><i></i><i></i><i></i></span></button>
+        <button class="task-button search" data-panel="search" aria-label="Search"><span></span></button>
+        <button class="task-button task-view" data-panel="taskview" aria-label="Task view"><span></span></button>
+        <button class="task-button chat" data-open="chat" aria-label="Chat"><span><i>◆</i></span></button>
+        <button class="task-button explorer" data-open="explorer" aria-label="File Explorer"><span><i></i></span></button>
+        <button class="task-button edge" data-open="edge" aria-label="Microsoft Edge"><span>e</span></button>
+        <button class="task-button store" data-open="store" aria-label="Microsoft Store"><span><i></i><b><em></em><em></em><em></em><em></em></b></span></button>
+      </div>
+      <span class="divider" aria-hidden="true"></span>
+      <div class="tray">
+        <button data-panel="quick" aria-label="Show hidden icons">⌃</button>
+        <button data-panel="quick" class="wifi" aria-label="Wi-Fi"><span>◔</span></button>
+        <button data-panel="quick" aria-label="Volume">◖))</button>
+        <button data-panel="quick" class="battery" aria-label="Battery"><span></span></button>
+        <button class="clock" data-panel="calendar" aria-label="Clock and calendar"><time id="clock-time"></time><time id="clock-date"></time></button>
+      </div>
+    </nav>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
