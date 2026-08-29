@@ -4,6 +4,9 @@ const menuButton = document.querySelector('.menu-trigger');
 const mobileNav = document.querySelector('.mobile-nav');
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+const isAz = document.documentElement.lang === 'az';
+const menuOpenLabel = isAz ? 'Menyunu aç' : 'Open menu';
+const menuCloseLabel = isAz ? 'Menyunu bağla' : 'Close menu';
 
 document.documentElement.dataset.motion = reduceMotion ? 'reduced' : 'ready';
 
@@ -23,7 +26,7 @@ function setMenu(open) {
   mobileNav.inert = !open;
   mobileNav.classList.toggle('mobile-nav--open', open);
   menuButton.querySelector('.menu-icon').classList.toggle('menu-icon--open', open);
-  menuButton.querySelector('.sr-only').textContent = open ? 'Close menu' : 'Open menu';
+  menuButton.querySelector('.sr-only').textContent = open ? menuCloseLabel : menuOpenLabel;
   if (open) {
     menuScrollY = window.scrollY;
     document.documentElement.classList.add('nav-open');

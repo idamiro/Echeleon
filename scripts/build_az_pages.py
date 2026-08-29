@@ -102,28 +102,28 @@ def page_home() -> None:
     az_path = ""
     faqs = [
         (
-            "Tipik layihə nə qədər vaxt aparır?",
+            "Layihə adətən nə qədər vaxt aparır?",
             "Məqsədli veb-sayt adətən iki-dörd həftə çəkir. Daha geniş platformalar, çoxdilli saytlar və məhsul işi isə həcmdən və funksionallıqdan asılı olaraq adətən dörd-səkkiz həftə və ya daha çox vaxt tələb edir.",
         ),
         (
-            "İşə başlamazdan əvvəl müştəridən nə tələb olunur?",
-            "Aydın qərar verən şəxs, mövcud brend və sayt materiallarına çıxış, şirkət haqqında açıq məlumat və vaxtında rəy.",
+            "Başlamaq üçün bizdən nə lazımdır?",
+            "Aydın qərar verən şəxs, mövcud brend və veb-sayt materiallarına çıxış, şirkət haqqında açıq məlumat və vaxtında rəy.",
         ),
         (
-            "Mövcud saytı redizayn edə bilərsiniz?",
-            "Bəli. Əvvəlcə mövcud məzmun və analitika nəzərdən keçirilir, sonra saxlanmağa dəyər hissələr saytı geridə saxlayanlardan ayrılır.",
+            "Mövcud veb-saytımızı yenidən dizayn edə bilərsiniz?",
+            "Bəli. Əvvəlcə mövcud məzmun və analitika nəzərdən keçirilir, sonra saxlanmağa dəyər hissələr veb-saytı geridə saxlayanlardan ayrılır.",
         ),
         (
-            "Çoxdilli saytlar necə hazırlanır?",
+            "Çoxdilli veb-saytlar hazırlayırsınız?",
             "Naviqasiya, iyerarxiya və məzmunun bütün dillərdə ardıcıl qalması üçün dil strukturu əvvəldən planlaşdırılır.",
         ),
         (
             "Sayt istifadəyə verildikdən sonra nə baş verir?",
-            "Hər layihəyə istifadəyə verildikdən sonra qısamüddətli dəstək daxildir. Sayta müntəzəm texniki xidmət və ya təkmilləşdirmə lazım olduqda davamlı dəstək də mümkündür.",
+            "Hər layihəyə istifadəyə verildikdən sonra qısamüddətli dəstək daxildir. Veb-sayta müntəzəm texniki xidmət və ya təkmilləşdirmə lazım olduqda davamlı dəstək də mümkündür.",
         ),
         (
             "Hansı texnologiyalardan istifadə edirsiniz?",
-            "Platforma layihəyə, komandanıza və sayt istifadəyə verildikdən sonrakı ehtiyaclara əsasən seçilir. Vulcet standartlara uyğun adaptiv saytlar hazırlayır; texniki tələblər dəqiqləşəndən sonra uyğun CMS, inteqrasiyalar və hostinq həllini tövsiyə edir.",
+            "Platforma layihəyə, komandanıza və veb-sayt istifadəyə verildikdən sonrakı ehtiyaclara əsasən seçilir. Vulcet standartlara uyğun adaptiv veb-saytlar hazırlayır; texniki tələblər dəqiqləşəndən sonra uyğun CMS, inteqrasiyalar və hostinq həllini tövsiyə edir.",
         ),
     ]
     faq_html = "\n".join(faq_item(q, a) for q, a in faqs)
@@ -138,7 +138,7 @@ def page_home() -> None:
                 "logo": {"@type": "ImageObject", "url": f"{SITE}/vulcet-mark.png"},
                 "image": f"{SITE}/og-vulcet.png",
                 "email": "studio@vulcet.com",
-                "description": "Vulcet qlobal brendinq, məhsul və veb-dizayn studiyasıdır.",
+                "description": "Vulcet — brendinq, məhsul və veb-dizayn sahəsində fəaliyyət göstərən qlobal dizayn studiyasıdır.",
                 "areaServed": "Worldwide",
                 "contactPoint": {
                     "@type": "ContactPoint",
@@ -175,68 +175,68 @@ def page_home() -> None:
     <section class="hero" id="top">
       <div class="shell hero-grid">
         <div class="hero-proof" aria-hidden="true"></div>
-        <h1 data-header-trigger="">Vulcet qlobal brendinq, məhsul və veb-dizayn studiyasıdır.</h1>
+        <h1 data-header-trigger="">Vulcet — brendinq, məhsul və veb-dizayn sahəsində fəaliyyət göstərən qlobal dizayn studiyasıdır.</h1>
         <div class="hero-lens" aria-hidden="true"><i></i><i></i><span></span></div>
       </div>
     </section>
     <section class="work-section" id="work"><div class="shell work-grid work-grid--cases">
       <div class="work-cases-intro">
         <div class="editorial-label"><span>01</span><span>Seçilmiş işlər</span></div>
-        <p class="work-cases-lede">Yayımda olan müştəri layihələri aydın kontekstlə — portfel doldurucu işlər olmadan.</p>
+        <p class="work-cases-lede">Real müştəri layihələri — hər biri öz konteksti və görülən işin aydın təsviri ilə.</p>
       </div>
       <article class="home-case">
         <div class="home-case__copy">
-          <div class="editorial-label"><span>01</span><span>Müştəri layihəsi</span></div>
+          <div class="editorial-label"><span>01</span><span>Müştəri layihəsi — FounderClub</span></div>
           <h2>FounderClub</h2>
-          <p>Təsisçiləri, tədbirləri, xəbərləri və üzvlüyü vahid rəqəmsal təcrübədə birləşdirən icma platforması.</p>
+          <p>Təsisçiləri, tədbirləri, xəbərləri və üzvlük imkanlarını vahid rəqəmsal platformada birləşdirən biznes icması.</p>
           <dl class="project-meta home-case__meta"><div><dt>Rol</dt><dd>Məhsul strukturu, UI/UX, proqramlaşdırma</dd></div><div><dt>Müddət</dt><dd>Təxminən altı həftə</dd></div><div><dt>Platforma</dt><dd>İcma platforması</dd></div><div><dt>Sistemlər</dt><dd>Xəbərlər, tədbirlər, üzvlük, icma</dd></div></dl>
-          <a class="text-link project-link" href="{AZ_PREFIX}/work/founderclub/">FounderClub case study-ni oxuyun <span aria-hidden="true">↗</span></a>
+          <a class="text-link project-link" href="{AZ_PREFIX}/work/founderclub/">FounderClub layihəsinə bax <span aria-hidden="true">↗</span></a>
         </div>
         <a class="home-case__media" href="https://founderclub.az" target="_blank" rel="noreferrer" aria-label="FounderClub saytına keçin">
           <img src="/founderclub-hero.webp" srcset="/founderclub-hero-small.webp 800w, /founderclub-hero.webp 1600w" sizes="(max-width: 899px) 92vw, 44vw" width="1600" height="1022" alt="FounderClub veb-saytının Bakı gecə görüntüsü." loading="lazy" decoding="async">
-          <span class="home-case__badge">Live / founderclub.az</span>
+          <span class="home-case__badge">Canlı sayt / founderclub.az</span>
         </a>
       </article>
       <article class="home-case">
         <div class="home-case__copy">
-          <div class="editorial-label"><span>02</span><span>Müştəri layihəsi</span></div>
+          <div class="editorial-label"><span>02</span><span>Müştəri layihəsi — Anadolu Qida</span></div>
           <h2>Anadolu Qida</h2>
-          <p>Bakıda un istehsalçısı üçün brend yönümlü biznes saytı — məhsul aydınlığı, istehsal hekayəsi və korporativ sifariş yolu.</p>
-          <dl class="project-meta home-case__meta"><div><dt>Rol</dt><dd>Strategiya, UI/UX, proqramlaşdırma</dd></div><div><dt>Müddət</dt><dd>Təxminən dörd həftə</dd></div><div><dt>Platforma</dt><dd>Korporativ veb-sayt</dd></div><div><dt>Sistemlər</dt><dd>Məhsullar, sorğu, brend keçidi</dd></div></dl>
-          <a class="text-link project-link" href="{AZ_PREFIX}/work/anadolu-qida/">Anadolu Qida case study-ni oxuyun <span aria-hidden="true">↗</span></a>
+          <p>Bakıda fəaliyyət göstərən un istehsalçısı üçün hazırlanmış korporativ veb-sayt — məhsulların aydın təqdimatı, istehsal prosesi və korporativ sifarişlər üçün rahat əlaqə imkanı.</p>
+          <dl class="project-meta home-case__meta"><div><dt>Rol</dt><dd>Strategiya, UI/UX, proqramlaşdırma</dd></div><div><dt>Müddət</dt><dd>Təxminən dörd həftə</dd></div><div><dt>Platforma</dt><dd>Korporativ veb-sayt</dd></div><div><dt>Sistemlər</dt><dd>Məhsullar, sorğular, brend keçidi</dd></div></dl>
+          <a class="text-link project-link" href="{AZ_PREFIX}/work/anadolu-qida/">Anadolu Qida layihəsinə bax <span aria-hidden="true">↗</span></a>
         </div>
         <a class="home-case__media" href="https://anadoluqida.com" target="_blank" rel="noreferrer" aria-label="Anadolu Qida saytına keçin">
           <img src="/anadolu-hero.webp" srcset="/anadolu-hero-small.jpg 900w, /anadolu-hero.webp 1600w" sizes="(max-width: 899px) 92vw, 44vw" width="1672" height="941" alt="Anadolu Qida saytından buğda tarlası hero görüntüsü." loading="lazy" decoding="async">
-          <span class="home-case__badge">Live / anadoluqida.com</span>
+          <span class="home-case__badge">Canlı sayt / anadoluqida.com</span>
         </a>
       </article>
-      <p class="work-cases-lede"><a class="text-link" href="/redesigns/">Studiya eksperimentlərinə baxın — orijinal məhsul tədqiqatları və interaktiv alətlər <span aria-hidden="true">↗</span></a></p>
+      <p class="work-cases-lede"><a class="text-link" href="/redesigns/">Studiya eksperimentlərinə bax — məhsul araşdırmaları və interaktiv alətlər <span aria-hidden="true">↗</span></a></p>
     </div></section>
     <section class="growth-section" id="services"><div class="growth-boundary" aria-hidden="true"></div><div class="shell growth-grid">
-      <div class="editorial-label editorial-label--dark"><span>02</span><span>Boşluq</span></div><h2>Güclü təklif növbəti addımı aydın edən veb-sayta layiqdir.</h2><p class="problem-copy">Vulcet xidmət biznesləri və yeni rəqəmsal məhsul buraxan komandalarla işləyir. Biznes yeni başlayır və ya qeyri-aydın saytdan irəli gedirsə, iş təklifi daha asan başa düşülür, etibar qazanır və hərəkətə keçir.</p>
-      <div class="diagnostics"><div class="diagnostic-row"><span>01</span><strong>Köhnəlmiş təqdimat</strong><p>Biznes olduğu yerdən geridə görünür.</p></div><div class="diagnostic-row"><span>02</span><strong>Qeyri-aydın xidmətlər</strong><p>Ziyarətçilər nə seçməli olduğunu anlamaqda çətinlik çəkir.</p></div><div class="diagnostic-row"><span>03</span><strong>Zəif mobil təcrübə</strong><p>Ən çox istifadə olunan cihazda etibar azalır.</p></div><div class="diagnostic-row"><span>04</span><strong>Parçalanmış dillər</strong><p>Beynəlxalq müştərilər ardıcıl olmayan hekayə alır.</p></div><div class="diagnostic-row"><span>05</span><strong>Çətin yeniləmələr</strong><p>Sayt biznesin inkişafını əks etdirmir.</p></div></div>
-      <div class="growth-transition"><p>Cavab daha çox bəzək deyil.<br><em>Daha aydın sistemdir.</em></p></div>
-      <div class="growth-intro"><span>Xidmətlər</span><h3>Strategiyadan buraxılışa</h3><p>Brend strategiyası, vizual kimlik, məhsul dizaynı və veb proqramlaşdırma — iş davamlılıq tələb etdikdə bir-birinə bağlı.</p><p><a class="text-link" href="{AZ_PREFIX}/services/">Bütün xidmətlərə baxın <span aria-hidden="true">↗</span></a></p></div>
-      <div class="scope-grid"><div><h4><a class="text-link" href="{AZ_PREFIX}/services/brand-strategy/">Brend strategiyası</a></h4><ul><li>Mövqeləndirmə və auditoriya aydınlığı</li><li>Mesaj iyerarxiyası</li><li>Qərar çərçivəsi</li></ul></div><div><h4><a class="text-link" href="{AZ_PREFIX}/services/visual-identity/">Vizual kimlik</a></h4><ul><li>Loqo və nişan sistemləri</li><li>Tipografiya və rəng</li><li>Brend qaydaları</li></ul></div><div><h4><a class="text-link" href="{AZ_PREFIX}/services/product-design/">Məhsul dizaynı</a></h4><ul><li>UX strukturu və axınlar</li><li>İnterfeys sistemləri</li><li>Prototip yoxlaması</li></ul></div><div><h4><a class="text-link" href="{AZ_PREFIX}/services/web-development/">Veb proqramlaşdırma</a></h4><ul><li>Adaptiv icra</li><li>Texniki SEO və analitika</li><li>Buraxılış və davamlı qayğı</li></ul></div></div>
+      <div class="editorial-label editorial-label--dark"><span>02</span><span>Ehtiyac</span></div><h2>Güclü təklif onu aydın təqdim edən veb-sayta ehtiyac duyur.</h2><p class="problem-copy">Vulcet xidmət şirkətləri və yeni rəqəmsal məhsullar hazırlayan komandalarla işləyir. Məqsəd sadəcə daha yaxşı görünən sayt yaratmaq deyil — biznesi, təklifi və istifadəçinin növbəti addımını aydınlaşdıran sistem qurmaqdır.</p>
+      <div class="diagnostics"><div class="diagnostic-row"><span>01</span><strong>Köhnəlmiş təqdimat</strong><p>Biznes olduğu səviyyədən geridə görünür.</p></div><div class="diagnostic-row"><span>02</span><strong>Aydın olmayan xidmətlər</strong><p>Ziyarətçilər nə seçməli olduğunu anlamaqda çətinlik çəkir.</p></div><div class="diagnostic-row"><span>03</span><strong>Zəif mobil təcrübə</strong><p>Ən çox istifadə olunan cihazda etibar azalır.</p></div><div class="diagnostic-row"><span>04</span><strong>Uyğunsuz dil strukturu</strong><p>Beynəlxalq müştərilər ardıcıl olmayan hekayə alır.</p></div><div class="diagnostic-row"><span>05</span><strong>Çətin yenilənən veb-sayt</strong><p>Veb-sayt biznesin inkişafını əks etdirmir.</p></div></div>
+      <div class="growth-transition"><p>Həll daha çox dekorasiya deyil.<br><em>Həll daha aydın sistemdir.</em></p></div>
+      <div class="growth-intro"><span>Xidmətlər</span><h3>Strategiyadan işə salınmaya qədər</h3><p>Brend strategiyası, vizual kimlik, məhsul dizaynı və veb proqramlaşdırma — layihənin davamlılıq tələb etdiyi hallarda vahid proses daxilində birləşdirilir.</p><p><a class="text-link" href="{AZ_PREFIX}/services/">Bütün xidmətlərə bax <span aria-hidden="true">↗</span></a></p></div>
+      <div class="scope-grid"><div><h4><a class="text-link" href="{AZ_PREFIX}/services/brand-strategy/">Brend strategiyası</a></h4><ul><li>Mövqeləndirmə və auditoriya aydınlığı</li><li>Mesaj iyerarxiyası</li><li>Qərar çərçivəsi</li></ul></div><div><h4><a class="text-link" href="{AZ_PREFIX}/services/visual-identity/">Vizual kimlik</a></h4><ul><li>Loqo və nişan sistemləri</li><li>Tipografiya və rəng</li><li>Brend qaydaları</li></ul></div><div><h4><a class="text-link" href="{AZ_PREFIX}/services/product-design/">Məhsul dizaynı</a></h4><ul><li>UX strukturu və axınlar</li><li>İnterfeys sistemləri</li><li>Prototip yoxlaması</li></ul></div><div><h4><a class="text-link" href="{AZ_PREFIX}/services/web-development/">Veb proqramlaşdırma</a></h4><ul><li>Adaptiv icra</li><li>Texniki SEO və analitika</li><li>İşə salma və davamlı qayğı</li></ul></div></div>
     </div></section>
-    <section class="process-section" id="process"><div class="shell process-grid"><div class="editorial-label"><span>03</span><span>İş necə irəliləyir</span></div><div class="working-model"><h2>İlk sualdan buraxılışa qədər birbaşa proses.</h2><p>Strategiya, dizayn və proqramlaşdırma ayrılmır; layihə boyu qərarlar aydın, yoxlama mərhələləri görünən qalır.</p><ul><li>Birbaşa əlaqə nöqtəsi</li><li>Ekranlardan əvvəl strategiya</li><li>Dizayn və proqramlaşdırma birlikdə</li><li>Buraxılışdan sonra da faydalı</li></ul></div><ol class="process-list">
-      <li class="process-stage process-stage--current"><span class="stage-number">01</span><div><h3>Müəyyənləşdirmə</h3><p>Biznesin nəyi çatdırmalı olduğunu, hazırda nələrin mövcud olduğunu və yeni saytın hansı nəticəni verməli olduğunu müəyyən edirik.</p><small><strong>Yoxlama nöqtəsi —</strong> Razılaşdırılmış məqsədlər, həcm və uğur meyarları.</small></div></li>
-      <li class="process-stage"><span class="stage-number">02</span><div><h3>Struktur</h3><p>Vizual qərarlardan əvvəl məzmun iyerarxiyası, səhifə arxitekturası və əsas istifadəçi yolları formalaşdırılır.</p><small><strong>Yoxlama nöqtəsi —</strong> Təsdiqlənmiş sayt xəritəsi, məzmun iyerarxiyası və əsas axınlar.</small></div></li>
-      <li class="process-stage"><span class="stage-number">03</span><div><h3>Dizayn və quruluş</h3><p>İnterfeys və icra birlikdə irəliləyir; adaptivlik, texniki mümkünlük və keyfiyyət bütün proses boyu uzlaşdırılır.</p><small><strong>Yoxlama nöqtəsi —</strong> Yoxlanmış adaptiv interfeys və işlək icra.</small></div></li>
-      <li class="process-stage"><span class="stage-number">04</span><div><h3>Buraxılış və təkmilləşdirmə</h3><p>Hazır sayt sınaqdan keçirilir, yayımlanır və ölçmək, idarə etmək üçün lazımi əsaslarla təhvil verilir.</p><small><strong>Yoxlama nöqtəsi —</strong> Sınaqdan keçmiş buraxılış, analitika bazası və dəstək təhvili.</small></div></li>
+    <section class="process-section" id="process"><div class="shell process-grid"><div class="editorial-label"><span>03</span><span>İş prosesi</span></div><div class="working-model"><h2>İlk sualdan layihənin işə salınmasına qədər vahid və birbaşa proses.</h2><p>Strategiya, dizayn və proqramlaşdırma birlikdə qalır; layihə boyu qərarlar aydın, yoxlama mərhələləri görünən olur.</p><ul><li>Birbaşa əlaqə</li><li>Əvvəl strategiya, sonra ekranlar</li><li>Dizayn və proqramlaşdırma birlikdə</li><li>İşə salındıqdan sonra da faydalı</li></ul></div><ol class="process-list">
+      <li class="process-stage process-stage--current"><span class="stage-number">01</span><div><h3>Müəyyənləşdiririk</h3><p>Biznesin nəyi çatdırmalı olduğunu, hazırda nələrin mövcud olduğunu və yeni veb-saytın hansı nəticəni verməli olduğunu müəyyən edirik.</p><small><strong>Yoxlama nöqtəsi —</strong> Razılaşdırılmış məqsədlər, həcm və uğur meyarları.</small></div></li>
+      <li class="process-stage"><span class="stage-number">02</span><div><h3>Struktur qururuq</h3><p>Vizual qərarlardan əvvəl məzmun iyerarxiyası, səhifə arxitekturası və əsas istifadəçi yolları formalaşdırılır.</p><small><strong>Yoxlama nöqtəsi —</strong> Təsdiqlənmiş sayt xəritəsi, məzmun iyerarxiyası və əsas axınlar.</small></div></li>
+      <li class="process-stage"><span class="stage-number">03</span><div><h3>Dizayn edir və hazırlayırıq</h3><p>İnterfeys və icra birlikdə irəliləyir; adaptivlik, texniki mümkünlük və keyfiyyət bütün proses boyu uzlaşdırılır.</p><small><strong>Yoxlama nöqtəsi —</strong> Yoxlanmış adaptiv interfeys və işlək icra.</small></div></li>
+      <li class="process-stage"><span class="stage-number">04</span><div><h3>İşə salır və təkmilləşdiririk</h3><p>Hazır veb-sayt sınaqdan keçirilir, yayımlanır və ölçmək, idarə etmək üçün lazımi əsaslarla təhvil verilir.</p><small><strong>Yoxlama nöqtəsi —</strong> Sınaqdan keçmiş buraxılış, analitika bazası və dəstək təhvili.</small></div></li>
     </ol></div></section>
     <section class="faq-section" id="faq"><div class="shell faq-grid"><div class="editorial-label"><span>04</span><span>Praktik suallar</span></div><h2>Başlamazdan əvvəl.</h2><div class="faq-list">
 {faq_html}
     </div></div></section>
-    <section class="final-cta" id="contact"><div class="closing-field" aria-hidden="true"><i></i><i></i><span></span><b></b></div><div class="shell final-grid"><div class="editorial-label"><span>05</span><span>Müzakirəyə başlayaq</span></div><h2>Sayt biznesə<br>uyğun olsun.</h2><div class="final-support"><p>Nə qurduğunuzu və saytın növbəti addımda nə etməli olduğunu bölüşün.</p><div><a class="button button--primary" href="{AZ_PREFIX}/contact/">{CTA_START} <span aria-hidden="true">↗</span></a><a class="text-link" href="mailto:studio@vulcet.com">studio@vulcet.com</a></div></div></div></section>
+    <section class="final-cta" id="contact"><div class="closing-field" aria-hidden="true"><i></i><i></i><span></span><b></b></div><div class="shell final-grid"><div class="editorial-label"><span>05</span><span>Əlaqə</span></div><h2>Veb-saytınız biznesinizin səviyyəsini əks etdirsin.</h2><div class="final-support"><p>Nə üzərində işlədiyinizi və veb-saytın bundan sonra sizin üçün nə etməli olduğunu bizə danışın.</p><div><a class="button button--primary" href="{AZ_PREFIX}/contact/">{CTA_START} <span aria-hidden="true">↗</span></a><a class="text-link" href="mailto:studio@vulcet.com">studio@vulcet.com</a></div></div></div></section>
   </main>"""
     )
     head = render_head(
         az_path=az_path,
         title="Vulcet — brendinq, məhsul və veb-dizayn studiyası",
-        description="Vulcet qlobal brendinq, məhsul və veb-dizayn studiyasıdır. Brendlər, məhsullar və veb-saytlar üçün strategiya, dizayn və proqramlaşdırma.",
+        description="Vulcet — brendinq, məhsul və veb-dizayn sahəsində fəaliyyət göstərən qlobal dizayn studiyasıdır. Brendlər, məhsullar və veb-saytlar üçün strategiya, dizayn və proqramlaşdırma.",
         og_title="Vulcet — brendinq, məhsul və veb-dizayn studiyası",
-        og_description="Vulcet qlobal brendinq, məhsul və veb-dizayn studiyasıdır. Brendlər, məhsullar və veb-saytlar üçün strategiya, dizayn və proqramlaşdırma.",
+        og_description="Vulcet — brendinq, məhsul və veb-dizayn sahəsində fəaliyyət göstərən qlobal dizayn studiyasıdır. Brendlər, məhsullar və veb-saytlar üçün strategiya, dizayn və proqramlaşdırma.",
         og_image_alt="Vulcet — brendinq, məhsul və veb-dizayn studiyası",
         schema=schema,
         style_css=STYLE_HERO,
@@ -265,17 +265,17 @@ def page_services_index() -> None:
       <div class="v-hero-system" aria-hidden="true"><span></span><i></i><b></b><em></em></div>
       <div class="shell v-services-hero-grid">
         <div class="editorial-label"><span>01</span><span>Xidmətlər</span></div>
-        <h1 data-header-trigger="">Aydın istiqamətdən istifadə oluna bilən brendə <em>qədər.</em></h1>
-        <div class="v-hero-copy"><p>Vulcet brend düşüncəsini, vizual sistemləri, məhsul təcrübəsini və veb proqramlaşdırmanı birləşdirir. Bir disiplinlə başlayın və ya hamısını birbaşa prosesdə birləşdirin.</p></div>
+        <h1 data-header-trigger="">Aydın strategiyadan işlək brend sisteminə <em>qədər.</em></h1>
+        <div class="v-hero-copy"><p>Vulcet brend strategiyası, vizual kimlik, məhsul dizaynı və veb proqramlaşdırmanı vahid prosesdə birləşdirir. Layihə bir xidmətlə başlaya və ehtiyacdan asılı olaraq digər istiqamətləri də əhatə edə bilər.</p></div>
         <ul class="v-hero-facts" aria-label="Vulcet imkanları"><li>Strategiya</li><li>Kimlik</li><li>Məhsul</li><li>Proqramlaşdırma</li></ul>
       </div>
     </section>
     <section class="v-service-overview" id="service-overview" aria-labelledby="overview-title">
       <div class="shell">
         <div class="v-section-intro">
-          <div class="editorial-label editorial-label--dark"><span>02</span><span>Disiplinlər</span></div>
-          <h2 id="overview-title">Növbəti addımı qurmağın dörd bağlı yolu.</h2>
-          <p>Hər əməkdaşlıq biznes problemini əsas götürür, paketi yox. Həcm və müddət ilkin layihə baxışından sonra təsdiqlənir.</p>
+          <div class="editorial-label editorial-label--dark"><span>02</span><span>Xidmət istiqamətləri</span></div>
+          <h2 id="overview-title">Biznesin ehtiyacına uyğun dörd əsas istiqamət.</h2>
+          <p>Hər əməkdaşlıq hazır xidmət paketindən deyil, biznesin real ehtiyacından başlayır. Həcm və müddət ilkin layihə baxışından sonra təsdiqlənir.</p>
         </div>
         <div class="v-service-cards">
           <article class="v-service-card v-service-card--essential">
@@ -283,7 +283,7 @@ def page_services_index() -> None:
             <h3>Brend<br>strategiyası</h3>
             <p class="v-card-summary">Məqsədli hərəkətə ehtiyacı olan brend üçün aydın mövqe, mesaj və qərar çərçivəsi.</p>
             <div class="v-card-price"><span>Tipik müddət</span><strong>4 həftədən</strong></div>
-            <div class="v-card-scope"><span>Əsas həcm</span><ul><li>Kəşfiyyat workshopu</li><li>Bazar və auditoriya tədqiqatı</li><li>Brend mövqeləndirməsi</li><li>Səs tonu</li></ul></div>
+            <div class="v-card-scope"><span>Əsas həcm</span><ul><li>Kəşfiyyat iş sessiyası</li><li>Bazar və auditoriya tədqiqatı</li><li>Brend mövqeləndirməsi</li><li>Səs tonu</li></ul></div>
             <a class="button button--secondary" href="{AZ_PREFIX}/services/brand-strategy/">Xidmətə bax <span aria-hidden="true">↗</span></a>
           </article>
           <article class="v-service-card v-service-card--growth">
@@ -292,7 +292,7 @@ def page_services_index() -> None:
             <h3>Vizual<br>kimlik</h3>
             <p class="v-card-summary">Strategiyanı fərqli və praktik vizual dilə çevirən ardıcıl kimlik.</p>
             <div class="v-card-price"><span>Tipik müddət</span><strong>4 həftədən</strong></div>
-            <div class="v-card-scope"><span>Əsas həcm</span><ul><li>Kreativ istiqamət</li><li>Açar vizual</li><li>Kimlik qaydaları</li><li>Motion dizayn sistemi</li></ul></div>
+            <div class="v-card-scope"><span>Əsas həcm</span><ul><li>Kreativ istiqamət</li><li>Açar vizual</li><li>Kimlik qaydaları</li><li>Animasiya dizayn sistemi</li></ul></div>
             <a class="button button--light" href="{AZ_PREFIX}/services/visual-identity/">Xidmətə bax <span aria-hidden="true">↗</span></a>
           </article>
           <article class="v-service-card v-service-card--product">
@@ -300,7 +300,7 @@ def page_services_index() -> None:
             <h3>Məhsul<br>dizaynı</h3>
             <p class="v-card-summary">Real istifadəçi yolları, aydın interfeyslər və məqsədli qarşılıqlı əlaqə ətrafında formalaşdırılmış veb-saytlar və rəqəmsal məhsullar.</p>
             <div class="v-card-price"><span>Tipik müddət</span><strong>4 həftədən</strong></div>
-            <div class="v-card-scope"><span>Əsas həcm</span><ul><li>Prototipləşdirmə və UX</li><li>İstifadəçi yolları</li><li>İnterfeys dizayn sistemi</li><li>Motion və mikrointeraksiyalar</li></ul></div>
+            <div class="v-card-scope"><span>Əsas həcm</span><ul><li>Prototipləşdirmə və UX</li><li>İstifadəçi yolları</li><li>İnterfeys dizayn sistemi</li><li>Animasiya və mikrointeraksiyalar</li></ul></div>
             <a class="button button--secondary" href="{AZ_PREFIX}/services/product-design/">Xidmətə bax <span aria-hidden="true">↗</span></a>
           </article>
           <article class="v-service-card v-service-card--care">
@@ -308,7 +308,7 @@ def page_services_index() -> None:
             <h3>Veb<br>proqramlaşdırma</h3>
             <p class="v-card-summary">Dizaynı qoruyan, biznesi dəstəkləyən və buraxılışdan sonra idarə oluna bilən adaptiv icra.</p>
             <div class="v-card-price"><span>Tipik müddət</span><strong>4 həftədən</strong></div>
-            <div class="v-card-scope"><span>Əsas həcm</span><ul><li>Frontend proqramlaşdırma</li><li>Motion və interaksiya</li><li>Texniki SEO və inteqrasiyalar</li><li>Buraxılış və texniki qayğı</li></ul></div>
+            <div class="v-card-scope"><span>Əsas həcm</span><ul><li>Frontend proqramlaşdırma</li><li>Animasiya və interaksiya</li><li>Texniki SEO və inteqrasiyalar</li><li>Buraxılış və texniki qayğı</li></ul></div>
             <a class="button button--secondary" href="{AZ_PREFIX}/services/web-development/">Xidmətə bax <span aria-hidden="true">↗</span></a>
           </article>
         </div>
@@ -320,9 +320,9 @@ def page_services_index() -> None:
         <h2>Ehtiyacdan başlayın,<br>etiketdən yox.</h2>
         <div class="faq-list">
           {faq_item("Yalnız ideyam var. Başlamaq üçün kifayətdirmi?", "Bəli. İlk addım ideyanı aydın brifə çevirməkdir: kim üçündür, nəyi çatdırmalıdır və biznesə nə lazımdır.")}
-          {faq_item("Strategiya, kimlik, məhsul dizaynı və proqramlaşdırma birləşdirilə bilərmi?", "Bəli. Disiplinlər ayrıca da işləyir, amma ən güclü davamlılıq istiqamət, vizual sistem, interfeys və son quruluşun bir-birinə bağlanmasından gəlir.")}
+          {faq_item("Strategiya, kimlik, məhsul dizaynı və proqramlaşdırma birləşdirilə bilərmi?", "Bəli. Xidmət istiqamətləri ayrıca da işləyir, amma ən güclü davamlılıq istiqamət, vizual sistem, interfeys və son quruluşun bir-birinə bağlanmasından gəlir.")}
           {faq_item("Hansı xidmətlə başlamalıyıq?", "Həll olunmamış qərardan başlayın. Mövqe qeyri-aydındırsa — strategiyadan; istiqamət aydındırsa, ifadə yox — kimlik və ya məhsul dizaynından. Proqramlaşdırma təcrübə və texniki həcm hazır olanda başlayır.")}
-          {faq_item("Son həcm necə müəyyən edilir?", "Vulcet məqsədləri, mövcud materialları, tələb olunan deliverabl-ları, funksionallığı və vaxtı nəzərdən keçirir, sonra tövsiyə olunan başlanğıc nöqtəsi ilə yazılı həcm verir.")}
+          {faq_item("Son həcm necə müəyyən edilir?", "Vulcet məqsədləri, mövcud materialları, təhvil veriləcək materialları, funksionallığı və vaxtı nəzərdən keçirir, sonra tövsiyə olunan başlanğıc nöqtəsi ilə yazılı həcm verir.")}
         </div>
       </div>
     </section>
@@ -332,9 +332,9 @@ def page_services_index() -> None:
           <div class="editorial-label editorial-label--dark"><span>03</span><span>Praktikada</span></div>
           <h2 id="work-proof-title">Bu prosesdən istifadə edən real layihələr.</h2>
           <p>Vulcet struktur, interfeys və proqramlaşdırmanı canlı müştəri işində necə tətbiq etdiyinə baxın.</p>
-          <p><a class="text-link" href="{AZ_PREFIX}/work/founderclub/">FounderClub case study <span aria-hidden="true">↗</span></a><br>
-          <a class="text-link" href="{AZ_PREFIX}/work/anadolu-qida/">Anadolu Qida case study <span aria-hidden="true">↗</span></a><br>
-          <a class="text-link" href="{AZ_PREFIX}/work/">Bütün seçilmiş işlər <span aria-hidden="true">↗</span></a></p>
+          <p><a class="text-link" href="{AZ_PREFIX}/work/founderclub/">FounderClub layihəsi <span aria-hidden="true">↗</span></a><br>
+          <a class="text-link" href="{AZ_PREFIX}/work/anadolu-qida/">Anadolu Qida layihəsi <span aria-hidden="true">↗</span></a><br>
+          <a class="text-link" href="{AZ_PREFIX}/work/">Bütün müştəri layihələri <span aria-hidden="true">↗</span></a></p>
         </div>
       </div>
     </section>
@@ -360,7 +360,7 @@ def page_services_index() -> None:
                 "title": "Brend, məhsul və veb-dizayn xidmətləri | Vulcet",
                 "description": "Brend strategiyası, vizual kimlik, məhsul dizaynı və veb proqramlaşdırma — istiqamətdən buraxılışa bir proses.",
                 "og_title": "Brend, məhsul və veb-dizayn xidmətləri | Vulcet",
-                "og_description": "Aydın brend və faydalı rəqəmsal mövcudluq üçün dörd bağlı disiplin.",
+                "og_description": "Aydın brend və faydalı rəqəmsal mövcudluq üçün dörd əsas istiqamət.",
                 "schema": schema,
             },
             main=main,
@@ -427,8 +427,8 @@ def page_all_services() -> None:
         title="Aydın mövqeləndirmə üçün brend strategiyası | Vulcet",
         name_en="Brand Strategy",
         name_az="Brend strategiyası",
-        dark_section='<section class="page-section page-section--dark"><div class="shell service-page-grid"><div class="service-commercial"><span>Tipik müddət</span><strong>4 həftədən</strong><p>Son həcm biznes, mövcud materiallar, bazar konteksti və verilməli qərarlara görə müəyyən edilir.</p></div><div class="service-scope-columns"><div><h2>Uyğundur</h2><ul><li>Buraxılışa hazırlanan yeni brendlər</li><li>Yeni mərhələyə və ya bazara çıxan bizneslər</li><li>Qeyri-aydın və ya ardıcıl olmayan mesajı olan komandalar</li><li>Vizualdan əvvəl istiqamət lazım olan rebrendlər</li></ul></div><div><h2>Tipik həcm</h2><ul><li>Kəşfiyyat workshopu</li><li>Auditoriya və bazar tədqiqatı</li><li>Rəqabət konteksti</li><li>Brend mövqeləndirməsi</li><li>Dəyər təklifi və əsas mesajlar</li><li>Səs tonu</li></ul></div></div></div></section>',
-        steps='<div class="principle-row"><span>01</span><h3>Kəşf et</h3><p>Biznes məqsədlərini, auditoriyanı, təklifi və cari çətinlikləri vahid brifdə birləşdirin.</p></div><div class="principle-row"><span>02</span><h3>Tədqiqat et</h3><p>Bazar, alternativlər və auditoriya kontekstini öyrənin ki, qərarlar zövqə yox, sübuta əsaslansın.</p></div><div class="principle-row"><span>03</span><h3>Mövqeləndir</h3><p>Brendin tutmalı olduğu yeri, aydın etməli olduğu dəyəri və davamlı sahib olmalı olduğu ideyaları müəyyən edin.</p></div><div class="principle-row"><span>04</span><h3>Səs ver</h3><p>Sayt və kənarda aydın ünsiyyət üçün dil prinsipləri, mesaj iyerarxiyası və tonu təyin edin.</p></div>',
+        dark_section='<section class="page-section page-section--dark"><div class="shell service-page-grid"><div class="service-commercial"><span>Tipik müddət</span><strong>4 həftədən</strong><p>Son həcm biznes, mövcud materiallar, bazar konteksti və verilməli qərarlara görə müəyyən edilir.</p></div><div class="service-scope-columns"><div><h2>Uyğundur</h2><ul><li>Buraxılışa hazırlanan yeni brendlər</li><li>Yeni mərhələyə və ya bazara çıxan bizneslər</li><li>Qeyri-aydın və ya ardıcıl olmayan mesajı olan komandalar</li><li>Vizualdan əvvəl istiqamət lazım olan rebrendlər</li></ul></div><div><h2>Tipik həcm</h2><ul><li>Kəşfiyyat iş sessiyası</li><li>Auditoriya və bazar tədqiqatı</li><li>Rəqabət konteksti</li><li>Brend mövqeləndirməsi</li><li>Dəyər təklifi və əsas mesajlar</li><li>Səs tonu</li></ul></div></div></div></section>',
+        steps='<div class="principle-row"><span>01</span><h3>Kəşf</h3><p>Biznes məqsədləri, auditoriya, təklif və cari çətinliklər vahid brifdə birləşdirilir.</p></div><div class="principle-row"><span>02</span><h3>Tədqiqat</h3><p>Bazar, alternativlər və auditoriya konteksti öyrənilir ki, qərarlar zövqə yox, sübuta əsaslanır.</p></div><div class="principle-row"><span>03</span><h3>Mövqeləndirmə</h3><p>Brendin tutmalı olduğu yer, aydın etməli olduğu dəyər və davamlı sahib olmalı olduğu ideyalar müəyyən edilir.</p></div><div class="principle-row"><span>04</span><h3>Kommunikasiya dili</h3><p>Sayt və kənar ünsiyyət üçün dil prinsipləri, mesaj iyerarxiyası və ton təyin edilir.</p></div>',
     )
     page_service_detail(
         "visual-identity",
@@ -436,13 +436,13 @@ def page_all_services() -> None:
         label="Vizual kimlik",
         h1="İnsanların tanıya biləcəyi və komandanın istifadə edə biləcəyi vizual <em>sistem.</em>",
         hero_copy="Loqodan artıq ehtiyacı olan brendlər üçün: veb-saytlar, təqdimatlar, sosial məzmun və hər vacib toxunma nöqtəsində ardıcıl dil.",
-        meta_description="Vulcet vizual kimlik: kreativ istiqamət, açar vizuallar, qaydalar və motion prinsipləri — vahid brend sistemi.",
+        meta_description="Vulcet vizual kimlik: kreativ istiqamət, açar vizuallar, qaydalar və animasiya prinsipləri — vahid brend sistemi.",
         og_title="Brendlər üçün vizual kimlik sistemləri | Vulcet",
         title="Brendlər üçün vizual kimlik sistemləri | Vulcet",
         name_en="Visual Identity",
         name_az="Vizual kimlik",
-        dark_section='<section class="page-section page-section--dark"><div class="shell service-page-grid"><div class="service-commercial"><span>Tipik müddət</span><strong>4 həftədən</strong><p>Son həcm mövcud strategiyadan, tələb olunan tətbiqlərdən və komandanın təhvildən sonra ehtiyac duyduğu səviyyədən asılıdır.</p></div><div class="service-scope-columns"><div><h2>Uyğundur</h2><ul><li>Vizual istiqamətə hazır yeni brendlər</li><li>Ardıcıl olmayan kimliyi olan bizneslər</li><li>Strategiya dəyişikliyindən sonra rebrendlər</li><li>Təkrarlanan vizual sistemi lazım olan komandalar</li></ul></div><div><h2>Tipik həcm</h2><ul><li>Kreativ istiqamət</li><li>Loqo təkmilləşdirməsi və ya kimlik nişanı</li><li>Rəng və tipografiya sistemi</li><li>Açar vizual və şəkil istiqaməti</li><li>Kimlik qaydaları</li><li>Motion prinsipləri</li></ul></div></div></div></section>',
-        steps='<div class="principle-row"><span>01</span><h3>İstiqamət təyin et</h3><p>Brend strategiyasını aydın vizual əraziyə, istinadlara və prinsiplərə çevirin.</p></div><div class="principle-row"><span>02</span><h3>Açar vizual qur</h3><p>Nişan, tip, rəng, şəkil və kompozisiya arasında əsas əlaqəni yaradın.</p></div><div class="principle-row"><span>03</span><h3>Təkrarlanan et</h3><p>Qaydaları və tətbiqləri sənədləşdirin ki, kimlik komanda və kanallar arasında ardıcıl qalsın.</p></div><div class="principle-row"><span>04</span><h3>Motion müəyyən et</h3><p>Mesajdan yayındırmadan kimliyi genişləndirən məqsədli animasiya və keçid prinsipləri təyin edin.</p></div>',
+        dark_section='<section class="page-section page-section--dark"><div class="shell service-page-grid"><div class="service-commercial"><span>Tipik müddət</span><strong>4 həftədən</strong><p>Son həcm mövcud strategiyadan, tələb olunan tətbiqlərdən və komandanın təhvildən sonra ehtiyac duyduğu səviyyədən asılıdır.</p></div><div class="service-scope-columns"><div><h2>Uyğundur</h2><ul><li>Vizual istiqamətə hazır yeni brendlər</li><li>Ardıcıl olmayan kimliyi olan bizneslər</li><li>Strategiya dəyişikliyindən sonra rebrendlər</li><li>Təkrarlanan vizual sistemi lazım olan komandalar</li></ul></div><div><h2>Tipik həcm</h2><ul><li>Kreativ istiqamət</li><li>Loqo təkmilləşdirməsi və ya kimlik nişanı</li><li>Rəng və tipografiya sistemi</li><li>Açar vizual və şəkil istiqaməti</li><li>Kimlik qaydaları</li><li>Animasiya prinsipləri</li></ul></div></div></div></section>',
+        steps='<div class="principle-row"><span>01</span><h3>Vizual istiqamət</h3><p>Brend strategiyası aydın vizual əraziyə, istinadlara və prinsiplərə çevrilir.</p></div><div class="principle-row"><span>02</span><h3>Açar vizual</h3><p>Nişan, tip, rəng, şəkil və kompozisiya arasında əsas əlaqə qurulur.</p></div><div class="principle-row"><span>03</span><h3>Sistemləşdirmə</h3><p>Qaydalar və tətbiqlər sənədləşdirilir ki, kimlik komanda və kanallar arasında ardıcıl qalsın.</p></div><div class="principle-row"><span>04</span><h3>Animasiya prinsipləri</h3><p>Mesajdan yayındırmadan kimliyi genişləndirən məqsədli animasiya və keçid prinsipləri formalaşdırılır.</p></div>',
     )
     page_service_detail(
         "product-design",
@@ -455,8 +455,8 @@ def page_all_services() -> None:
         title="Rəqəmsal məhsul və UI/UX dizaynı | Vulcet",
         name_en="Product Design",
         name_az="Məhsul dizaynı",
-        dark_section='<section class="page-section page-section--dark"><div class="shell service-page-grid"><div class="service-commercial"><span>Tipik müddət</span><strong>4 həftədən</strong><p>Son həcm istifadəçi yollarının, ekranların, vəziyyətlərin və tələb olunan prototip detallığının sayından asılıdır.</p></div><div class="service-scope-columns"><div><h2>Uyğundur</h2><ul><li>Mürəkkəb istifadəçi yolları olan veb-saytlar</li><li>Yeni rəqəmsal xidmətlər və MVP-lər</li><li>Müştəri və ya tərəfdaş portalları</li><li>İstifadə oluna bilmə problemləri olan mövcud məhsullar</li></ul></div><div><h2>Tipik həcm</h2><ul><li>Məhsul kəşfiyyatı</li><li>Informasiya arxitekturası</li><li>İstifadəçi yolları və tapşırıq axınları</li><li>İnteraktiv prototipləşdirmə</li><li>UI və dizayn sistemi</li><li>Motion və mikrointeraksiyalar</li></ul></div></div></div></section>',
-        steps='<div class="principle-row"><span>01</span><h3>Təcrübəni prototipləşdir</h3><p>Son interfeys və ya quruluşa bağlanmadan əvvəl tələbləri sınaqdan keçirilə bilən struktura çevirin.</p></div><div class="principle-row"><span>02</span><h3>Yolu formalaşdır</h3><p>İstifadəçilərin başa düşməli, qərar verməli və tamamlamalı olduğu ətrafında məlumat və hərəkətləri təşkil edin.</p></div><div class="principle-row"><span>03</span><h3>Sistemi qur</h3><p>Tipografiya, komponentlər, vəziyyətlər və adaptiv davranış üçün təkrar istifadə olunan interfeys qaydaları yaradın.</p></div><div class="principle-row"><span>04</span><h3>Motion-u məqsədli istifadə et</h3><p>Dəyişikliyi izah etmək, diqqəti yönəltmək və rəy vermək üçün keçidlər və mikrointeraksiyalar tətbiq edin.</p></div>',
+        dark_section='<section class="page-section page-section--dark"><div class="shell service-page-grid"><div class="service-commercial"><span>Tipik müddət</span><strong>4 həftədən</strong><p>Son həcm istifadəçi yollarının, ekranların, vəziyyətlərin və tələb olunan prototip detallığının sayından asılıdır.</p></div><div class="service-scope-columns"><div><h2>Uyğundur</h2><ul><li>Mürəkkəb istifadəçi yolları olan veb-saytlar</li><li>Yeni rəqəmsal xidmətlər və MVP-lər</li><li>Müştəri və ya tərəfdaş portalları</li><li>İstifadə oluna bilmə problemləri olan mövcud məhsullar</li></ul></div><div><h2>Tipik həcm</h2><ul><li>Məhsul kəşfiyyatı</li><li>Informasiya arxitekturası</li><li>İstifadəçi yolları və tapşırıq axınları</li><li>İnteraktiv prototipləşdirmə</li><li>UI və dizayn sistemi</li><li>Animasiya və mikrointeraksiyalar</li></ul></div></div></div></section>',
+        steps='<div class="principle-row"><span>01</span><h3>Prototipləşdirmə</h3><p>Son interfeys və ya quruluşa bağlanmadan əvvəl tələblər sınaqdan keçirilə bilən struktura çevrilir.</p></div><div class="principle-row"><span>02</span><h3>İstifadəçi yolu</h3><p>İstifadəçilərin başa düşməli, qərar verməli və tamamlamalı olduğu ətrafında məlumat və hərəkətlər təşkil edilir.</p></div><div class="principle-row"><span>03</span><h3>İnterfeys sistemi</h3><p>Tipografiya, komponentlər, vəziyyətlər və adaptiv davranış üçün təkrar istifadə olunan interfeys qaydaları yaradılır.</p></div><div class="principle-row"><span>04</span><h3>Məqsədli animasiya</h3><p>Dəyişikliyi izah etmək, diqqəti yönəltmək və rəy vermək üçün keçidlər və mikrointeraksiyalar tətbiq edilir.</p></div>',
     )
     page_service_detail(
         "web-development",
@@ -469,8 +469,8 @@ def page_all_services() -> None:
         title="Veb proqramlaşdırma və icra | Vulcet",
         name_en="Web Development",
         name_az="Veb proqramlaşdırma",
-        dark_section='<section class="page-section page-section--dark"><div class="shell service-page-grid"><div class="service-commercial"><span>Tipik müddət</span><strong>4 həftədən</strong><p>Son həcm səhifə sayı, interaksiya, məzmun idarəetməsi, inteqrasiyalar və layihənin texniki tələblərindən asılıdır.</p></div><div class="service-scope-columns"><div><h2>Uyğundur</h2><ul><li>Təsdiqlənmiş veb-sayt və məhsul dizaynları</li><li>Fərdi adaptiv marketinq saytları</li><li>Məzmun yönümlü və ya çoxdilli platformalar</li><li>İnteqrasiya və ya CMS lazım olan komandalar</li></ul></div><div><h2>Tipik həcm</h2><ul><li>Adaptiv frontend proqramlaşdırma</li><li>Motion və interaksiya</li><li>CMS tətbiqi</li><li>Texniki SEO və performans</li><li>Üçüncü tərəf inteqrasiyaları</li><li>Sınaq, buraxılış və texniki qayğı</li></ul></div></div></div></section>',
-        steps='<div class="principle-row"><span>01</span><h3>Dəqiq icra et</h3><p>Qəbul edilmiş interfeysi cihazlar arasında iyerarxiya, boşluq və davranışı qoruyan adaptiv komponentlərə çevirin.</p></div><div class="principle-row"><span>02</span><h3>Məqsədli motion əlavə et</h3><p>Əlçatanlıq və ya performansdan güzəşt vermədən təcrübəni dəstəkləyən interaksiya və animasiya qurun.</p></div><div class="principle-row"><span>03</span><h3>Sistemləri birləşdir</h3><p>Razılaşdırılmış biznes axını ətrafında CMS, formalar, analitika və xarici alətləri inteqrasiya edin.</p></div><div class="principle-row"><span>04</span><h3>Optimallaşdır və burax</h3><p>Buraxılışdan əvvəl funksionallıq, adaptivlik, əlçatanlıq, performans və texniki SEO-nu yoxlayın.</p></div><div class="principle-row"><span>05</span><h3>Vacib olanı qoruyun</h3><p>Aydın təhvil və müntəzəm texniki qayğı tələb olunduqda davamlı dəstək yolu təqdim edin.</p></div>',
+        dark_section='<section class="page-section page-section--dark"><div class="shell service-page-grid"><div class="service-commercial"><span>Tipik müddət</span><strong>4 həftədən</strong><p>Son həcm səhifə sayı, interaksiya, məzmun idarəetməsi, inteqrasiyalar və layihənin texniki tələblərindən asılıdır.</p></div><div class="service-scope-columns"><div><h2>Uyğundur</h2><ul><li>Təsdiqlənmiş veb-sayt və məhsul dizaynları</li><li>Fərdi adaptiv marketinq saytları</li><li>Məzmun yönümlü və ya çoxdilli platformalar</li><li>İnteqrasiya və ya CMS lazım olan komandalar</li></ul></div><div><h2>Tipik həcm</h2><ul><li>Adaptiv frontend proqramlaşdırma</li><li>Animasiya və interaksiya</li><li>CMS tətbiqi</li><li>Texniki SEO və performans</li><li>Üçüncü tərəf inteqrasiyaları</li><li>Sınaq, buraxılış və texniki qayğı</li></ul></div></div></div></section>',
+        steps='<div class="principle-row"><span>01</span><h3>Dəqiq icra</h3><p>Qəbul edilmiş interfeys cihazlar arasında iyerarxiya, boşluq və davranışı qoruyan adaptiv komponentlərə çevrilir.</p></div><div class="principle-row"><span>02</span><h3>İnteraksiya və animasiya</h3><p>Əlçatanlıq və ya performansdan güzəşt vermədən təcrübəni dəstəkləyən interaksiya və animasiya qurulur.</p></div><div class="principle-row"><span>03</span><h3>Sistem inteqrasiyası</h3><p>Razılaşdırılmış biznes axını ətrafında CMS, formalar, analitika və xarici alətlər inteqrasiya edilir.</p></div><div class="principle-row"><span>04</span><h3>Optimallaşdırma və buraxılış</h3><p>Buraxılışdan əvvəl funksionallıq, adaptivlik, əlçatanlıq, performans və texniki SEO yoxlanılır.</p></div><div class="principle-row"><span>05</span><h3>Davamlı dəstək</h3><p>Aydın təhvil və müntəzəm texniki qayğı tələb olunduqda davamlı dəstək yolu təqdim edilir.</p></div>',
     )
 
 
@@ -480,12 +480,12 @@ def page_studio() -> None:
         """
   <main id="main">
     <section class="page-hero"><div class="page-hero-signal" aria-hidden="true"></div><div class="shell page-hero-grid"><div class="editorial-label"><span>01</span><span>Studiya</span></div><h1>Davamlılıq tələb edən iş üçün qlobal brendinq, məhsul və veb-dizayn <em>studiyası.</em></h1><p class="page-hero-copy">Vulcet Polşadan beynəlxalq işləyən qlobal brendinq, məhsul və veb-dizayn studiyasıdır. Strategiya, dizayn və mühəndislik şöbələr arasında ötürülmək əvəzinə bir-birinə bağlı qalır.</p></div></section>
-    <section class="page-section"><div class="shell page-intro-grid"><div class="editorial-label"><span>02</span><span>Model</span></div><h2>Birbaşa əməkdaşlıq, az ötürmə və aydın məsuliyyət.</h2><p>Müştərilər bir bağlı proseslə işləyir. Layihə həqiqətən ehtiyac duyanda ixtisaslaşmış əməkdaşlıq əlavə oluna bilər, istiqamət və məsuliyyət isə aydın qalır.</p></div></section>
+    <section class="page-section"><div class="shell page-intro-grid"><div class="editorial-label"><span>02</span><span>İş modeli</span></div><h2>Birbaşa əməkdaşlıq, daha az vasitəçi və aydın məsuliyyət.</h2><p>Müştərilər vahid proseslə işləyir. Layihə həqiqətən ehtiyac olduqda ixtisaslaşmış əməkdaşlar cəlb olunur; istiqamət və məsuliyyət isə aydın qalır.</p></div></section>
     <section class="page-section"><div class="shell studio-grid-new">
       <div class="principle-row"><span>01</span><h3>Biznesdən başla</h3><p>Düzgün sayt insanların nə başa düşməli olduğu və təşkilatın nə nail olmalı olduğu ilə müəyyən edilir.</p></div>
-      <div class="principle-row"><span>02</span><h3>Stilizasiyadan əvvəl struktur</h3><p>Vizual ifadə işə rəhbərlik etməzdən əvvəl məzmun iyerarxiyası və istifadəçi yolları razılaşdırılır.</p></div>
+      <div class="principle-row"><span>02</span><h3>Vizual üslubdan əvvəl struktur</h3><p>Vizual ifadə işə rəhbərlik etməzdən əvvəl məzmun iyerarxiyası və istifadəçi yolları razılaşdırılır.</p></div>
       <div class="principle-row"><span>03</span><h3>Mühəndisliklə dizayn et</h3><p>Adaptiv davranış, əlçatanlıq və performans interfeysi əvvəldən formalaşdırır.</p></div>
-      <div class="principle-row"><span>04</span><h3>Yalnız doğru olanı yayımla</h3><p>Uydurma metrikalar, şişirdilmiş komanda dili və ya uydurma case study-lər yox. Etibar işin özündən gəlməlidir.</p></div>
+      <div class="principle-row"><span>04</span><h3>Yalnız doğru olanı yayımla</h3><p>Uydurma metrikalar, şişirdilmiş komanda dili və ya uydurma layihələr yox. Etibar işin özündən gəlməlidir.</p></div>
     </div></section>
 </main>"""
     )
@@ -529,7 +529,7 @@ def page_work_index() -> None:
     main = dedent(
         f"""
   <main id="main">
-    <section class="page-hero"><div class="page-hero-signal" aria-hidden="true"></div><div class="shell page-hero-grid"><div class="editorial-label"><span>01</span><span>Seçilmiş işlər</span></div><h1>Layıq olduqları kontekstlə göstərilən seçilmiş brendinq, məhsul və veb <em>işləri.</em></h1></div></section>
+    <section class="page-hero"><div class="page-hero-signal" aria-hidden="true"></div><div class="shell page-hero-grid"><div class="editorial-label"><span>01</span><span>Seçilmiş işlər</span></div><h1>Seçilmiş brendinq, məhsul və veb layihələri — hər biri öz <em>kontekstində.</em></h1></div></section>
     <section class="portfolio-index" aria-label="Müştəri layihələri">
       <div class="shell portfolio-index-list">
         <article class="portfolio-row">
@@ -537,9 +537,9 @@ def page_work_index() -> None:
             <p class="portfolio-row__meta"><span>01</span><span>Müştəri layihəsi</span></p>
             <h2><a href="{AZ_PREFIX}/work/founderclub/">FounderClub</a></h2>
             <p>İcmanı, tədbirləri, xəbərləri və üzvlüyü vahid ardıcıl sistemə gətirən rəqəmsal platforma.</p>
-            <a class="text-link portfolio-row__link" href="{AZ_PREFIX}/work/founderclub/">Case study-yə bax <span aria-hidden="true">↗</span></a>
+            <a class="text-link portfolio-row__link" href="{AZ_PREFIX}/work/founderclub/">Layihəyə bax <span aria-hidden="true">↗</span></a>
           </div>
-          <a class="portfolio-row__media" href="{AZ_PREFIX}/work/founderclub/" aria-label="FounderClub case study">
+          <a class="portfolio-row__media" href="{AZ_PREFIX}/work/founderclub/" aria-label="FounderClub layihəsi">
             <img src="/founderclub-hero.webp" srcset="/founderclub-hero-small.webp 800w, /founderclub-hero.webp 1600w" sizes="(max-width: 899px) 100vw, 50vw" width="1600" height="1022" alt="FounderClub icma platforması veb-saytı." loading="eager" decoding="async">
           </a>
         </article>
@@ -548,9 +548,9 @@ def page_work_index() -> None:
             <p class="portfolio-row__meta"><span>02</span><span>Müştəri layihəsi</span></p>
             <h2><a href="{AZ_PREFIX}/work/anadolu-qida/">Anadolu Qida</a></h2>
             <p>Un istehsalçısı üçün brend yönümlü veb-sayt — məhsullar, istehsal hekayəsi və korporativ sorğu vahid yolda.</p>
-            <a class="text-link portfolio-row__link" href="{AZ_PREFIX}/work/anadolu-qida/">Case study-yə bax <span aria-hidden="true">↗</span></a>
+            <a class="text-link portfolio-row__link" href="{AZ_PREFIX}/work/anadolu-qida/">Layihəyə bax <span aria-hidden="true">↗</span></a>
           </div>
-          <a class="portfolio-row__media" href="{AZ_PREFIX}/work/anadolu-qida/" aria-label="Anadolu Qida case study">
+          <a class="portfolio-row__media" href="{AZ_PREFIX}/work/anadolu-qida/" aria-label="Anadolu Qida layihəsi">
             <img src="/anadolu-hero.webp" width="1672" height="941" alt="Anadolu Qida korporativ veb-saytı." loading="lazy" decoding="async">
           </a>
         </article>
@@ -620,22 +620,22 @@ def page_work_cases() -> None:
         dedent(
             f"""
   <main id="main">
-    <section class="page-hero"><div class="page-hero-signal" aria-hidden="true"></div><div class="shell page-hero-grid"><div class="editorial-label"><span>01</span><span>Müştəri layihəsi</span></div><h1>FounderClub — biznes icması üçün daha aydın <em>ev.</em></h1><p class="page-hero-copy">Üzvlük, tədbirlər, xəbərlər və icma fəaliyyətini birləşdirən platforma üçün məhsul strukturu, UI/UX və proqramlaşdırma.</p></div></section>
-    <div class="case-summary page-section page-section--dark"><div class="shell case-grid"><p>İş tədbirlərə, xəbərlərə və üzvlüyə ardıcıl iyerarxiya verməyə yönəlmişdi — FounderClub-un Bakı kimi hiss etdirməsini itirmədən.</p><dl class="case-facts"><div><dt>Müştəri</dt><dd>FounderClub</dd></div><div><dt>Rol</dt><dd>Məhsul strukturu, UI/UX, proqramlaşdırma</dd></div><div><dt>Müddət</dt><dd>Təxminən altı həftə</dd></div><div><dt>Status</dt><dd>founderclub.az-da canlı</dd></div></dl></div></div>
+    <section class="page-hero"><div class="page-hero-signal" aria-hidden="true"></div><div class="shell page-hero-grid"><div class="editorial-label"><span>01</span><span>Müştəri layihəsi</span></div><h1>FounderClub — biznes icması üçün vahid rəqəmsal <em>platforma.</em></h1><p class="page-hero-copy">Üzvlük, tədbirlər, xəbərlər və icma fəaliyyətini birləşdirən platforma üçün məhsul strukturu, UI/UX və proqramlaşdırma.</p></div></section>
+    <div class="case-summary page-section page-section--dark"><div class="shell case-grid"><p>Əsas məqsəd tədbirləri, xəbərləri və üzvlük sistemini aydın strukturda birləşdirmək, eyni zamanda FounderClub-un Bakıya xas yerli kimliyini qorumaq idi.</p><dl class="case-facts"><div><dt>Müştəri</dt><dd>FounderClub</dd></div><div><dt>Rol</dt><dd>Məhsul strukturu, UI/UX, proqramlaşdırma</dd></div><div><dt>Müddət</dt><dd>Təxminən altı həftə</dd></div><div><dt>Vəziyyət</dt><dd>founderclub.az-da canlı</dd></div></dl></div></div>
     <figure class="case-feature"><div class="shell"><img src="/founderclub-hero.webp" srcset="/founderclub-hero-small.webp 800w, /founderclub-hero.webp 1600w" sizes="(max-width: 1200px) 92vw, 1120px" width="1600" height="1022" alt="FounderClub saytında Bakı silueti." fetchpriority="high" decoding="async"><figcaption>Ana səhifə — yerli kimlik və üzvlük mesajı vahid açılış kadrajında birləşir.</figcaption></div></figure>
     <div class="case-body shell">
       <section class="case-chapter" aria-labelledby="fc-context"><div class="case-chapter__grid"><p class="case-chapter__label" id="fc-context">01 / Kontekst</p><h2 class="case-chapter__title">Fərqli fəaliyyətlər vahid platforma kimi <em>hiss olunmalı idi.</em></h2><p class="case-chapter__text">FounderClub biznes icmasını, tədbirləri, redaksiya xəbərlərini və üzvlüyü birləşdirir. Sayt bu hissələri asan başa düşülən etməli, premium və yerli kimliyi qorumalı idi.</p></div></section>
       <section class="case-chapter" aria-labelledby="fc-response"><div class="case-chapter__grid"><p class="case-chapter__label" id="fc-response">02 / Həll</p><h2 class="case-chapter__title">Ayrı səhifələr yox — strukturlaşdırılmış redaksiya sistemi.</h2><p class="case-chapter__text">İnterfeys elanlar, tədbir materialları və icma məzmunu üçün ardıcıl iyerarxiya istifadə edir. Güclü şəkillər kimliyi daşıyır; saxlanmış tipografiya və proqnozlaşdırıla bilən naviqasiya məlumatı daşıyır. İş <a href="{AZ_PREFIX}/services/product-design/">məhsul dizaynı</a> və <a href="{AZ_PREFIX}/services/web-development/">veb proqramlaşdırmanı</a> vahid prosesdə birləşdirdi.</p></div></section>
-      <div class="case-gallery"><p class="case-gallery__intro">Tədbirlər və redaksiya məzmunu eyni vizual dili paylaşır — fotoqrafiya aparır, mətn dəstəkləyir.</p><div class="case-gallery__grid case-gallery--landscape"><figure><img src="/founderclub-event-office.webp" width="1000" height="600" alt="FounderClub ofis ziyarəti tədbiri." loading="lazy" decoding="async"><figcaption>Ofis ziyarəti</figcaption></figure><figure><img src="/founderclub-event-networking.webp" width="768" height="432" alt="FounderClub networking tədbiri." loading="lazy" decoding="async"><figcaption>İcma networking</figcaption></figure><figure><img src="/founderclub-news-atameken.webp" width="1280" height="960" alt="FounderClub beynəlxalq xəbər təqdimatı." loading="lazy" decoding="async"><figcaption>Redaksiya xəbəri</figcaption></figure><figure><img src="/founderclub-news-seabreeze.webp" width="1280" height="852" alt="FounderClub Sea Breeze layihə təqdimatı." loading="lazy" decoding="async"><figcaption>Layihə işıqlandırması</figcaption></figure></div></div>
+      <div class="case-gallery"><p class="case-gallery__intro">Tədbirlər və redaksiya məzmunu eyni vizual dili paylaşır — fotoqrafiya aparır, mətn dəstəkləyir.</p><div class="case-gallery__grid case-gallery--landscape"><figure><img src="/founderclub-event-office.webp" width="1000" height="600" alt="FounderClub ofis ziyarəti tədbiri." loading="lazy" decoding="async"><figcaption>Ofis ziyarəti</figcaption></figure><figure><img src="/founderclub-event-networking.webp" width="768" height="432" alt="FounderClub şəbəkələşmə tədbiri." loading="lazy" decoding="async"><figcaption>İcma şəbəkələşməsi</figcaption></figure><figure><img src="/founderclub-news-atameken.webp" width="1280" height="960" alt="FounderClub beynəlxalq xəbər təqdimatı." loading="lazy" decoding="async"><figcaption>Redaksiya xəbəri</figcaption></figure><figure><img src="/founderclub-news-seabreeze.webp" width="1280" height="852" alt="FounderClub Sea Breeze layihə təqdimatı." loading="lazy" decoding="async"><figcaption>Layihə işıqlandırması</figcaption></figure></div></div>
       <section class="case-chapter" aria-labelledby="fc-outcome"><div class="case-chapter__grid"><p class="case-chapter__label" id="fc-outcome">03 / Nəticə</p><h2 class="case-chapter__title">Canlı və istifadəyə hazır ardıcıl platforma.</h2><p class="case-chapter__text">Üzvlük, tədbirlər və redaksiya məzmunu indi vahid naviqasiya olunan sistem paylaşır. Sayt FounderClub-a ardıcıl ictimai üz verir — <a href="https://founderclub.az" target="_blank" rel="noreferrer">founderclub.az</a>-da canlıdır. Founder Club rəsmi saytında <a href="https://founderclub.az/en/digital-partnership-with-vulcet" target="_blank" rel="noreferrer noopener">rəqəmsal tərəfdaşlığı elan edib</a>.</p></div></section>
     </div>
-    <section class="page-cta"><div class="shell"><h2>Canlı sayta baxın.</h2><div><p>İcma, tədbirlər və xəbərlərin vahid platforma kimi necə oxunduğuna baxın.</p><a class="button button--light" href="https://founderclub.az" target="_blank" rel="noreferrer">founderclub.az <span aria-hidden="true">↗</span></a><a class="text-link" href="{AZ_PREFIX}/work/">Bütün müştəri işləri <span aria-hidden="true">↗</span></a></div></div></section>
+    <section class="page-cta"><div class="shell"><h2>Canlı sayta baxın.</h2><div><p>İcma, tədbirlər və xəbərlərin vahid platforma kimi necə oxunduğuna baxın.</p><a class="button button--light" href="https://founderclub.az" target="_blank" rel="noreferrer">founderclub.az <span aria-hidden="true">↗</span></a><a class="text-link" href="{AZ_PREFIX}/work/">Bütün müştəri layihələri <span aria-hidden="true">↗</span></a></div></div></section>
   </main>"""
         ),
         {
-            "title": "FounderClub veb-sayt case study | Vulcet",
-            "description": "FounderClub case study: icma, tədbirlər, xəbərlər və üzvlük üçün ardıcıl rəqəmsal platforma.",
-            "og_title": "FounderClub veb-sayt case study | Vulcet",
+            "title": "FounderClub veb-sayt layihəsi | Vulcet",
+            "description": "FounderClub layihəsi: icma, tədbirlər, xəbərlər və üzvlük üçün ardıcıl rəqəmsal platforma.",
+            "og_title": "FounderClub veb-sayt layihəsi | Vulcet",
             "og_description": "Biznes icması platforması üçün məhsul strukturu, UI/UX və proqramlaşdırma.",
             "og_type": "article",
             "schema": {
@@ -667,22 +667,22 @@ def page_work_cases() -> None:
         dedent(
             f"""
   <main id="main">
-    <section class="page-hero"><div class="page-hero-signal" aria-hidden="true"></div><div class="shell page-hero-grid"><div class="editorial-label"><span>02</span><span>Müştəri layihəsi</span></div><h1>Anadolu Qida — un istehsalçısı üçün daha aydın <em>ev.</em></h1><p class="page-hero-copy">Bakıda un şirkəti üçün brend yönümlü veb-sayt dizaynı və proqramlaşdırma: məhsul aydınlığı, istehsal hekayəsi və praktik korporativ sorğu yolu.</p></div></section>
-    <div class="case-summary page-section page-section--dark"><div class="shell case-grid"><p>İş istehsal biznesini etibarlı rəqəmsal mövcudluğa çevirdi — alıcılar və tərəfdaşlar təklifi başa düşə, əməliyyata etibar edə və sifariş söhbətinə sürtünməsiz keçə bilsin.</p><dl class="case-facts"><div><dt>Müştəri</dt><dd>Anadolu Qida</dd></div><div><dt>Rol</dt><dd>Strategiya, UI/UX, proqramlaşdırma</dd></div><div><dt>Müddət</dt><dd>Təxminən dörd həftə</dd></div><div><dt>Status</dt><dd>anadoluqida.com-da canlı</dd></div></dl></div></div>
-    <figure class="case-feature"><div class="shell"><img src="/anadolu-hero.webp" srcset="/anadolu-hero-small.jpg 900w, /anadolu-hero.webp 1600w" sizes="(max-width: 1200px) 92vw, 1120px" width="1672" height="941" alt="Anadolu Qida saytından buğda tarlası hero görüntüsü." fetchpriority="high" decoding="async"><figcaption>Ana səhifə — məhsul mesajını birbaşa açan məhsul görüntüsü, bəzək üçün bəzək yox.</figcaption></div></figure>
+    <section class="page-hero"><div class="page-hero-signal" aria-hidden="true"></div><div class="shell page-hero-grid"><div class="editorial-label"><span>02</span><span>Müştəri layihəsi</span></div><h1>Anadolu Qida — un istehsalçısı üçün aydın rəqəmsal <em>təqdimat.</em></h1><p class="page-hero-copy">Bakıda un şirkəti üçün brend yönümlü veb-sayt dizaynı və proqramlaşdırma: məhsul aydınlığı, istehsal hekayəsi və praktik korporativ sorğu yolu.</p></div></section>
+    <div class="case-summary page-section page-section--dark"><div class="shell case-grid"><p>İş istehsal biznesini etibarlı rəqəmsal mövcudluğa çevirdi — alıcılar və tərəfdaşlar təklifi başa düşə, əməliyyata etibar edə və korporativ sifariş üçün asanlıqla əlaqə saxlaya bilsin.</p><dl class="case-facts"><div><dt>Müştəri</dt><dd>Anadolu Qida</dd></div><div><dt>Rol</dt><dd>Strategiya, UI/UX, proqramlaşdırma</dd></div><div><dt>Müddət</dt><dd>Təxminən dörd həftə</dd></div><div><dt>Vəziyyət</dt><dd>anadoluqida.com-da canlı</dd></div></dl></div></div>
+    <figure class="case-feature"><div class="shell"><img src="/anadolu-hero.webp" srcset="/anadolu-hero-small.jpg 900w, /anadolu-hero.webp 1600w" sizes="(max-width: 1200px) 92vw, 1120px" width="1672" height="941" alt="Anadolu Qida saytından buğda tarlası hero görüntüsü." fetchpriority="high" decoding="async"><figcaption>Ana səhifə — məhsul mesajını birbaşa açan məhsul görüntüsü; dekorativ deyil, məzmunu dəstəkləyir.</figcaption></div></figure>
     <div class="case-body shell">
       <section class="case-chapter" aria-labelledby="aq-context"><div class="case-chapter__grid"><p class="case-chapter__label" id="aq-context">01 / Kontekst</p><h2 class="case-chapter__title">İstehsal biznesi zavod qədər möhkəm sayta ehtiyac <em>duyurdu.</em></h2><p class="case-chapter__text">Anadolu Qida çörəkxanalar, xəmir mətbəxləri və korporativ təchizat üçün un istehsal edir. Rəqəmsal mövcudluq qablaşmanı aydın təqdim etməli, istehsalı izah etməli və ciddi alıcıları sorğuya yönləndirməli — eyni sistemdən Mirvari Logistics-ə də çıxış olmalı idi.</p></div></section>
       <section class="case-chapter" aria-labelledby="aq-response"><div class="case-chapter__grid"><p class="case-chapter__label" id="aq-response">02 / Həll</p><h2 class="case-chapter__title">Məhsullar, dəyərlər və sifarişlər üçün vahid redaksiya sistemi.</h2><p class="case-chapter__text">İnterfeys məhsul həqiqəti ilə başlayır: paket ölçüləri, istifadə halları və istehsal nəzarəti. Güclü fotoqrafiya kimliyi daşıyır; saxlanmış tipografiya kommersiya yolunu daşıyır. Dəyərlər, kataloq və sorğu vahid iyerarxiyada — <a href="{AZ_PREFIX}/services/brand-strategy/">brend strategiyası</a>, <a href="{AZ_PREFIX}/services/visual-identity/">vizual kimlik</a> və <a href="{AZ_PREFIX}/services/web-development/">veb proqramlaşdırma</a> vasitəsilə formalaşdırılıb.</p></div></section>
-      <div class="case-gallery"><p class="case-gallery__intro">Məhsul fotoqrafiyası portret formatlıdır — layout paket nisbətlərinə hörmət edir.</p><div class="case-gallery__grid case-gallery--portrait"><figure><img src="/anadolu-flour-25.jpg" width="819" height="1024" alt="Anadolu Qida 25 kq un çuvalı." loading="lazy" decoding="async"><figcaption>25 kq çuval</figcaption></figure><figure><img src="/anadolu-flour-10.jpg" width="819" height="1024" alt="Anadolu Qida 10 kq un qablaşması." loading="lazy" decoding="async"><figcaption>10 kq paket</figcaption></figure><figure><img src="/anadolu-catalog.jpg" width="682" height="1024" alt="Anadolu Qida məhsul kataloqu." loading="lazy" decoding="async"><figcaption>Kataloq hekayəsi</figcaption></figure></div><div class="case-gallery__grid case-gallery--wide"><figure><img src="/anadolu-warehouse.jpg" width="1200" height="800" alt="Anadolu Qida anbarı və logistika." loading="lazy" decoding="async"><figcaption>Əməliyyat və logistika konteksti</figcaption></figure></div></div>
+      <div class="case-gallery"><p class="case-gallery__intro">Məhsul fotoqrafiyası portret formatlıdır — səhifə quruluşu paket nisbətlərinə uyğun qurulub.</p><div class="case-gallery__grid case-gallery--portrait"><figure><img src="/anadolu-flour-25.jpg" width="819" height="1024" alt="Anadolu Qida 25 kq un çuvalı." loading="lazy" decoding="async"><figcaption>25 kq çuval</figcaption></figure><figure><img src="/anadolu-flour-10.jpg" width="819" height="1024" alt="Anadolu Qida 10 kq un qablaşması." loading="lazy" decoding="async"><figcaption>10 kq paket</figcaption></figure><figure><img src="/anadolu-catalog.jpg" width="682" height="1024" alt="Anadolu Qida məhsul kataloqu." loading="lazy" decoding="async"><figcaption>Kataloq hekayəsi</figcaption></figure></div><div class="case-gallery__grid case-gallery--wide"><figure><img src="/anadolu-warehouse.jpg" width="1200" height="800" alt="Anadolu Qida anbarı və logistika." loading="lazy" decoding="async"><figcaption>Əməliyyat və logistika konteksti</figcaption></figure></div></div>
       <section class="case-chapter" aria-labelledby="aq-outcome"><div class="case-chapter__grid"><p class="case-chapter__label" id="aq-outcome">03 / Nəticə</p><h2 class="case-chapter__title">Baxış və sorğu üçün hazır canlı biznes saytı.</h2><p class="case-chapter__text">Un məhsulları, istehsal hekayəsi, sertifikat yolu və sifariş əlaqəsi — Mirvari Logistics isə nəzərdə tutulmuş brend keçidi ilə. Sübut canlı saytdadır: <a href="https://anadoluqida.com" target="_blank" rel="noreferrer">anadoluqida.com</a>.</p></div></section>
     </div>
-    <section class="page-cta"><div class="shell"><h2>Canlı sayta baxın.</h2><div><p>Məhsulları, istehsal hekayəsini və korporativ sorğu yolunu kontekstdə görün.</p><a class="button button--light" href="https://anadoluqida.com" target="_blank" rel="noreferrer">anadoluqida.com <span aria-hidden="true">↗</span></a><a class="text-link" href="{AZ_PREFIX}/work/">Bütün müştəri işləri <span aria-hidden="true">↗</span></a></div></div></section>
+    <section class="page-cta"><div class="shell"><h2>Canlı sayta baxın.</h2><div><p>Məhsulları, istehsal hekayəsini və korporativ sorğu yolunu kontekstdə görün.</p><a class="button button--light" href="https://anadoluqida.com" target="_blank" rel="noreferrer">anadoluqida.com <span aria-hidden="true">↗</span></a><a class="text-link" href="{AZ_PREFIX}/work/">Bütün müştəri layihələri <span aria-hidden="true">↗</span></a></div></div></section>
   </main>"""
         ),
         {
-            "title": "Anadolu Qida veb-sayt case study | Vulcet",
-            "description": "Anadolu Qida case study: un istehsalçısı üçün brend yönümlü biznes saytı.",
-            "og_title": "Anadolu Qida veb-sayt case study | Vulcet",
+            "title": "Anadolu Qida veb-sayt layihəsi | Vulcet",
+            "description": "Anadolu Qida layihəsi: un istehsalçısı üçün brend yönümlü biznes veb-saytı.",
+            "og_title": "Anadolu Qida veb-sayt layihəsi | Vulcet",
             "og_description": "Un istehsalçısı üçün daha aydın rəqəmsal mövcudluq: məhsullar, istehsal hekayəsi və korporativ sifariş.",
             "og_type": "article",
             "schema": {
@@ -724,9 +724,9 @@ def page_contact() -> None:
       </div>
       <div class="shell contact-hero-grid">
         <div class="editorial-label editorial-label--dark"><span>01</span><span>Əlaqə</span></div>
-        <h1>Vulcet-i işə götürün — nəyin hərəkət etməli olduğunu <em>deyin.</em></h1>
+        <h1>Layihəniz haqqında <em>danışaq.</em></h1>
         <div class="contact-hero-copy">
-          <p>Biznes çətinliyini, veb-saytın və ya məhsulun nə etməli olduğunu və prosesdə harada olduğunuzu bölüşün.</p>
+          <p>Biznesinizin qarşısındakı çətinliyi, veb-saytın və ya məhsulun nə etməli olduğunu və layihənin hazırkı mərhələsini bizimlə bölüşün.</p>
           <a href="mailto:studio@vulcet.com">studio@vulcet.com <span aria-hidden="true">↗</span></a>
         </div>
         <div class="contact-hero-meta">
@@ -770,22 +770,22 @@ def page_contact() -> None:
                 <label for="contact-need">Nəyə ehtiyacınız var? <span aria-hidden="true">*</span></label>
                 <select id="contact-need" name="need" required="">
                   <option value="">Birini seçin</option>
-                  <option>Brand Strategy</option>
-                  <option>Visual Identity</option>
-                  <option>Product Design</option>
-                  <option>Web Development</option>
-                  <option>Not sure yet</option>
+                  <option value="Brand Strategy">Brend strategiyası</option>
+                  <option value="Visual Identity">Vizual kimlik</option>
+                  <option value="Product Design">Məhsul dizaynı</option>
+                  <option value="Web Development">Veb proqramlaşdırma</option>
+                  <option value="Not sure yet">Hələ əmin deyiləm</option>
                 </select>
               </div>
               <div class="contact-field">
                 <label for="contact-budget">Təxmini büdcə <span aria-hidden="true">*</span></label>
                 <select id="contact-budget" name="budget" required="">
                   <option value="">Aralıq seçin</option>
-                  <option>Under $5,000</option>
-                  <option>$5,000-$9,000</option>
-                  <option>$9,000-$15,000</option>
-                  <option>$15,000+</option>
-                  <option>Not defined yet</option>
+                  <option value="Under $5,000">$5,000-dan az</option>
+                  <option value="$5,000-$9,000">$5,000–$9,000</option>
+                  <option value="$9,000-$15,000">$9,000–$15,000</option>
+                  <option value="$15,000+">$15,000+</option>
+                  <option value="Not defined yet">Hələ müəyyən edilməyib</option>
                 </select>
               </div>
               <div class="contact-field contact-field--wide contact-starting-point">
@@ -814,10 +814,10 @@ def page_contact() -> None:
               <div class="contact-field">
                 <label for="contact-start">Üstünlük verilən başlama tarixi</label>
                 <select id="contact-start" name="start">
-                  <option>As soon as possible</option>
-                  <option>Within 1-2 months</option>
-                  <option>Within 3-4 months</option>
-                  <option>Later / flexible</option>
+                  <option value="As soon as possible">Mümkün qədər tez</option>
+                  <option value="Within 1-2 months">1–2 ay ərzində</option>
+                  <option value="Within 3-4 months">3–4 ay ərzində</option>
+                  <option value="Later / flexible">Daha sonra / çevik</option>
                 </select>
               </div>
               <div class="contact-field contact-field--wide">
@@ -860,18 +860,18 @@ def page_contact() -> None:
     schema = {
         "@context": "https://schema.org",
         "@type": "ContactPage",
-        "name": "Vulcet-i işə götürün — veb-sayt layihəsinə başlayın",
+        "name": "Vulcet ilə layihəyə başlayın",
         "url": f"{SITE}/az/contact/",
-        "description": "Vulcet ilə veb-sayt və ya rəqəmsal məhsul layihəsinə başlayın.",
+        "description": "Veb-sayt, rəqəmsal məhsul və ya brend layihəniz haqqında Vulcet ilə danışın. Məqsədi, layihənin həcmini və vaxt çərçivəsini bizimlə bölüşün.",
         "inLanguage": "az",
         "mainEntity": {"@type": "Organization", "name": "Vulcet", "email": "studio@vulcet.com", "url": f"{SITE}/az/"},
     }
     head = render_head(
         az_path=az_path,
-        title="Vulcet-i işə götürün — veb-sayt və ya rəqəmsal məhsul layihəsi",
-        description="Vulcet ilə veb-sayt və ya rəqəmsal məhsul layihəsinə başlayın. Biznes məqsədini, həcmi və vaxtı bölüşün.",
-        og_title="Vulcet-i işə götürün — veb-sayt layihəsinə başlayın",
-        og_description="Veb-sayt və ya rəqəmsal məhsul üçün biznes məqsədini, həcmi və vaxtı bölüşün.",
+        title="Vulcet ilə layihəyə başlayın | Əlaqə",
+        description="Veb-sayt, rəqəmsal məhsul və ya brend layihəniz haqqında Vulcet ilə danışın. Məqsədi, layihənin həcmini və vaxt çərçivəsini bizimlə bölüşün.",
+        og_title="Vulcet ilə layihəyə başlayın",
+        og_description="Veb-sayt, rəqəmsal məhsul və ya brend layihəniz haqqında danışaq.",
         schema=schema,
         style_css=STYLE_EDITORIAL,
         extra_stylesheets=("/contact.css?v=20260813-4",),
@@ -962,8 +962,8 @@ def page_site_map() -> None:
       <h2>İşlər</h2>
       <ul>
         <li><a href="/az/work/">Seçilmiş işlər</a></li>
-        <li><a href="/az/work/founderclub/">FounderClub case study</a></li>
-        <li><a href="/az/work/anadolu-qida/">Anadolu Qida case study</a></li>
+        <li><a href="/az/work/founderclub/">FounderClub layihəsi</a></li>
+        <li><a href="/az/work/anadolu-qida/">Anadolu Qida layihəsi</a></li>
       </ul>
       <h2>Eksperimentlər (ingilis dilində)</h2>
       <ul>

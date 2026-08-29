@@ -22,13 +22,30 @@
   panel.className = 'consent-panel';
   panel.setAttribute('aria-labelledby', 'consent-title');
   panel.hidden = Boolean(savedChoice);
+  const isAz = document.documentElement.lang === 'az';
+  const copy = isAz
+    ? {
+        eyebrow: 'Məxfilik seçimi',
+        title: 'Veb-saytı təkmilləşdirməyə kömək edək?',
+        body: `Vulcet Google Analytics-dən yalnız icazənizlə istifadə edir. Saytın zəruri funksiyaları hər halda işləyir. <a href="${relativeRoot}privacy/">Məxfilik bildirişini</a> oxuyun.`,
+        decline: 'Analitikanı rədd et',
+        allow: 'Analitikaya icazə ver'
+      }
+    : {
+        eyebrow: 'Privacy choice',
+        title: 'Help improve the website?',
+        body: `Vulcet uses Google Analytics only with your permission. Necessary site functions remain available either way. Read the <a href="${relativeRoot}privacy/">privacy notice</a>.`,
+        decline: 'Decline analytics',
+        allow: 'Allow analytics'
+      };
+
   panel.innerHTML = `
-    <span>Privacy choice</span>
-    <h2 id="consent-title">Help improve the website?</h2>
-    <p>Vulcet uses Google Analytics only with your permission. Necessary site functions remain available either way. Read the <a href="${relativeRoot}privacy/">privacy notice</a>.</p>
+    <span>${copy.eyebrow}</span>
+    <h2 id="consent-title">${copy.title}</h2>
+    <p>${copy.body}</p>
     <div class="consent-actions">
-      <button type="button" data-consent="denied">Decline analytics</button>
-      <button type="button" data-consent="granted">Allow analytics</button>
+      <button type="button" data-consent="denied">${copy.decline}</button>
+      <button type="button" data-consent="granted">${copy.allow}</button>
     </div>
   `;
 

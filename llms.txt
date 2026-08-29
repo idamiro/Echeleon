@@ -3,6 +3,7 @@
 > Vulcet is a global branding, product and web design studio. Strategy, design and development for brands, products and websites.
 
 - Site: https://vulcet.com/
+- Languages: English (default), Azerbaijani commercial pages at https://vulcet.com/az/
 - Contact: studio@vulcet.com
 - Location: Poland (international clients)
 
@@ -15,18 +16,20 @@
 
 ## Services
 
-- Brand Strategy — https://vulcet.com/services/brand-strategy/
-- Visual Identity — https://vulcet.com/services/visual-identity/
-- Product Design (UI/UX) — https://vulcet.com/services/product-design/
-- Web Development — https://vulcet.com/services/web-development/
-- Services overview — https://vulcet.com/services/
+- Brand Strategy — https://vulcet.com/services/brand-strategy/ (AZ: https://vulcet.com/az/services/brand-strategy/)
+- Visual Identity — https://vulcet.com/services/visual-identity/ (AZ: https://vulcet.com/az/services/visual-identity/)
+- Product Design (UI/UX) — https://vulcet.com/services/product-design/ (AZ: https://vulcet.com/az/services/product-design/)
+- Web Development — https://vulcet.com/services/web-development/ (AZ: https://vulcet.com/az/services/web-development/)
+- Services overview — https://vulcet.com/services/ (AZ: https://vulcet.com/az/services/)
 
 ## Selected work
 
-- FounderClub website case study — https://vulcet.com/work/founderclub/ (live: https://founderclub.az)
-- Anadolu Qida website case study — https://vulcet.com/work/anadolu-qida/ (live: https://anadoluqida.com)
+- FounderClub website case study — https://vulcet.com/work/founderclub/ (AZ: https://vulcet.com/az/work/founderclub/) (live: https://founderclub.az)
+- Anadolu Qida website case study — https://vulcet.com/work/anadolu-qida/ (AZ: https://vulcet.com/az/work/anadolu-qida/) (live: https://anadoluqida.com)
 
 ## Redesign experiments
+
+English only (no Azerbaijani versions yet):
 
 - Kinetic Clarity: unofficial Nike product page redesign — https://vulcet.com/redesigns/kinetic-clarity/ (not client work, not for sale, not affiliated with Nike)
 - Interactive Nike product stage — https://vulcet.com/redesigns/nike/
@@ -35,6 +38,8 @@
 - Human Check — CAPTCHA UX interaction experiment (design concept, not security) — https://vulcet.com/experiments/human-check/
 
 ## Blog / Journal
+
+English only (no Azerbaijani versions yet):
 
 - Journal index — https://vulcet.com/blog/
 - Rethinking CAPTCHA: Can Verification Become Part of the Interaction? (Human Check) — https://vulcet.com/blog/human-check-captcha-alternative/

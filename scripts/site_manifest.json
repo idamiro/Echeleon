@@ -1,11 +1,87 @@
 {
   "base": "https://vulcet.com",
-  "lastmod": "2026-08-28",
+  "lastmod": "2026-08-29",
   "urls": [
-    { "path": "/", "changefreq": "weekly", "priority": "1.0" },
-    { "path": "/work/", "changefreq": "weekly", "priority": "0.9" },
-    { "path": "/work/founderclub/", "changefreq": "monthly", "priority": "0.8" },
-    { "path": "/work/anadolu-qida/", "changefreq": "monthly", "priority": "0.8" },
+    {
+      "path": "/",
+      "changefreq": "weekly",
+      "priority": "1.0",
+      "alternates": [
+        { "lang": "en", "path": "/" },
+        { "lang": "az", "path": "/az/" },
+        { "lang": "x-default", "path": "/" }
+      ]
+    },
+    {
+      "path": "/az/",
+      "changefreq": "weekly",
+      "priority": "1.0",
+      "alternates": [
+        { "lang": "en", "path": "/" },
+        { "lang": "az", "path": "/az/" },
+        { "lang": "x-default", "path": "/" }
+      ]
+    },
+    {
+      "path": "/work/",
+      "changefreq": "weekly",
+      "priority": "0.9",
+      "alternates": [
+        { "lang": "en", "path": "/work/" },
+        { "lang": "az", "path": "/az/work/" },
+        { "lang": "x-default", "path": "/work/" }
+      ]
+    },
+    {
+      "path": "/az/work/",
+      "changefreq": "weekly",
+      "priority": "0.9",
+      "alternates": [
+        { "lang": "en", "path": "/work/" },
+        { "lang": "az", "path": "/az/work/" },
+        { "lang": "x-default", "path": "/work/" }
+      ]
+    },
+    {
+      "path": "/work/founderclub/",
+      "changefreq": "monthly",
+      "priority": "0.8",
+      "alternates": [
+        { "lang": "en", "path": "/work/founderclub/" },
+        { "lang": "az", "path": "/az/work/founderclub/" },
+        { "lang": "x-default", "path": "/work/founderclub/" }
+      ]
+    },
+    {
+      "path": "/az/work/founderclub/",
+      "changefreq": "monthly",
+      "priority": "0.8",
+      "alternates": [
+        { "lang": "en", "path": "/work/founderclub/" },
+        { "lang": "az", "path": "/az/work/founderclub/" },
+        { "lang": "x-default", "path": "/work/founderclub/" }
+      ]
+    },
+    {
+      "path": "/work/anadolu-qida/",
+      "changefreq": "monthly",
+      "priority": "0.8",
+      "alternates": [
+        { "lang": "en", "path": "/work/anadolu-qida/" },
+        { "lang": "az", "path": "/az/work/anadolu-qida/" },
+        { "lang": "x-default", "path": "/work/anadolu-qida/" }
+      ]
+    },
+    {
+      "path": "/az/work/anadolu-qida/",
+      "changefreq": "monthly",
+      "priority": "0.8",
+      "alternates": [
+        { "lang": "en", "path": "/work/anadolu-qida/" },
+        { "lang": "az", "path": "/az/work/anadolu-qida/" },
+        { "lang": "x-default", "path": "/work/anadolu-qida/" }
+      ]
+    },
     { "path": "/redesigns/", "changefreq": "weekly", "priority": "0.8" },
     { "path": "/redesigns/kinetic-clarity/", "changefreq": "monthly", "priority": "0.8" },
     { "path": "/redesigns/nike/", "changefreq": "monthly", "priority": "0.8" },
@@ -13,12 +89,126 @@
     { "path": "/redesigns/case-studio/", "changefreq": "monthly", "priority": "0.8" },
     { "path": "/redesigns/hold/", "changefreq": "monthly", "priority": "0.7" },
     { "path": "/experiments/human-check/", "changefreq": "monthly", "priority": "0.7" },
-    { "path": "/services/", "changefreq": "weekly", "priority": "0.9" },
-    { "path": "/services/brand-strategy/", "changefreq": "monthly", "priority": "0.8" },
-    { "path": "/services/visual-identity/", "changefreq": "monthly", "priority": "0.8" },
-    { "path": "/services/product-design/", "changefreq": "monthly", "priority": "0.7" },
-    { "path": "/services/web-development/", "changefreq": "monthly", "priority": "0.7" },
-    { "path": "/studio/", "changefreq": "monthly", "priority": "0.7" },
+    {
+      "path": "/services/",
+      "changefreq": "weekly",
+      "priority": "0.9",
+      "alternates": [
+        { "lang": "en", "path": "/services/" },
+        { "lang": "az", "path": "/az/services/" },
+        { "lang": "x-default", "path": "/services/" }
+      ]
+    },
+    {
+      "path": "/az/services/",
+      "changefreq": "weekly",
+      "priority": "0.9",
+      "alternates": [
+        { "lang": "en", "path": "/services/" },
+        { "lang": "az", "path": "/az/services/" },
+        { "lang": "x-default", "path": "/services/" }
+      ]
+    },
+    {
+      "path": "/services/brand-strategy/",
+      "changefreq": "monthly",
+      "priority": "0.8",
+      "alternates": [
+        { "lang": "en", "path": "/services/brand-strategy/" },
+        { "lang": "az", "path": "/az/services/brand-strategy/" },
+        { "lang": "x-default", "path": "/services/brand-strategy/" }
+      ]
+    },
+    {
+      "path": "/az/services/brand-strategy/",
+      "changefreq": "monthly",
+      "priority": "0.8",
+      "alternates": [
+        { "lang": "en", "path": "/services/brand-strategy/" },
+        { "lang": "az", "path": "/az/services/brand-strategy/" },
+        { "lang": "x-default", "path": "/services/brand-strategy/" }
+      ]
+    },
+    {
+      "path": "/services/visual-identity/",
+      "changefreq": "monthly",
+      "priority": "0.8",
+      "alternates": [
+        { "lang": "en", "path": "/services/visual-identity/" },
+        { "lang": "az", "path": "/az/services/visual-identity/" },
+        { "lang": "x-default", "path": "/services/visual-identity/" }
+      ]
+    },
+    {
+      "path": "/az/services/visual-identity/",
+      "changefreq": "monthly",
+      "priority": "0.8",
+      "alternates": [
+        { "lang": "en", "path": "/services/visual-identity/" },
+        { "lang": "az", "path": "/az/services/visual-identity/" },
+        { "lang": "x-default", "path": "/services/visual-identity/" }
+      ]
+    },
+    {
+      "path": "/services/product-design/",
+      "changefreq": "monthly",
+      "priority": "0.7",
+      "alternates": [
+        { "lang": "en", "path": "/services/product-design/" },
+        { "lang": "az", "path": "/az/services/product-design/" },
+        { "lang": "x-default", "path": "/services/product-design/" }
+      ]
+    },
+    {
+      "path": "/az/services/product-design/",
+      "changefreq": "monthly",
+      "priority": "0.7",
+      "alternates": [
+        { "lang": "en", "path": "/services/product-design/" },
+        { "lang": "az", "path": "/az/services/product-design/" },
+        { "lang": "x-default", "path": "/services/product-design/" }
+      ]
+    },
+    {
+      "path": "/services/web-development/",
+      "changefreq": "monthly",
+      "priority": "0.7",
+      "alternates": [
+        { "lang": "en", "path": "/services/web-development/" },
+        { "lang": "az", "path": "/az/services/web-development/" },
+        { "lang": "x-default", "path": "/services/web-development/" }
+      ]
+    },
+    {
+      "path": "/az/services/web-development/",
+      "changefreq": "monthly",
+      "priority": "0.7",
+      "alternates": [
+        { "lang": "en", "path": "/services/web-development/" },
+        { "lang": "az", "path": "/az/services/web-development/" },
+        { "lang": "x-default", "path": "/services/web-development/" }
+      ]
+    },
+    {
+      "path": "/studio/",
+      "changefreq": "monthly",
+      "priority": "0.7",
+      "alternates": [
+        { "lang": "en", "path": "/studio/" },
+        { "lang": "az", "path": "/az/studio/" },
+        { "lang": "x-default", "path": "/studio/" }
+      ]
+    },
+    {
+      "path": "/az/studio/",
+      "changefreq": "monthly",
+      "priority": "0.7",
+      "alternates": [
+        { "lang": "en", "path": "/studio/" },
+        { "lang": "az", "path": "/az/studio/" },
+        { "lang": "x-default", "path": "/studio/" }
+      ]
+    },
     { "path": "/blog/", "changefreq": "weekly", "priority": "0.8" },
     { "path": "/blog/human-check-captcha-alternative/", "changefreq": "monthly", "priority": "0.9" },
     { "path": "/blog/your-brand-isnt-outdated-your-system-is/", "changefreq": "monthly", "priority": "0.8" },
@@ -28,8 +218,65 @@
     { "path": "/blog/what-redesign-experiments-teach/", "changefreq": "monthly", "priority": "0.7" },
     { "path": "/blog/business-website-vs-growth-website/", "changefreq": "monthly", "priority": "0.8" },
     { "path": "/blog/when-a-business-website-needs-a-redesign/", "changefreq": "monthly", "priority": "0.8" },
-    { "path": "/contact/", "changefreq": "monthly", "priority": "0.8" },
-    { "path": "/privacy/", "changefreq": "yearly", "priority": "0.3" },
-    { "path": "/site-map/", "changefreq": "monthly", "priority": "0.4" }
+    {
+      "path": "/contact/",
+      "changefreq": "monthly",
+      "priority": "0.8",
+      "alternates": [
+        { "lang": "en", "path": "/contact/" },
+        { "lang": "az", "path": "/az/contact/" },
+        { "lang": "x-default", "path": "/contact/" }
+      ]
+    },
+    {
+      "path": "/az/contact/",
+      "changefreq": "monthly",
+      "priority": "0.8",
+      "alternates": [
+        { "lang": "en", "path": "/contact/" },
+        { "lang": "az", "path": "/az/contact/" },
+        { "lang": "x-default", "path": "/contact/" }
+      ]
+    },
+    {
+      "path": "/privacy/",
+      "changefreq": "yearly",
+      "priority": "0.3",
+      "alternates": [
+        { "lang": "en", "path": "/privacy/" },
+        { "lang": "az", "path": "/az/privacy/" },
+        { "lang": "x-default", "path": "/privacy/" }
+      ]
+    },
+    {
+      "path": "/az/privacy/",
+      "changefreq": "yearly",
+      "priority": "0.3",
+      "alternates": [
+        { "lang": "en", "path": "/privacy/" },
+        { "lang": "az", "path": "/az/privacy/" },
+        { "lang": "x-default", "path": "/privacy/" }
+      ]
+    },
+    {
+      "path": "/site-map/",
+      "changefreq": "monthly",
+      "priority": "0.4",
+      "alternates": [
+        { "lang": "en", "path": "/site-map/" },
+        { "lang": "az", "path": "/az/site-map/" },
+        { "lang": "x-default", "path": "/site-map/" }
+      ]
+    },
+    {
+      "path": "/az/site-map/",
+      "changefreq": "monthly",
+      "priority": "0.4",
+      "alternates": [
+        { "lang": "en", "path": "/site-map/" },
+        { "lang": "az", "path": "/az/site-map/" },
+        { "lang": "x-default", "path": "/site-map/" }
+      ]
+    }
   ]
 }

@@ -13,6 +13,17 @@
   const needSelect = form.querySelector('#contact-need');
   let activeStep = 1;
 
+  const isAz = document.documentElement.lang === 'az';
+  const messages = isAz
+    ? {
+        sending: 'Layihə brifi göndərilir…',
+        error: 'Brif göndərilə bilmədi. Yenidən cəhd edin və ya studio@vulcet.com ünvanına yazın.'
+      }
+    : {
+        sending: 'Sending your project brief…',
+        error: 'The brief could not be sent. Please try again or email studio@vulcet.com.'
+      };
+
   const requestedService = new URLSearchParams(window.location.search).get('service');
   const serviceLabels = {
     'brand-strategy': 'Brand Strategy',
@@ -83,7 +94,7 @@
 
     submitButton.disabled = true;
     submitButton.setAttribute('aria-busy', 'true');
-    status.textContent = 'Sending your project brief…';
+    status.textContent = messages.sending;
 
     try {
       const response = await fetch(form.action, {
@@ -103,7 +114,7 @@
       if (typeof window.gtag === 'function') window.gtag('event', 'generate_lead', { form_name: 'project_brief' });
     } catch (error) {
       status.setAttribute('role', 'alert');
-      status.textContent = 'The brief could not be sent. Please try again or email studio@vulcet.com.';
+      status.textContent = messages.error;
       submitButton.disabled = false;
       submitButton.removeAttribute('aria-busy');
     }

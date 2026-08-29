@@ -157,7 +157,7 @@ def render_footer(
     <div class="footer-signal" aria-hidden="true"><span></span><b></b></div>
     <div class="shell footer-grid">
       <div class="footer-brand"><a class="wordmark" href="{home_href}" aria-label="Vulcet — ana səhifə"><img src="/vulcet-wordmark.png?v={WORDMARK_VER}" alt="Vulcet"></a><p>{FOOTER_TAGLINE}</p>{FOOTER_SOCIAL}</div>
-      <nav class="footer-nav" aria-label="Alt naviqasiya"><div><span>Keçidlər</span>{"".join(navigate)}</div><div><span>Xidmətlər</span>{"".join(services)}</div><div><span>Digər</span><a href="{AZ_PREFIX}/privacy/"{privacy_cur}>Məxfilik</a><a href="{AZ_PREFIX}/site-map/"{sitemap_cur}>Sayt xəritəsi</a><button class="footer-cookie-link" type="button" data-cookie-settings="">Kuki ayarları</button></div></nav>
+      <nav class="footer-nav" aria-label="Alt naviqasiya"><div><span>Naviqasiya</span>{"".join(navigate)}</div><div><span>Xidmətlər</span>{"".join(services)}</div><div><span>Digər</span><a href="{AZ_PREFIX}/privacy/"{privacy_cur}>Məxfilik</a><a href="{AZ_PREFIX}/site-map/"{sitemap_cur}>Sayt xəritəsi</a><button class="footer-cookie-link" type="button" data-cookie-settings="">Kuki ayarları</button></div></nav>
       <div class="footer-contact"><span>Əlaqə</span><a href="mailto:studio@vulcet.com">studio@vulcet.com</a><p>{FOOTER_INTERNATIONAL}</p></div>
       <div class="footer-utility"><small>© <span id="year"></span> Vulcet</small><small>{utility_line2}</small><small>{utility_line3}</small></div>
     </div>
