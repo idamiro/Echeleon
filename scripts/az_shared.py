@@ -126,7 +126,6 @@ def render_header(
     </div>
     <div id="mobile-nav" class="mobile-nav" aria-hidden="true" inert="">
       <nav aria-label="Mobil naviqasiya">{mobile_nav}</nav>
-      <div class="lang-switch lang-switch--mobile" aria-label="Dil"><a class="lang-switch__link" href="{en_href(az_path)}" lang="en" hreflang="en">EN</a><span class="lang-switch__sep" aria-hidden="true">/</span><a class="lang-switch__link is-active" href="{az_canonical(az_path)}" lang="az" hreflang="az" aria-current="page">AZ</a></div>
       {mobile_cta_html}
     </div>
   </header>"""

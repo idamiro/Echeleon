@@ -4342,7 +4342,6 @@ html.nav-open, body.nav-open { overflow: hidden; overscroll-behavior: none; }
   .site-header .menu-trigger {
     display: grid !important;
     flex: 0 0 auto;
-    margin-left: auto;
   }
 
   .hero {

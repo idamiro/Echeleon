@@ -81,14 +81,10 @@ def render_switcher(en_url: str, az_url: str) -> str:
     )
 
 
-def render_mobile_switcher(en_url: str, az_url: str) -> str:
-    return (
-        f'<div class="lang-switch lang-switch--mobile" aria-label="Language">'
-        f'<a class="lang-switch__link is-active" href="{en_url}" lang="en" hreflang="en" aria-current="page">EN</a>'
-        f'<span class="lang-switch__sep" aria-hidden="true">/</span>'
-        f'<a class="lang-switch__link" href="{az_url}" lang="az" hreflang="az">AZ</a>'
-        f"</div>"
-    )
+MOBILE_SWITCHER_RE = re.compile(
+    r'\s*<div class="lang-switch lang-switch--mobile"[^>]*>.*?</div>',
+    re.DOTALL,
+)
 
 
 def patch_html(path: Path) -> bool:
@@ -143,18 +139,7 @@ def patch_html(path: Path) -> bool:
             1,
         )
 
-    mobile_switcher = render_mobile_switcher(en_url, az_url)
-    if 'lang-switch--mobile' not in html:
-        html = html.replace(
-            '</nav>\n      <a class="button button--primary" href="/contact/">Start a project',
-            f'</nav>\n      {mobile_switcher}\n      <a class="button button--primary" href="/contact/">Start a project',
-            1,
-        )
-        html = html.replace(
-            '</nav><a class="button button--primary" href="/contact/">Start a project',
-            f'</nav>{mobile_switcher}<a class="button button--primary" href="/contact/">Start a project',
-            1,
-        )
+    html = MOBILE_SWITCHER_RE.sub("", html)
 
     if key == "index.html" and '"availableLanguage":["English"]' in html:
         html = html.replace(
