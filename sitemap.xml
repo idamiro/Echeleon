@@ -116,12 +116,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://vulcet.com/experiments/windows-11/</loc>
-    <lastmod>2026-08-29</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://vulcet.com/services/</loc>
     <lastmod>2026-08-29</lastmod>
     <changefreq>weekly</changefreq>
