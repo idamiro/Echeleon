@@ -37,18 +37,21 @@
   justify-self: end;
 }
 
-.mobile-nav .lang-switch {
-  margin-bottom: 20px;
-}
-
 @media (max-width: 899px) {
   .header-grid .lang-switch {
-    display: none;
+    display: inline-flex;
+    flex: 0 0 auto;
+    margin-left: auto;
+    grid-column: auto;
+    justify-self: auto;
   }
 }
 
 @media (min-width: 900px) {
-  .mobile-nav .lang-switch {
-    display: none;
+  .site-header .header-grid .lang-switch,
+  .site-header--fixed .header-grid .lang-switch {
+    flex: 0 0 auto;
+    grid-column: auto !important;
+    justify-self: auto;
   }
 }
